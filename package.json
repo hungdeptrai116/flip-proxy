@@ -7,11 +7,11 @@
     "start": "node proxy-server.js"
   },
   "dependencies": {
-    "axios": "^1.6.8",
-    "cheerio": "^1.0.0-rc.12",
+    "axios": "^1.10.0",
+    "bcrypt": "^5.1.1",
+    "cheerio": "^1.1.1",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongoose": "^7.6.1",
-    "bcrypt": "^5.1.1"
+    "mongoose": "^7.6.1"
   }
 }
-
