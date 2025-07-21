@@ -13,6 +13,7 @@ const BOOKS = {
 
 app.use(cors());
 
+// Route to fetch and sanitize HTML
 app.get('/view/:bookId', async (req, res) => {
   const bookId = req.params.bookId;
   const flipUrl = BOOKS[bookId];
@@ -22,15 +23,17 @@ app.get('/view/:bookId', async (req, res) => {
     const response = await axios.get(flipUrl + "/");
     const $ = cheerio.load(response.data);
 
+    // Clean out QR/social
     $('[class*="share"], [class*="Social"], [href*="fliphtml5"]').remove();
     $('[src*="qrcode"], iframe[src*="share"], .qr, .qr-code, .share-btn').remove();
     $('[style*="position:fixed"]').remove();
 
+    // Rewrite static assets
     $('script[src], link[href], iframe[src]').each((_, el) => {
       const attr = el.name === 'link' ? 'href' : 'src';
       const original = $(el).attr(attr);
       if (original && !original.startsWith('http')) {
-        $(el).attr(attr, `/asset/${bookId}${original.startsWith('/') ? '' : '/'}${original}`);
+        $(el).attr(attr, `/${bookId}${original.startsWith('/') ? '' : '/'}${original}`);
       }
     });
 
@@ -43,7 +46,8 @@ app.get('/view/:bookId', async (req, res) => {
   }
 });
 
-app.get('/asset/:bookId/*', async (req, res) => {
+// Fallback route to proxy all asset files that were missed
+app.get('/:bookId/*', async (req, res) => {
   const bookId = req.params.bookId;
   const flipUrl = BOOKS[bookId];
   if (!flipUrl) return res.status(404).send("Sách không tồn tại");
@@ -65,5 +69,5 @@ app.get('/asset/:bookId/*', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`); // 🔥 Render sẽ nhận log này để coi là 'live'
+  console.log(`Server is listening on port ${PORT}`);
 });
