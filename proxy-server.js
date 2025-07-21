@@ -32,8 +32,9 @@ app.get('/view/:bookId', async (req, res) => {
       const attr = el.name === 'link' ? 'href' : 'src';
       const original = $(el).attr(attr);
       if (original && !original.startsWith('http')) {
-        $(el).attr(attr, `/asset/${bookId}${original.startsWith('/') ? '' : '/'}${original}`);
-      }
+  const cleanPath = original.startsWith('/') ? original : '/' + original;
+  $(el).attr(attr, `/asset/${bookId}${cleanPath}`);
+}
     });
 
     // Thêm thông báo
