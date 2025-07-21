@@ -1,17 +1,14 @@
 {
-  "name": "secure-flipbook",
+  "name": "flip-proxy",
   "version": "1.0.0",
-  "description": "Proxy server to serve protected FlipHTML5 books",
   "main": "proxy-server.js",
   "scripts": {
     "start": "node proxy-server.js"
   },
   "dependencies": {
-    "axios": "^1.10.0",
-    "bcrypt": "^5.1.1",
-    "cheerio": "^1.1.1",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "mongoose": "^7.6.1"
+    "express": "^4.18.2"
   }
 }
