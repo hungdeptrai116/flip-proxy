@@ -13,12 +13,10 @@ const BOOKS = {
   toan: 'https://online.fliphtml5.com/ickgb/divg'
 };
 
-// Giao diện chính
 app.get('/', (req, res) => {
-  res.send('FlipHTML5 Proxy đang chạy');
+  res.send('🛡️ FlipHTML5 Secure Proxy đang hoạt động!');
 });
 
-// Proxy trang HTML chính
 app.get('/view/:bookId', async (req, res) => {
   const bookId = req.params.bookId;
   const flipUrl = BOOKS[bookId];
@@ -28,58 +26,54 @@ app.get('/view/:bookId', async (req, res) => {
     const response = await axios.get(flipUrl + '/');
     const $ = cheerio.load(response.data);
 
-    // Xóa QR, nút chia sẻ, đường dẫn về fliphtml5
-    $('[class*="share"], [class*="Social"], [href*="fliphtml5"]').remove();
-    $('[src*="qrcode"], iframe[src*="share"], .qr, .qr-code, .share-btn').remove();
+    // Xóa QR code, share, footer
+    $('[class*="share"], [class*="Social"], [href*="fliphtml5"], iframe[src*="share"]').remove();
+    $('[src*="qrcode"], .qr, .qr-code').remove();
     $('[style*="position:fixed"]').remove();
 
-    // Fix đường dẫn tài nguyên
+    // Fix src/href → chuyển về proxy
     $('script[src], link[href], iframe[src]').each((_, el) => {
       const attr = el.name === 'link' ? 'href' : 'src';
       const original = $(el).attr(attr);
       if (original && !original.startsWith('http')) {
-        const cleanPath = original.startsWith('/') ? original : '/' + original;
-        $(el).attr(attr, `/asset/${bookId}${cleanPath}`);
+        const clean = original.startsWith('/') ? original : '/' + original;
+        $(el).attr(attr, `/asset/${bookId}${clean}`);
       }
     });
 
-    // Thêm dòng thông báo
+    // Banner an toàn
     $('body').prepend(`
-      <div style="position:fixed;top:10px;left:10px;background:#111;color:#fff;padding:4px 8px;z-index:9999;font-size:12px;">
-        Đang xem sách trong môi trường an toàn 🛡️
+      <div style="position:fixed;top:10px;left:10px;background:#000;color:#fff;padding:5px 10px;z-index:9999;font-size:13px;">
+        📖 Bạn đang đọc sách trong môi trường an toàn
       </div>
     `);
 
     res.send($.html());
   } catch (err) {
-    console.error("❌ Proxy fetch failed:", err);
-    res.status(500).send("Lỗi khi tải sách.");
+    console.error('❌ Lỗi lấy nội dung sách:', err.message);
+    res.status(500).send("Lỗi tải sách.");
   }
 });
 
-// Proxy tài nguyên tĩnh
 app.get('/asset/:bookId/*', async (req, res) => {
   const bookId = req.params.bookId;
   const flipUrl = BOOKS[bookId];
   if (!flipUrl) return res.status(404).send("Sách không tồn tại");
 
-  const assetPath = req.params[0];
-  const targetUrl = `${flipUrl}/${assetPath}`;
+  const path = req.params[0];
+  const target = `${flipUrl}/${path}`;
   try {
-    const response = await axios.get(targetUrl, { responseType: 'arraybuffer' });
-
-    Object.entries(response.headers).forEach(([key, value]) => {
+    const response = await axios.get(target, { responseType: 'arraybuffer' });
+    for (const [key, value] of Object.entries(response.headers)) {
       res.setHeader(key, value);
-    });
-
+    }
     res.send(response.data);
   } catch (err) {
-    console.error(`❌ Failed to proxy asset: ${targetUrl}`, err.message);
+    console.error(`❌ Asset không tải được: ${target}`, err.message);
     res.status(404).send("Không tìm thấy tài nguyên.");
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Proxy server is running at http://localhost:${PORT}`);
+  console.log(`✅ Proxy đang chạy tại http://localhost:${PORT}`);
 });
-
