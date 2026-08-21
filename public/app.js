@@ -8,6 +8,7 @@
 
 /* ---------- Khoá lưu trữ ---------- */
 const K_USER = 'promax_user', K_EXAMS = 'promax_exams', K_HISTORY = 'promax_history';
+const K_TOKEN = 'promax_token';
 
 /* ---------- Tiện ích DOM ---------- */
 function h(tag, attrs, children) {
@@ -89,6 +90,60 @@ function load(key, fallback) {
 function save(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); }
   catch (e) { toast('Không lưu được dữ liệu (bộ nhớ trình duyệt đã đầy)', 'error'); }
+}
+
+
+/* =========================================================================
+   GIAO TIẾP VỚI MÁY CHỦ
+   Có máy chủ  -> kho đề dùng chung cho cả lớp, học sinh nộp kết quả về cho GV.
+   Không có    -> chạy hoàn toàn trong máy (mở file lms.html trực tiếp, hoặc mất mạng).
+   ========================================================================= */
+const server = { on: false, persistent: false, token: load(K_TOKEN, '') };
+
+async function apiFetch(path, opts) {
+  const o = Object.assign({ headers: {} }, opts || {});
+  if (server.token) o.headers['Authorization'] = 'Bearer ' + server.token;
+  if (o.body !== undefined && typeof o.body !== 'string') {
+    o.headers['Content-Type'] = 'application/json';
+    o.body = JSON.stringify(o.body);
+  }
+  const res = await fetch('api/' + path, o);
+  let data = null;
+  try { data = await res.json(); } catch (e) { data = null; }
+  if (!res.ok) {
+    const err = new Error((data && data.error) || ('Máy chủ báo lỗi ' + res.status));
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+/* Token hết hiệu lực (đổi mật khẩu, máy chủ khởi động lại...) -> bắt đăng nhập lại */
+function handleAuthError(err) {
+  if (err && err.status === 401) {
+    server.token = '';
+    save(K_TOKEN, '');
+    localStorage.removeItem(K_USER);
+    state.user = null;
+    render();
+    toast('Phiên đăng nhập đã hết hạn, mời đăng nhập lại', 'error');
+    return true;
+  }
+  return false;
+}
+
+/* Đẩy toàn bộ kho đề lên máy chủ. Trả về true nếu đã lưu được. */
+async function pushExams() {
+  if (!server.on) { saveExams(); return true; }
+  try {
+    await apiFetch('exams', { method: 'PUT', body: { exams: state.exams } });
+    saveExams();                            // giữ một bản trong máy để lỡ mất mạng vẫn xem được
+    return true;
+  } catch (err) {
+    if (handleAuthError(err)) return false;
+    toast('Không lưu được lên máy chủ: ' + err.message, 'error');
+    return false;
+  }
 }
 
 /* =========================================================================
@@ -290,6 +345,7 @@ const TITLES = {
   dashboard: function () { return state.user.role === 'teacher' ? 'Bảng điều khiển' : 'Danh sách đề thi'; },
   edit: function () { return state.draft && state.draft.id ? 'Sửa đề thi' : 'Soạn đề thi mới'; },
   bulk: function () { return 'Tự động nhận diện từ file'; },
+  results: function () { return state.user.role === 'teacher' ? 'Kết quả học sinh nộp về' : 'Kết quả & lịch sử'; },
   exam: function () { return 'Đang làm bài'; },
   result: function () { return 'Kết quả & lịch sử'; },
   review: function () { return 'Xem lại bài làm'; }
@@ -298,7 +354,8 @@ const TITLES = {
 function sidebar() {
   const menu = state.user.role === 'teacher'
     ? [{ id: 'dashboard', icon: '📊', label: 'Bảng điều khiển' },
-       { id: 'bulk', icon: '⚡', label: 'Nhận diện từ file' }]
+       { id: 'bulk', icon: '⚡', label: 'Nhận diện từ file' }].concat(
+         server.on ? [{ id: 'results', icon: '📋', label: 'Kết quả học sinh' }] : [])
     : [{ id: 'dashboard', icon: '📚', label: 'Đề thi' },
        { id: 'result', icon: '🏆', label: 'Lịch sử & kết quả' }];
 
@@ -361,31 +418,63 @@ function viewLogin() {
   const tabStudent = h('button', { type: 'button', class: 'tab active' }, '🎓 Học sinh');
   const tabTeacher = h('button', { type: 'button', class: 'tab' }, '👨‍🏫 Giáo viên');
 
-  tabStudent.addEventListener('click', function () {
-    role = 'student'; tabStudent.className = 'tab active'; tabTeacher.className = 'tab';
-    nameInput.placeholder = 'Nhập tên của bạn';
-  });
-  tabTeacher.addEventListener('click', function () {
-    role = 'teacher'; tabTeacher.className = 'tab active'; tabStudent.className = 'tab';
-    nameInput.placeholder = 'Tên giáo viên';
-  });
+  const passInput = h('input', { class: 'input', type: 'password', placeholder: 'Mật khẩu giáo viên', style: 'margin-top:10px' });
+  const passWrap = h('div', { class: 'hidden' }, [passInput]);
+  const submitBtn = h('button', { class: 'btn btn-primary btn-block', type: 'submit' }, 'Vào hệ thống');
+
+  function setRole(r) {
+    role = r;
+    const teacher = r === 'teacher';
+    tabTeacher.className = teacher ? 'tab active' : 'tab';
+    tabStudent.className = teacher ? 'tab' : 'tab active';
+    nameInput.placeholder = teacher ? 'Tên giáo viên' : 'Nhập tên của bạn';
+    passWrap.className = teacher && server.on ? '' : 'hidden';
+  }
+  tabStudent.addEventListener('click', function () { setRole('student'); });
+  tabTeacher.addEventListener('click', function () { setRole('teacher'); });
 
   const form = h('form', {
-    onsubmit: function (e) {
+    onsubmit: async function (e) {
       e.preventDefault();
       const name = nameInput.value.trim();
       if (!name) { toast('Vui lòng nhập tên!', 'error'); nameInput.focus(); return; }
+
+      if (role === 'teacher' && server.on) {
+        if (!passInput.value) { toast('Nhập mật khẩu giáo viên', 'error'); passInput.focus(); return; }
+        submitBtn.disabled = true;
+        try {
+          const res = await apiFetch('login', { method: 'POST', body: { password: passInput.value } });
+          server.token = res.token;
+          save(K_TOKEN, server.token);
+        } catch (err) {
+          submitBtn.disabled = false;
+          toast(err.message, 'error');
+          passInput.value = '';
+          passInput.focus();
+          return;
+        }
+        submitBtn.disabled = false;
+      }
+
       state.user = { role: role, name: name };
       save(K_USER, state.user);
       state.view = 'dashboard';
       render();
       toast('Xin chào ' + name + '!');
+      if (server.on) {
+        apiFetch('exams').then(function (list) {
+          state.exams = Array.isArray(list) ? list : [];
+          saveExams();
+          render();
+        }).catch(function () {});
+      }
     }
   }, [
     h('div', { class: 'tabs' }, [tabStudent, tabTeacher]),
     nameInput,
+    passWrap,
     h('div', { style: 'height:12px' }),
-    h('button', { class: 'btn btn-primary btn-block', type: 'submit' }, 'Vào hệ thống')
+    submitBtn
   ]);
 
   return h('div', { class: 'login-wrap' }, [
@@ -395,7 +484,9 @@ function viewLogin() {
         h('h1', { style: 'font-size:22px', text: 'LMS ProMax' }),
         h('p', { class: 'muted', text: 'Hệ thống luyện thi thông minh' })
       ]),
-      form
+      form,
+      h('p', { class: 'muted', style: 'text-align:center;margin:14px 0 0;font-size:12px',
+        text: server.on ? 'Đề thi lấy từ máy chủ của lớp' : 'Đang chạy trong máy, dữ liệu lưu tại trình duyệt này' })
     ])
   ]);
 }
@@ -439,8 +530,13 @@ function importData(ev) {
         };
       });
       if (!confirm('Thay thế toàn bộ ' + state.exams.length + ' đề hiện có bằng ' + clean.length + ' đề trong file?')) return;
-      state.exams = clean; saveExams(); render();
-      toast('Đã phục hồi ' + clean.length + ' đề thi');
+      const backup = state.exams.slice();
+      state.exams = clean;
+      pushExams().then(function (okSaved) {
+        if (!okSaved) state.exams = backup;
+        render();
+        if (okSaved) toast('Đã phục hồi ' + clean.length + ' đề thi');
+      });
     } catch (err) { toast('File này không phải bản sao lưu của LMS ProMax (cần file .json xuất từ nút "Sao lưu")', 'error'); }
   };
   reader.readAsText(file);
@@ -453,7 +549,68 @@ function importData(ev) {
 function teacherView() {
   if (state.view === 'edit') return viewExamForm();
   if (state.view === 'bulk') return viewBulk();
+  if (state.view === 'results') return viewTeacherResults();
   return viewTeacherDashboard();
+}
+
+/* Bảng điểm học sinh nộp về, kèm nút tải Excel */
+function viewTeacherResults() {
+  const box = h('div', {}, [h('p', { class: 'muted', text: 'Đang tải kết quả...' })]);
+
+  function draw(rows) {
+    box.textContent = '';
+    const head = h('div', { class: 'row', style: 'margin-bottom:14px' }, [
+      h('h2', { style: 'font-size:16px', text: 'Tổng cộng ' + rows.length + ' lượt làm bài' }),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn btn-ghost btn-sm', onclick: function () { go('results'); } }, '🔄 Tải lại'),
+      h('button', {
+        class: 'btn btn-ok btn-sm', disabled: !rows.length,
+        onclick: function () { window.location.href = 'api/results.xlsx?token=' + encodeURIComponent(server.token); }
+      }, '⬇️ Tải Excel'),
+      h('button', {
+        class: 'btn btn-danger-ghost btn-sm', disabled: !rows.length,
+        onclick: async function () {
+          if (!confirm('Xoá toàn bộ ' + rows.length + ' kết quả? Nên tải Excel về trước khi xoá.')) return;
+          try { await apiFetch('results', { method: 'DELETE' }); go('results'); toast('Đã xoá toàn bộ kết quả'); }
+          catch (err) { if (!handleAuthError(err)) toast(err.message, 'error'); }
+        }
+      }, 'Xoá tất cả')
+    ]);
+
+    const table = h('div', { class: 'card' }, [head]);
+    if (!rows.length) {
+      table.appendChild(h('p', { class: 'empty', text: 'Chưa có học sinh nào nộp bài.' }));
+    } else {
+      table.appendChild(h('div', { class: 'row', style: 'font-size:12px;font-weight:700;color:var(--muted);padding:0 14px 6px' }, [
+        h('span', { style: 'flex:2', text: 'HỌC SINH' }),
+        h('span', { style: 'flex:3', text: 'ĐỀ THI' }),
+        h('span', { style: 'flex:1;text-align:center', text: 'ĐIỂM' }),
+        h('span', { style: 'flex:1;text-align:right', text: 'NỘP LÚC' })
+      ]));
+      rows.forEach(function (r) {
+        table.appendChild(h('div', { class: 'exam-row', style: 'gap:8px' }, [
+          h('span', { style: 'flex:2;font-weight:600;min-width:0', text: r.student }),
+          h('span', { style: 'flex:3;min-width:0', class: 'muted', text: r.examTitle + ' · ' + (r.mode === 'exam' ? 'Thi thử' : 'Luyện tập') }),
+          h('span', { style: 'flex:1;text-align:center;font-weight:700;color:' + (r.percent >= 80 ? 'var(--ok)' : r.percent >= 50 ? '#2563eb' : 'var(--bad)'),
+            text: r.score + '/' + r.total }),
+          h('span', { style: 'flex:1;text-align:right', class: 'muted',
+            text: new Date(r.at).toLocaleString('vi-VN') })
+        ]));
+      });
+    }
+    box.appendChild(table);
+    box.appendChild(h('p', { class: 'muted', style: 'margin-top:10px;font-size:12px',
+      text: 'Điểm do máy của học sinh tự chấm rồi gửi về, phù hợp để theo dõi việc luyện tập ở nhà.' }));
+  }
+
+  apiFetch('results')
+    .then(draw)
+    .catch(function (err) {
+      if (handleAuthError(err)) return;
+      box.textContent = '';
+      box.appendChild(h('p', { class: 'empty', text: 'Không tải được kết quả: ' + err.message }));
+    });
+  return box;
 }
 
 function newDraft() {
@@ -463,6 +620,13 @@ function newDraft() {
 
 function viewTeacherDashboard() {
   const totalQ = state.exams.reduce(function (s, e) { return s + e.questions.length; }, 0);
+  const warn = server.on && !server.persistent
+    ? h('div', { class: 'note', style: 'background:#fef3c7' }, [
+        h('b', { style: 'color:#b45309', text: '⚠️ Dữ liệu trên máy chủ chưa được lưu lâu dài' }),
+        h('p', { style: 'margin:6px 0 0' }, 'Đề thi và kết quả có thể mất khi máy chủ khởi động lại. ' +
+          'Hãy đặt biến môi trường MONGODB_URI trên Render, hoặc bấm "⬇️ Sao lưu" thường xuyên.')
+      ])
+    : null;
   const rows = state.exams.length
     ? state.exams.map(function (exam) {
         return h('div', { class: 'exam-row' }, [
@@ -476,8 +640,13 @@ function viewTeacherDashboard() {
             } }, 'Sửa'),
             h('button', { class: 'btn btn-danger-ghost btn-sm', onclick: function () {
               if (!confirm('Xoá đề "' + exam.title + '"?')) return;
+              const backup = state.exams.slice();
               state.exams = state.exams.filter(function (e) { return e.id !== exam.id; });
-              saveExams(); render(); toast('Đã xoá đề thi');
+              pushExams().then(function (okSaved) {
+                if (!okSaved) state.exams = backup;
+                render();
+                if (okSaved) toast('Đã xoá đề thi');
+              });
             } }, 'Xoá')
           ])
         ]);
@@ -485,6 +654,7 @@ function viewTeacherDashboard() {
     : [h('p', { class: 'empty', text: 'Chưa có đề nào. Bấm "Nhận diện từ file" để tải đề lên.' })];
 
   return h('div', {}, [
+    warn,
     h('div', { class: 'grid grid-3', style: 'margin-bottom:20px' }, [
       h('div', { class: 'card' }, [h('div', { class: 'stat-label', text: 'Tổng số đề thi' }), h('div', { class: 'stat-value', style: 'color:var(--brand)', text: state.exams.length })]),
       h('div', { class: 'card' }, [h('div', { class: 'stat-label', text: 'Tổng số câu hỏi' }), h('div', { class: 'stat-value', style: 'color:var(--ok)', text: totalQ })]),
@@ -602,11 +772,16 @@ function saveDraft() {
     })
   };
   const i = state.exams.findIndex(function (e) { return e.id === exam.id; });
+  const backup = state.exams.slice();
   if (i >= 0) state.exams[i] = exam; else state.exams.unshift(exam);
-  saveExams();
-  state.draft = null;
-  go('dashboard');
-  toast('Đã lưu "' + exam.title + '" (' + exam.questions.length + ' câu)');
+
+  pushExams().then(function (okSaved) {
+    if (!okSaved) { state.exams = backup; render(); return; }
+    state.draft = null;
+    go('dashboard');
+    toast('Đã lưu "' + exam.title + '" (' + exam.questions.length + ' câu)' +
+      (server.on ? ' - học sinh vào là thấy ngay' : ''));
+  });
 }
 
 /* =========================================================================
@@ -889,6 +1064,15 @@ function finishExam(timedOut) {
   state.run = null;
   go('result');
   toast(timedOut ? 'Hết giờ! Bài đã được nộp tự động.' : 'Nộp bài thành công!', timedOut ? 'info' : 'success');
+
+  if (server.on) {
+    apiFetch('results', { method: 'POST', body: {
+      student: state.user.name, examTitle: result.examTitle, mode: result.mode,
+      score: result.score, total: result.total, timeSpent: result.timeSpent
+    } }).catch(function () {
+      toast('Không gửi được kết quả về cho giáo viên (kiểm tra mạng)', 'error');
+    });
+  }
 }
 
 function viewResult() {
@@ -966,7 +1150,47 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 /* để kiểm thử tự động */
-window.__lms = { parseExam: parseExam, buildAttempt: buildAttempt, scoreAttempt: scoreAttempt, state: state, render: render };
+window.__lms = { parseExam: parseExam, buildAttempt: buildAttempt, scoreAttempt: scoreAttempt,
+                 state: state, render: render, server: server };
 
-render();
+/* Dò xem có máy chủ không. Có thì lấy kho đề chung của lớp, không thì chạy
+   hoàn toàn trong máy như khi mở thẳng file lms.html. */
+async function boot() {
+  render();                                   // vẽ ngay bằng dữ liệu trong máy cho đỡ chớp trắng
+  try {
+    const health = await apiFetch('health');
+    server.on = !!health.ok;
+    server.persistent = !!health.persistent;
+  } catch (e) {
+    server.on = false;
+  }
+  if (!server.on) { render(); return; }
+
+  /* Đang là giáo viên nhưng token không còn giá trị (đổi mật khẩu, xoá dữ liệu
+     trình duyệt...) -> bắt đăng nhập lại ngay, đừng để bấm Lưu mới báo lỗi. */
+  if (state.user && state.user.role === 'teacher') {
+    try {
+      await apiFetch('results');
+    } catch (err) {
+      if (err.status === 401) {
+        server.token = ''; save(K_TOKEN, '');
+        localStorage.removeItem(K_USER);
+        state.user = null;
+      }
+    }
+  }
+
+  /* Có máy chủ thì kho đề trên đó là nguồn duy nhất: trống nghĩa là trống,
+     không tự chèn đề minh hoạ để tránh vô tình đăng đề demo cho cả lớp. */
+  try {
+    const list = await apiFetch('exams');
+    state.exams = Array.isArray(list) ? list : [];
+    saveExams();                              // lưu tạm để lỡ mất mạng vẫn ôn được
+  } catch (err) {
+    toast('Không lấy được đề từ máy chủ, đang dùng bản lưu trong máy', 'error');
+  }
+  render();
+}
+
+boot();
 })();

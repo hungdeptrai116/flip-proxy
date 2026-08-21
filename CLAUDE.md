@@ -6,11 +6,14 @@ Guidance for AI assistants working in this repository.
 
 Two things share this repo:
 
-1. **LMS ProMax** (`public/`) — a browser-side quiz/exam system in Vietnamese.
+1. **LMS ProMax** (`public/` + `server/`) — a quiz/exam system in Vietnamese.
    Teachers import an exam from PDF/DOCX/TXT (or paste it), the app parses
    questions, options, answer keys and explanations; students take it in
-   practice or timed-exam mode with scoring, history and review. All data lives
-   in the visitor's own `localStorage`; there is no backend for it.
+   practice or timed-exam mode with scoring, history and review. When the API
+   is reachable the exam bank is **shared server-side** (one teacher password,
+   students need none) and finished attempts are posted back for the teacher to
+   read and export to Excel. With no server (opening `lms.html` off disk) the
+   app falls back to a fully local `localStorage`-only mode.
 2. **flip-proxy** (`proxy-server.js`) — the original Express service that
    proxies third-party flipbook viewers (currently **flipbookpdf.net**) so
    readers get the book without the original site's share buttons, QR codes and
@@ -22,10 +25,14 @@ serves `public/` so `npm start` is all that's needed to use the LMS.
 ## Layout
 
 ```
-proxy-server.js         Express: static hosting for public/ + the /view/:bookId proxy
+proxy-server.js         Express bootstrap: proxy route, store + API wiring, static hosting
+server/api.js           /api router: login, exams, results, results.xlsx
+server/store.js         data layer, two backends: file (data/db.json) and MongoDB
+server/xlsx.js          dependency-free .xlsx writer (a ZIP of XML, built with zlib)
 public/lms.html         LMS page shell + all CSS (hand-written, no framework)
-public/app.js           the whole LMS: parser, state, views (~700 lines, plain ES5-ish JS)
+public/app.js           the whole LMS client: API layer, parser, state, views
 public/vendor/          KaTeX, pdf.js, mammoth vendored from npm (~2.6 MB, offline-ready)
+data/                   runtime data, gitignored — created on first save
 README.md               end-user instructions, in Vietnamese
 package.json            deps and the single `start` script
 package-lock.json       STALE — see "Known rough edges"
@@ -35,9 +42,11 @@ node_modules/           committed to git (~3.6k files) — see "Known rough edge
 ## Commands
 
 ```bash
-npm install          # only needed if node_modules is missing/stale
-npm start            # = node proxy-server.js
-PORT=3000 npm start  # override the port (defaults to 10000)
+npm install                              # only needed if node_modules is missing/stale
+npm start                                # = node proxy-server.js
+PORT=3000 npm start                      # override the port (defaults to 10000)
+TEACHER_PASSWORD=secret npm start        # fixed teacher password (else a random one is logged)
+MONGODB_URI='mongodb+srv://...' npm start  # persistent store instead of data/db.json
 ```
 
 Then open <http://localhost:10000> for the LMS. Opening `public/lms.html`
@@ -77,6 +86,11 @@ data → state → view functions → boot.
 - **`buildAttempt(exam)`** shuffles questions *and* options, remapping
   `correct` through the new option order. Any question with a blank option is
   left unshuffled.
+- **`server`** (module-level) holds `{on, persistent, token}`. `boot()` probes
+  `GET api/health`: reachable → the server's exam list is the single source of
+  truth (empty means empty; the demo exam is *not* pushed silently);
+  unreachable → local-only mode. `pushExams()` is the one write path — it
+  optimistically updates `state.exams`, PUTs, and rolls back on failure.
 - **State** is one module-level `state` object; `render()` rebuilds the view.
   The exam timer is a single `setInterval` that mutates `state.run` and patches
   `#clock` in place, so no re-render happens per second and the submitted
@@ -86,16 +100,40 @@ data → state → view functions → boot.
 
 Data keys in `localStorage`: `promax_user`, `promax_exams`, `promax_history`.
 
+## Architecture — API (`server/`)
+
+- **`store.js`** picks a backend at boot: MongoDB when `MONGODB_URI` is set,
+  otherwise a JSON file at `data/db.json`. Both expose the same async interface
+  (`getExams/setExams/addResult/getResults/clearResults`) plus `kind` and
+  `persistent`. A failing Mongo connection logs in Vietnamese and **falls back
+  to the file store** rather than killing the process — the class stays online.
+- **`api.js`** mounts at `/api`. `GET /health`, `GET /exams` and `POST /results`
+  are public; `PUT /exams`, `GET /results`, `DELETE /results` and
+  `GET /results.xlsx` require the teacher token. The token is
+  `sha256('lms-promax:' + password)`, so it survives restarts without any
+  session store; `POST /login` trades the password for it and locks an IP out
+  for 10 minutes after 8 failures. Everything from the browser goes through
+  `sanitizeExams` / `clean` / `int` before it is stored — never trust the client.
+- **`xlsx.js`** writes a real `.xlsx` (verified by reading it back with
+  SheetJS) with no dependency: `zlib.deflateRawSync` plus hand-built ZIP local
+  headers, central directory and a `sheet1.xml` using inline strings.
+
+Known limits, stated in the README rather than hidden: exam answers are in the
+public `GET /api/exams` payload, and scoring happens in the browser, so results
+are self-reported. Fine for homework practice, not for a graded exam. Fixing it
+means server-side grading plus stripping `correct` in exam mode.
+
 ## Architecture — proxy (`proxy-server.js`)
 
 In order:
 
 1. **Middleware** — `cors()` (fully open) and `express.json()`.
 2. **Static hosting** — `express.static(public/)` plus `GET /` sending
-   `public/lms.html`, so `npm start` serves the LMS.
-3. **`BOOKS` registry** (`proxy-server.js:19`) — a hardcoded map of
+   `public/lms.html`, so `npm start` serves the LMS. Mounted inside `start()`
+   *after* the `/api` router, because the store has to be created first.
+3. **`BOOKS` registry** — a hardcoded map of
    `bookId → upstream viewer URL`. Today it holds a single entry, `toan`.
-4. **`GET /view/:bookId`** (`proxy-server.js:24`) — the proxy route:
+4. **`GET /view/:bookId`** — the proxy route:
    - Looks up `BOOKS[bookId]`; unknown id → `404`.
    - `axios.get(flipUrl)` fetches the upstream HTML.
    - `cheerio` loads it and strips elements matching
@@ -163,7 +201,15 @@ elsewhere, that is a design change worth raising, not a silent refactor.
 Deployed on **Render** as a web service. `npm start` is the start command and
 Render injects `PORT` (hence the `10000` default, and why several commits in
 history are about making the startup log detectable by Render). There is no
-`render.yaml` in the repo — the service is configured in Render's dashboard.
+`render.yaml` in the repo — the service is configured in Render's dashboard,
+including the two environment variables that matter: `TEACHER_PASSWORD` and
+`MONGODB_URI`.
+
+Render's free tier has **no persistent disk and spins down after 15 minutes of
+inactivity**, so the file store loses everything on the next wake-up. That is
+why `MONGODB_URI` is not optional in practice, why `/api/health` reports
+`persistent`, and why the teacher dashboard shows a yellow warning when it is
+false. Do not "simplify" that warning away. README.md has the end-user steps.
 
 ## Known rough edges
 
@@ -186,10 +232,13 @@ relevant to the change at hand:
 - **CORS is wide open** and the proxy will fetch and return upstream HTML for
   any registered book. Fine for the intended use, worth mentioning if the
   service is ever exposed more broadly.
-- **LMS data is per-browser.** Exams and history live in `localStorage`, so a
-  teacher's exams are invisible to a student on another machine; the JSON
-  backup/restore buttons are the only transfer mechanism. Adding a real
-  backend is a design change worth raising, not a silent refactor.
+- **Two data locations, on purpose.** The shared exam bank and submitted
+  results live server-side; each student's own attempt history stays in their
+  `localStorage` and is never uploaded. Opening `lms.html` off disk drops back
+  to fully local mode. When changing storage, keep both paths working.
+- **Results are self-reported.** The browser grades the attempt and POSTs the
+  score, and `GET /api/exams` includes the answer keys. Do not describe the
+  system as exam-proctoring; see the note under "Architecture — API".
 - **`public/vendor/` is vendored on purpose** (~2.6 MB: KaTeX + fonts, pdf.js +
   its worker, mammoth). It is what makes `file://` and offline use work. Do not
   swap it back to CDN tags to save repo size.
