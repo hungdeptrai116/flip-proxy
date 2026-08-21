@@ -2,12 +2,17 @@ const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
+
+// Giao diện LMS ProMax (thư mục public) - mở http://localhost:PORT là dùng được ngay
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'lms.html')));
 
 // Danh sách sách
 const BOOKS = {
@@ -45,4 +50,5 @@ app.get('/view/:bookId', async (req, res) => {
 // Khởi động server
 app.listen(PORT, () => {
   console.log(`✅ Proxy server đang chạy tại cổng ${PORT}`);
+  console.log(`📚 Mở trình duyệt: http://localhost:${PORT}`);
 });

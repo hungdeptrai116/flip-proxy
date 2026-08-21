@@ -4,21 +4,32 @@ Guidance for AI assistants working in this repository.
 
 ## What this project is
 
-`flip-proxy` is a single-file Node.js/Express service that proxies third-party
-flipbook viewers (currently **flipbookpdf.net**) so readers can view a book
-without the original site's share buttons, QR codes and branding, and without
-being handed the upstream URL.
+Two things share this repo:
 
-The whole application is `proxy-server.js` (~48 lines). There is no framework
-scaffolding, no build step, no test suite, no linter and no CI.
+1. **LMS ProMax** (`public/`) — a browser-side quiz/exam system in Vietnamese.
+   Teachers import an exam from PDF/DOCX/TXT (or paste it), the app parses
+   questions, options, answer keys and explanations; students take it in
+   practice or timed-exam mode with scoring, history and review. All data lives
+   in the visitor's own `localStorage`; there is no backend for it.
+2. **flip-proxy** (`proxy-server.js`) — the original Express service that
+   proxies third-party flipbook viewers (currently **flipbookpdf.net**) so
+   readers get the book without the original site's share buttons, QR codes and
+   branding, and without being handed the upstream URL.
+
+There is no build step, no bundler, no linter and no CI. `proxy-server.js` also
+serves `public/` so `npm start` is all that's needed to use the LMS.
 
 ## Layout
 
 ```
-proxy-server.js      the entire application (routes + book registry + startup)
-package.json         deps and the single `start` script
-package-lock.json    STALE — see "Known rough edges"
-node_modules/        committed to git (~3.6k files) — see "Known rough edges"
+proxy-server.js         Express: static hosting for public/ + the /view/:bookId proxy
+public/lms.html         LMS page shell + all CSS (hand-written, no framework)
+public/app.js           the whole LMS: parser, state, views (~700 lines, plain ES5-ish JS)
+public/vendor/          KaTeX, pdf.js, mammoth vendored from npm (~2.6 MB, offline-ready)
+README.md               end-user instructions, in Vietnamese
+package.json            deps and the single `start` script
+package-lock.json       STALE — see "Known rough edges"
+node_modules/           committed to git (~3.6k files) — see "Known rough edges"
 ```
 
 ## Commands
@@ -29,10 +40,15 @@ npm start            # = node proxy-server.js
 PORT=3000 npm start  # override the port (defaults to 10000)
 ```
 
+Then open <http://localhost:10000> for the LMS. Opening `public/lms.html`
+directly off disk (`file://`) also works — verified, including PDF import —
+because nothing loads from a CDN.
+
 Smoke test without touching the network:
 
 ```bash
-curl -i http://localhost:10000/view/nope   # → 404 "Không tìm thấy sách"
+curl -i http://localhost:10000/view/nope        # → 404 "Không tìm thấy sách"
+curl -sI http://localhost:10000/ | head -1      # → 200, the LMS page
 ```
 
 `/view/toan` performs a real outbound HTTPS request to flipbookpdf.net. In
@@ -42,14 +58,44 @@ status error logged — that is an environment limitation, not a code bug.
 Verify startup and the 404 branch locally; do not "fix" the 500 by changing
 error handling unless the failure reproduces with real network access.
 
-## Architecture
+## Architecture — LMS (`public/app.js`)
 
-`proxy-server.js`, in order:
+One IIFE, no framework. Order inside the file: DOM helpers → parser → default
+data → state → view functions → boot.
+
+- **`h(tag, attrs, children)`** builds DOM nodes. `attrs.math` routes text
+  through `renderMath`, which splits on `$...$` and hands only the math to
+  KaTeX; every other character goes through `createTextNode`. **Never render
+  exam content with `innerHTML`** — imported JSON is untrusted and this is what
+  keeps it safe (there is a test for it).
+- **`parseExam(text)`** → `{questions, dropped}`. `normalizeLines` first
+  re-splits lines before `Câu N.`, `A.` and `Đáp án:` because PDF extraction
+  collapses a page into one long line. Answers are only ever assigned to the
+  question currently being built; a trailing answer key (`1A 2C 3B`) is applied
+  afterwards by number. Keyword regexes accept unaccented spellings (`cau`,
+  `bai`) since OCR'd files often lose diacritics.
+- **`buildAttempt(exam)`** shuffles questions *and* options, remapping
+  `correct` through the new option order. Any question with a blank option is
+  left unshuffled.
+- **State** is one module-level `state` object; `render()` rebuilds the view.
+  The exam timer is a single `setInterval` that mutates `state.run` and patches
+  `#clock` in place, so no re-render happens per second and the submitted
+  answers are always the live ones.
+- `window.__lms` exposes `parseExam`, `buildAttempt`, `scoreAttempt`, `state`
+  and `render` purely so browser tests can reach them.
+
+Data keys in `localStorage`: `promax_user`, `promax_exams`, `promax_history`.
+
+## Architecture — proxy (`proxy-server.js`)
+
+In order:
 
 1. **Middleware** — `cors()` (fully open) and `express.json()`.
-2. **`BOOKS` registry** (`proxy-server.js:13`) — a hardcoded map of
+2. **Static hosting** — `express.static(public/)` plus `GET /` sending
+   `public/lms.html`, so `npm start` serves the LMS.
+3. **`BOOKS` registry** (`proxy-server.js:19`) — a hardcoded map of
    `bookId → upstream viewer URL`. Today it holds a single entry, `toan`.
-3. **`GET /view/:bookId`** (`proxy-server.js:18`) — the only route:
+4. **`GET /view/:bookId`** (`proxy-server.js:24`) — the proxy route:
    - Looks up `BOOKS[bookId]`; unknown id → `404`.
    - `axios.get(flipUrl)` fetches the upstream HTML.
    - `cheerio` loads it and strips elements matching
@@ -58,14 +104,10 @@ error handling unless the failure reproduces with real network access.
    - Prepends a fixed-position Vietnamese "safe proxy" banner to `<body>`.
    - Returns the rewritten HTML via `$.html()`.
    - Any throw → `console.error` + `500`.
-4. **`app.listen(PORT)`** with `PORT = process.env.PORT || 10000`.
+5. **`app.listen(PORT)`** with `PORT = process.env.PORT || 10000`.
 
 ### Things the current version deliberately does *not* have
 
-Earlier commits had these; they were removed and should not be reintroduced
-without a reason:
-
-- **No `GET /` health route.** It existed until commit `dce40dc`.
 - **No `GET /asset/:bookId/*` passthrough route.** The old FlipHTML5 version
   rewrote relative `src`/`href` attributes to `/asset/...` and streamed the
   bytes back. The flipbookpdf.net page uses absolute asset URLs, so assets
@@ -78,8 +120,11 @@ be joined with exactly one `/`.
 
 ## Conventions
 
-- **CommonJS** (`require`), not ESM. Node 22 is what's installed here; nothing
-  in the code requires a specific version.
+- **CommonJS** (`require`) on the server, not ESM. Node 22 is what's installed
+  here; nothing in the code requires a specific version.
+- `public/app.js` is a **classic script**, not a module — ES modules would break
+  `file://` usage. Keep it that way, and keep new vendored libs in
+  `public/vendor/` rather than adding CDN tags.
 - **Vietnamese** for comments, log lines and all user-facing strings
   (`"Không tìm thấy sách"`, `"Lỗi proxy khi tải sách."`). Keep new strings in
   Vietnamese to match.
@@ -88,6 +133,15 @@ be joined with exactly one `/`.
   English (e.g. `🔧 Update proxy server for flipbookpdf.net`). Follow the
   existing style.
 - No formatter is configured; match the surrounding 2-space indentation.
+
+## Common task: changing the exam parser
+
+`parseExam` is the fragile part — it string-matches teacher-written documents.
+Before and after any change, run text through it and compare: PDF-flattened
+input (no newlines), a question whose stem contains the word "đa dạng" (an old
+regex matched the bare "đa" and silently deleted the question), a question with
+fewer than 4 options, a multi-line explanation, and a trailing answer key. All
+five were real bugs.
 
 ## Common task: adding a book
 
@@ -132,6 +186,16 @@ relevant to the change at hand:
 - **CORS is wide open** and the proxy will fetch and return upstream HTML for
   any registered book. Fine for the intended use, worth mentioning if the
   service is ever exposed more broadly.
+- **LMS data is per-browser.** Exams and history live in `localStorage`, so a
+  teacher's exams are invisible to a student on another machine; the JSON
+  backup/restore buttons are the only transfer mechanism. Adding a real
+  backend is a design change worth raising, not a silent refactor.
+- **`public/vendor/` is vendored on purpose** (~2.6 MB: KaTeX + fonts, pdf.js +
+  its worker, mammoth). It is what makes `file://` and offline use work. Do not
+  swap it back to CDN tags to save repo size.
+- **The exam parser is heuristic** — see "Common task: changing the exam
+  parser". Assume any change can silently drop questions and check the listed
+  cases.
 - **The DOM-stripping selectors are heuristic.** They are string-matched
   against upstream markup that can change at any time; a book rendering with
   visible branding usually means the upstream page changed, not that the code
@@ -139,9 +203,15 @@ relevant to the change at hand:
 
 ## Working agreements
 
-- Keep changes minimal and inside `proxy-server.js` unless the task calls for
-  more; this is a small, single-purpose service.
-- There are no tests to run. Validate by starting the server and hitting the
-  routes with `curl` as shown above.
+- Keep changes minimal and inside the file that owns the behaviour; the LMS is
+  `public/app.js`, the proxy is `proxy-server.js`.
+- There is no test suite in the repo. Validate the proxy with `curl` as shown
+  above. Validate LMS changes in a real browser: the app was built and checked
+  with Playwright driving the vendored Chromium against `npm start` (login,
+  import from real PDF/DOCX/TXT files, exam and practice flows, timeout
+  auto-submit, shuffle remapping over 300 runs, backup/restore, XSS safety).
+  Install Playwright *outside* the repo so the committed `node_modules/` stays
+  untouched, and launch with
+  `executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'`.
 - Develop on the branch you were assigned; commit and push there, and do not
   open a pull request unless explicitly asked.
