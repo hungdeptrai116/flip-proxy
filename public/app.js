@@ -132,6 +132,21 @@ function handleAuthError(err) {
   return false;
 }
 
+/* Lấy kho đề từ máy chủ. Có máy chủ thì đó là nguồn duy nhất: trống nghĩa là
+   trống, không chèn đề minh hoạ trong máy vào, tránh vô tình đăng đề demo cho
+   cả lớp. Phải gọi sau mọi lần đổi tư cách người dùng (đăng nhập, thiết lập). */
+async function syncExams() {
+  try {
+    const list = await apiFetch('exams');
+    state.exams = Array.isArray(list) ? list : [];
+    saveExams();                          // lưu tạm để lỡ mất mạng vẫn ôn được
+    return true;
+  } catch (err) {
+    toast('Không lấy được đề từ máy chủ, đang dùng bản lưu trong máy', 'error');
+    return false;
+  }
+}
+
 /* Đẩy toàn bộ kho đề lên máy chủ. Trả về true nếu đã lưu được. */
 async function pushExams() {
   if (!server.on) { saveExams(); return true; }
@@ -438,6 +453,7 @@ function viewSetup() {
         state.user = { role: 'teacher', name: name };
         save(K_USER, state.user);
         state.view = 'dashboard';
+        await syncExams();               // kho đề của lớp còn trống, đừng dùng đề demo trong máy
         render();
         toast('Xong! Giờ bạn có thể tải đề lên cho học sinh.');
       } catch (err) {
@@ -516,13 +532,7 @@ function viewLogin() {
       state.view = 'dashboard';
       render();
       toast('Xin chào ' + name + '!');
-      if (server.on) {
-        apiFetch('exams').then(function (list) {
-          state.exams = Array.isArray(list) ? list : [];
-          saveExams();
-          render();
-        }).catch(function () {});
-      }
+      if (server.on) syncExams().then(render);
     }
   }, [
     h('div', { class: 'tabs' }, [tabStudent, tabTeacher]),
@@ -1239,15 +1249,7 @@ async function boot() {
     }
   }
 
-  /* Có máy chủ thì kho đề trên đó là nguồn duy nhất: trống nghĩa là trống,
-     không tự chèn đề minh hoạ để tránh vô tình đăng đề demo cho cả lớp. */
-  try {
-    const list = await apiFetch('exams');
-    state.exams = Array.isArray(list) ? list : [];
-    saveExams();                              // lưu tạm để lỡ mất mạng vẫn ôn được
-  } catch (err) {
-    toast('Không lấy được đề từ máy chủ, đang dùng bản lưu trong máy', 'error');
-  }
+  await syncExams();
   render();
 }
 
