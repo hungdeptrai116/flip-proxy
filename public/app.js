@@ -98,7 +98,7 @@ function save(key, val) {
    Có máy chủ  -> kho đề dùng chung cho cả lớp, học sinh nộp kết quả về cho GV.
    Không có    -> chạy hoàn toàn trong máy (mở file lms.html trực tiếp, hoặc mất mạng).
    ========================================================================= */
-const server = { on: false, persistent: false, token: load(K_TOKEN, '') };
+const server = { on: false, persistent: false, needsSetup: false, token: load(K_TOKEN, '') };
 
 async function apiFetch(path, opts) {
   const o = Object.assign({ headers: {} }, opts || {});
@@ -389,6 +389,7 @@ function logout() {
 function render() {
   const root = $('#root');
   root.textContent = '';
+  if (server.needsSetup) { root.appendChild(viewSetup()); return; }
   if (!state.user) { root.appendChild(viewLogin()); return; }
 
   const body = state.user.role === 'teacher' ? teacherView() : studentView();
@@ -407,6 +408,60 @@ function render() {
       h('main', { class: 'content fade-in' }, [body])
     ])
   ]));
+}
+
+/* =========================================================================
+   THIẾT LẬP LẦN ĐẦU
+   Máy chủ vừa dựng xong, chưa có mật khẩu giáo viên. Người mở trang đầu tiên
+   đặt mật khẩu, sau đó màn này biến mất vĩnh viễn.
+   ========================================================================= */
+function viewSetup() {
+  const pass1 = h('input', { class: 'input', type: 'password', placeholder: 'Mật khẩu giáo viên (ít nhất 6 ký tự)' });
+  const pass2 = h('input', { class: 'input', type: 'password', placeholder: 'Nhập lại mật khẩu', style: 'margin-top:10px' });
+  const nameInput = h('input', { class: 'input', type: 'text', placeholder: 'Tên của bạn (VD: Thầy Hùng)', style: 'margin-top:10px' });
+  const btn = h('button', { class: 'btn btn-primary btn-block', type: 'submit', style: 'margin-top:14px' }, 'Đặt mật khẩu & bắt đầu');
+
+  const form = h('form', {
+    onsubmit: async function (e) {
+      e.preventDefault();
+      const pw = pass1.value;
+      if (pw.length < 6) { toast('Mật khẩu phải từ 6 ký tự trở lên', 'error'); pass1.focus(); return; }
+      if (pw !== pass2.value) { toast('Hai ô mật khẩu chưa giống nhau', 'error'); pass2.focus(); return; }
+      const name = nameInput.value.trim() || 'Giáo viên';
+
+      btn.disabled = true;
+      try {
+        const res = await apiFetch('setup', { method: 'POST', body: { password: pw } });
+        server.token = res.token;
+        save(K_TOKEN, server.token);
+        server.needsSetup = false;
+        state.user = { role: 'teacher', name: name };
+        save(K_USER, state.user);
+        state.view = 'dashboard';
+        render();
+        toast('Xong! Giờ bạn có thể tải đề lên cho học sinh.');
+      } catch (err) {
+        btn.disabled = false;
+        toast(err.message, 'error');
+      }
+    }
+  }, [pass1, pass2, nameInput, btn]);
+
+  return h('div', { class: 'login-wrap' }, [
+    h('div', { class: 'login-box fade-in' }, [
+      h('div', { style: 'text-align:center;margin-bottom:20px' }, [
+        h('div', { class: 'login-logo', text: '∑' }),
+        h('h1', { style: 'font-size:22px', text: 'Thiết lập lần đầu' }),
+        h('p', { class: 'muted', text: 'Đặt mật khẩu giáo viên cho lớp học của bạn' })
+      ]),
+      h('div', { class: 'note', style: 'background:#fef3c7' }, [
+        h('b', { style: 'color:#b45309', text: '⚠️ Làm ngay bây giờ' }),
+        h('p', { style: 'margin:6px 0 0' },
+          'Ai mở trang này đầu tiên cũng đặt được mật khẩu. Hãy đặt xong rồi mới gửi link cho học sinh.')
+      ]),
+      form
+    ])
+  ]);
 }
 
 /* =========================================================================
@@ -1161,10 +1216,14 @@ async function boot() {
     const health = await apiFetch('health');
     server.on = !!health.ok;
     server.persistent = !!health.persistent;
+    server.needsSetup = !!health.needsSetup;
   } catch (e) {
     server.on = false;
   }
   if (!server.on) { render(); return; }
+
+  /* Máy chủ mới dựng, chưa ai đặt mật khẩu -> hiện màn thiết lập trước tiên */
+  if (server.needsSetup) { render(); return; }
 
   /* Đang là giáo viên nhưng token không còn giá trị (đổi mật khẩu, xoá dữ liệu
      trình duyệt...) -> bắt đăng nhập lại ngay, đừng để bấm Lưu mới báo lỗi. */

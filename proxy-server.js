@@ -2,7 +2,6 @@ const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors');
-const crypto = require('crypto');
 const path = require('path');
 const { createStore } = require('./server/store');
 const { createApi } = require('./server/api');
@@ -49,12 +48,14 @@ app.get('/view/:bookId', async (req, res) => {
 async function start() {
   const store = await createStore();
 
+  // Mật khẩu giáo viên: ưu tiên biến môi trường, sau đó tới mật khẩu đã đặt
+  // từ trang web. Chưa có cả hai thì lần mở trang đầu tiên sẽ hiện màn thiết lập.
   const passwordFromEnv = !!process.env.TEACHER_PASSWORD;
-  const password = passwordFromEnv
-    ? process.env.TEACHER_PASSWORD
-    : crypto.randomBytes(4).toString('hex');
+  const config = await store.getConfig();
+  const password = process.env.TEACHER_PASSWORD || null;
+  const passwordHash = passwordFromEnv ? null : (config.teacherPasswordHash || null);
 
-  app.use('/api', createApi(store, { password, passwordFromEnv }));
+  app.use('/api', createApi(store, { password, passwordHash, passwordFromEnv }));
 
   // Giao diện LMS ProMax - mở http://localhost:PORT là dùng được ngay
   app.use(express.static(path.join(__dirname, 'public')));
@@ -65,9 +66,11 @@ async function start() {
     console.log(`📚 Mở trình duyệt: http://localhost:${PORT}`);
     if (passwordFromEnv) {
       console.log('🔑 Mật khẩu giáo viên: lấy từ biến môi trường TEACHER_PASSWORD');
+    } else if (passwordHash) {
+      console.log('🔑 Mật khẩu giáo viên: đã được đặt từ trang web');
     } else {
-      console.log(`🔑 Chưa đặt TEACHER_PASSWORD. Mật khẩu giáo viên tạm thời lần này: ${password}`);
-      console.log('   (Đặt biến môi trường TEACHER_PASSWORD để dùng mật khẩu cố định)');
+      console.log('🔑 Chưa có mật khẩu giáo viên. Người mở trang đầu tiên sẽ được đặt.');
+      console.log('   Hãy tự mở trang ngay bây giờ, trước khi gửi link cho học sinh.');
     }
     if (!store.persistent) {
       console.log('⚠️  Đang lưu ra file. Nếu deploy trên Render bản miễn phí, hãy đặt MONGODB_URI');

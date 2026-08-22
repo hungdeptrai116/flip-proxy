@@ -58,12 +58,21 @@ làm xong điểm tự gửi về cho giáo viên.
 
 ### 1. Đặt mật khẩu giáo viên
 
+Lần đầu mở trang, hệ thống hiện màn **Thiết lập lần đầu** để bạn tự đặt mật khẩu
+giáo viên ngay trên web. Đặt xong là khoá luôn, người vào sau chỉ thấy màn đăng
+nhập bình thường.
+
+> Ai mở trang đầu tiên cũng đặt được mật khẩu, nên hãy **tự mở trang và đặt xong
+> rồi mới gửi link cho học sinh**.
+
+Muốn chốt cứng mật khẩu từ đầu (khỏi lo ai mở trước) thì đặt biến môi trường,
+khi đó màn thiết lập không xuất hiện:
+
 ```bash
 TEACHER_PASSWORD=matkhau-cua-ban npm start
 ```
 
-Chưa đặt thì máy chủ tự sinh một mật khẩu ngẫu nhiên và in ra màn hình lúc khởi động
-(mỗi lần chạy lại một mật khẩu khác), nên khi dùng thật hãy đặt cố định.
+Mật khẩu chỉ được lưu ở dạng băm sha256, không lưu dạng chữ thô.
 
 Học sinh **không cần mật khẩu**, chỉ nhập tên. Không có mật khẩu thì không sửa hay
 xoá được đề, cũng không xem được bảng điểm cả lớp.
@@ -88,15 +97,16 @@ Lấy `MONGODB_URI` miễn phí: tạo tài khoản ở mongodb.com/atlas → t�
 ### 3. Deploy lên Render
 
 1. Gộp nhánh này vào `main` (Render đang theo dõi repo này).
-2. Trong Render → dịch vụ của bạn → **Environment**, thêm hai biến:
-   - `TEACHER_PASSWORD` = mật khẩu bạn chọn
+2. Trong Render → dịch vụ của bạn → **Environment**, thêm một biến:
    - `MONGODB_URI` = chuỗi kết nối lấy ở bước 2
 3. Bấm **Manual Deploy → Deploy latest commit**, đợi log hiện
    `✅ Kho dữ liệu: MongoDB` và `✅ Proxy server đang chạy tại cổng ...`.
-4. Gửi link `https://<tên-dịch-vụ>.onrender.com` cho học sinh.
+4. **Tự mở link trước** và đặt mật khẩu giáo viên ở màn Thiết lập lần đầu.
+5. Xong mới gửi link `https://<tên-dịch-vụ>.onrender.com` cho học sinh.
 
 Kiểm tra nhanh sau khi deploy: mở `https://<link>/api/health`, thấy
-`"storage":"mongo","persistent":true` là dữ liệu đã được lưu lâu dài.
+`"storage":"mongo","persistent":true` là dữ liệu đã được lưu lâu dài, và
+`"needsSetup":false` là mật khẩu đã đặt xong.
 
 Lưu ý bản miễn phí của Render ngủ sau 15 phút không ai vào, nên em nào mở đầu tiên
 sẽ phải đợi khoảng 30 giây.

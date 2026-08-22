@@ -52,16 +52,27 @@ function sanitizeExams(input) {
 function createApi(store, options) {
   const opts = options || {};
   const password = opts.password;
-  const token = tokenFor(password);
   const router = express.Router();
   const fails = new Map();          // chặn dò mật khẩu: đếm số lần sai theo IP
+
+  /* Mật khẩu có thể đến từ hai nguồn:
+     - biến môi trường TEACHER_PASSWORD (cố định, ưu tiên cao nhất)
+     - do giáo viên tự đặt từ trình duyệt ở lần mở đầu tiên
+     Chỉ giữ bản băm sha256 trong bộ nhớ và trong kho dữ liệu, không giữ mật khẩu
+     dạng chữ thô. Bản băm này cũng chính là token đăng nhập.
+     Đặt được lúc đang chạy nên phải đọc động, không chốt cứng lúc khởi động. */
+  let current = opts.passwordHash || (password ? tokenFor(password) : null);
+  const needsSetup = () => !current;
+  const token = () => current;
 
   router.use(express.json({ limit: '8mb' }));
 
   function isTeacher(req) {
+    const t = token();
+    if (!t) return false;
     const header = req.get('authorization') || '';
     const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
-    return sameToken(bearer || req.query.token || '', token);
+    return sameToken(bearer || req.query.token || '', t);
   }
   function requireTeacher(req, res, next) {
     if (!isTeacher(req)) return res.status(401).json({ error: 'Cần đăng nhập bằng tài khoản giáo viên' });
@@ -76,20 +87,46 @@ function createApi(store, options) {
       persistent: store.persistent,
       exams: exams.length,
       results: results.length,
-      passwordFromEnv: !!opts.passwordFromEnv
+      passwordFromEnv: !!opts.passwordFromEnv,
+      needsSetup: needsSetup()
     });
   });
 
+  /* Lần mở đầu tiên: chưa ai đặt mật khẩu thì người mở trang được quyền đặt.
+     Đặt xong là khoá luôn, lần sau muốn đổi phải sửa biến môi trường
+     TEACHER_PASSWORD hoặc xoá dữ liệu. */
+  router.post('/setup', async (req, res) => {
+    if (!needsSetup()) {
+      return res.status(409).json({ error: 'Hệ thống đã có mật khẩu giáo viên rồi' });
+    }
+    const pw = String((req.body && req.body.password) || '');
+    if (pw.length < 6) {
+      return res.status(400).json({ error: 'Mật khẩu phải từ 6 ký tự trở lên' });
+    }
+    try {
+      const hash = tokenFor(pw);
+      await store.setConfig({ teacherPasswordHash: hash });
+      current = hash;
+      console.log('🔑 Giáo viên đã đặt mật khẩu qua trang web');
+      res.json({ token: token() });
+    } catch (err) {
+      res.status(500).json({ error: 'Không lưu được mật khẩu: ' + err.message });
+    }
+  });
+
   router.post('/login', (req, res) => {
+    if (needsSetup()) {
+      return res.status(409).json({ error: 'Chưa đặt mật khẩu giáo viên, hãy tải lại trang để thiết lập' });
+    }
     const ip = req.ip || 'x';
     const rec = fails.get(ip) || { n: 0, until: 0 };
     if (rec.until > Date.now()) {
       return res.status(429).json({ error: 'Sai mật khẩu nhiều lần, thử lại sau vài phút' });
     }
     const given = String((req.body && req.body.password) || '');
-    if (given && given.length === password.length && sameToken(given, password)) {
+    if (given && sameToken(tokenFor(given), current)) {
       fails.delete(ip);
-      return res.json({ token: token });
+      return res.json({ token: token() });
     }
     rec.n++;
     if (rec.n >= 8) { rec.until = Date.now() + 10 * 60 * 1000; rec.n = 0; }

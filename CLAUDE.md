@@ -107,13 +107,19 @@ Data keys in `localStorage`: `promax_user`, `promax_exams`, `promax_history`.
   (`getExams/setExams/addResult/getResults/clearResults`) plus `kind` and
   `persistent`. A failing Mongo connection logs in Vietnamese and **falls back
   to the file store** rather than killing the process — the class stays online.
-- **`api.js`** mounts at `/api`. `GET /health`, `GET /exams` and `POST /results`
-  are public; `PUT /exams`, `GET /results`, `DELETE /results` and
-  `GET /results.xlsx` require the teacher token. The token is
-  `sha256('lms-promax:' + password)`, so it survives restarts without any
+- **`api.js`** mounts at `/api`. `GET /health`, `POST /setup`, `POST /login`,
+  `GET /exams` and `POST /results` are public; `PUT /exams`, `GET /results`,
+  `DELETE /results` and `GET /results.xlsx` require the teacher token. The token
+  is `sha256('lms-promax:' + password)`, so it survives restarts without any
   session store; `POST /login` trades the password for it and locks an IP out
   for 10 minutes after 8 failures. Everything from the browser goes through
   `sanitizeExams` / `clean` / `int` before it is stored — never trust the client.
+- **Teacher password, two sources.** `TEACHER_PASSWORD` wins when set. Otherwise
+  the first visitor gets a **first-run setup screen** (`health.needsSetup` →
+  `viewSetup()` → `POST /setup`) and claims the password; only the sha256 hash
+  is stored, in `store.setConfig({teacherPasswordHash})`, and `/setup` answers
+  409 forever after. `current` inside `createApi` is therefore mutable at
+  runtime — read it through `token()`, never capture it at construction.
 - **`xlsx.js`** writes a real `.xlsx` (verified by reading it back with
   SheetJS) with no dependency: `zlib.deflateRawSync` plus hand-built ZIP local
   headers, central directory and a `sheet1.xml` using inline strings.
@@ -201,9 +207,9 @@ elsewhere, that is a design change worth raising, not a silent refactor.
 Deployed on **Render** as a web service. `npm start` is the start command and
 Render injects `PORT` (hence the `10000` default, and why several commits in
 history are about making the startup log detectable by Render). There is no
-`render.yaml` in the repo — the service is configured in Render's dashboard,
-including the two environment variables that matter: `TEACHER_PASSWORD` and
-`MONGODB_URI`.
+`render.yaml` in the repo — the service is configured in Render's dashboard.
+`MONGODB_URI` is the one environment variable that has to be set there;
+`TEACHER_PASSWORD` is optional since the first-run setup screen covers it.
 
 Render's free tier has **no persistent disk and spins down after 15 minutes of
 inactivity**, so the file store loses everything on the next wake-up. That is

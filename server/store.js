@@ -11,7 +11,7 @@ const MAX_RESULTS = 5000;   // giữ lại tối đa bấy nhiêu lượt nộp 
 /* ---------------- Chế độ ghi ra file ---------------- */
 function fileStore(dir) {
   const file = path.join(dir, 'db.json');
-  let db = { exams: [], results: [] };
+  let db = { exams: [], results: [], config: {} };
 
   try {
     fs.mkdirSync(dir, { recursive: true });
@@ -19,6 +19,7 @@ function fileStore(dir) {
       const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
       db.exams = Array.isArray(raw.exams) ? raw.exams : [];
       db.results = Array.isArray(raw.results) ? raw.results : [];
+      db.config = raw.config && typeof raw.config === 'object' ? raw.config : {};
     }
   } catch (err) {
     console.error('❌ Không đọc được', file, '-', err.message);
@@ -39,6 +40,8 @@ function fileStore(dir) {
     async addResult(r) { db.results.unshift(r); db.results = db.results.slice(0, MAX_RESULTS); flush(); },
     async getResults() { return db.results; },
     async clearResults() { db.results = []; flush(); },
+    async getConfig() { return db.config; },
+    async setConfig(patch) { db.config = Object.assign({}, db.config, patch); flush(); },
     async close() {}
   };
 }
@@ -51,6 +54,7 @@ async function mongoStore(uri) {
   const db = client.db(process.env.MONGODB_DB || 'lms_promax');
   const exams = db.collection('exams');
   const results = db.collection('results');
+  const config = db.collection('config');
   await results.createIndex({ at: -1 });
 
   return {
@@ -70,6 +74,16 @@ async function mongoStore(uri) {
       return await results.find({}, { projection: { _id: 0 } }).sort({ at: -1 }).limit(MAX_RESULTS).toArray();
     },
     async clearResults() { await results.deleteMany({}); },
+    async getConfig() {
+      const doc = await config.findOne({ _id: 'main' });
+      if (!doc) return {};
+      const out = Object.assign({}, doc);
+      delete out._id;
+      return out;
+    },
+    async setConfig(patch) {
+      await config.updateOne({ _id: 'main' }, { $set: patch }, { upsert: true });
+    },
     async close() { await client.close(); }
   };
 }
