@@ -4,11 +4,16 @@
     <pattern id="p" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".16"/></pattern>
   </defs>
   <rect width="800" height="450" fill="url(#g)"/><rect width="800" height="450" fill="url(#p)"/>
-  <circle cx="650" cy="350" r="140" fill="#1e3a8a" fill-opacity=".25"/>
-  <g fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M120 360 L260 120 L400 360 Z"/>
-    <path d="M440 360 A110 110 0 0 1 660 360"/><path d="M440 360 H660"/>
-    <path d="M520 360 A40 40 0 0 1 560 320"/>
+  <circle cx="660" cy="350" r="140" fill="#1e3a8a" fill-opacity=".25"/>
+  <!-- tờ báo -->
+  <g transform="translate(400 70)">
+    <rect x="0" y="0" width="300" height="300" rx="18" fill="#fff" fill-opacity=".95"/>
+    <rect x="28" y="30" width="244" height="26" rx="6" fill="#1e3a8a"/>
+    <rect x="28" y="76" width="110" height="90" rx="8" fill="#d97706" fill-opacity=".85"/>
+    <g fill="#94a3b8"><rect x="154" y="80" width="118" height="10" rx="5"/><rect x="154" y="104" width="118" height="10" rx="5"/><rect x="154" y="128" width="118" height="10" rx="5"/><rect x="154" y="152" width="80" height="10" rx="5"/></g>
+    <g fill="#cbd5e1"><rect x="28" y="190" width="244" height="10" rx="5"/><rect x="28" y="214" width="244" height="10" rx="5"/><rect x="28" y="238" width="244" height="10" rx="5"/><rect x="28" y="262" width="160" height="10" rx="5"/></g>
   </g>
-  <text x="420" y="170" font-family="Georgia,'Times New Roman',serif" font-size="96" font-weight="700" fill="#fff" fill-opacity=".95">&#960; &#8776; 3,14</text>
+  <text x="62" y="228" font-family="'Be Vietnam Pro',Arial,Helvetica,sans-serif" font-size="92" font-weight="800" fill="#fff">TIN</text>
+  <text x="62" y="322" font-family="'Be Vietnam Pro',Arial,Helvetica,sans-serif" font-size="92" font-weight="800" fill="#fff">TỨC</text>
+  <rect x="68" y="346" width="230" height="10" rx="5" fill="#1e3a8a"/>
 </svg>

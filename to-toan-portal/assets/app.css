@@ -31,8 +31,9 @@
 
 /* ---------- Banner trang chủ: nền xanh navy + ký hiệu Toán mờ ---------- */
 .hero-bg {
+  /* Tổ ong (lục giác) mờ — nền trung tính, không còn ký hiệu Toán */
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='240' viewBox='0 0 360 240'%3E%3Cg fill='%23ffffff' fill-opacity='.07' font-family='Georgia,serif' font-size='54'%3E%3Ctext x='20' y='70'%3E%E2%88%91%3C/text%3E%3Ctext x='170' y='60'%3E%CF%80%3C/text%3E%3Ctext x='290' y='110'%3E%E2%88%AB%3C/text%3E%3Ctext x='60' y='190'%3E%E2%88%9A%3C/text%3E%3Ctext x='200' y='200'%3E%E2%88%9E%3C/text%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23fff' stroke-opacity='.07' stroke-width='2'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%23fff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E"),
     linear-gradient(135deg, #172554 0%, #1e3a8a 55%, #2563eb 100%);
 }
 

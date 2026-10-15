@@ -23,6 +23,12 @@ window.SITE_CONFIG = {
   // PHẢI trùng với email trong firestore.rules.
   adminEmail: "nganh1802@gmail.com",
 
+  // Đổi địa chỉ website: điền địa chỉ MỚI vào siteUrl (VD: "https://ten-moi.onrender.com").
+  // Ai vào một trong các địa chỉ cũ ở legacyHosts sẽ tự được chuyển sang địa chỉ mới (giữ nguyên trang đang xem).
+  // Để siteUrl trống = không chuyển hướng.
+  siteUrl: "",
+  legacyHosts: ["to-toan-portal.onrender.com"],
+
   // Phiên bản Firebase JS SDK tải từ CDN (chỉ tải khi chạy chế độ Firebase).
   firebaseVersion: "10.14.1",
 

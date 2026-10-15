@@ -44,7 +44,7 @@
     },
     'de-cuong': {
       title: 'Ôn văn hóa',
-      desc: 'Đề cương và tài liệu ôn tập văn hóa (môn Toán) — xem trực tiếp trên điện thoại, tải về dạng PDF.',
+      desc: 'Đề cương và tài liệu ôn tập văn hóa — xem trực tiếp trên điện thoại, tải về dạng PDF.',
       cats: ['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12']
     },
     'de-cuong-10': {

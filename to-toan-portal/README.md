@@ -53,6 +53,14 @@ Các thông báo/poster của Trường còn vài chỗ ghi khác nhau; cần ng
 độ tuổi (18–35 hay 18–40) · lương "bình quân 20–25 triệu" tính thế nào và từ giai đoạn nào · khoản nào miễn phí (ăn, ở, xe) · công ty/mỏ/địa điểm làm việc sau đào tạo ·
 số ảnh 3x4 (05 hay 06) · giấy khai sinh là bản sao hay photo công chứng · nơi nộp hồ sơ (địa phương hay phân hiệu) · cách Trường ghi nhận người giới thiệu.
 
+## Đổi địa chỉ website (tên miền phụ `*.onrender.com`)
+Tên `ten-dich-vu.onrender.com` được đặt lúc **tạo** dịch vụ trên Render và (theo hiểu biết của người viết, chưa kiểm chứng) **đổi tên dịch vụ sau đó không đổi địa chỉ**. Muốn địa chỉ mới:
+1. Render → **New → Static Site** → cùng repo/nhánh, *Build Command* `echo "Site tinh, khong can build"`, *Publish Directory* `to-toan-portal`, đặt **tên mới** (tên này thành địa chỉ). Không dùng chữ "tkv"/"vinacomin" trong tên để không bị hiểu là trang chính thức.
+2. Trong `config.js` điền `siteUrl: "https://ten-moi.onrender.com"`; trong `index.html` đổi địa chỉ ở thẻ `og:image` sang tên mới. Đẩy code lên.
+3. Dịch vụ cũ **giữ nguyên** một thời gian: ai vào địa chỉ cũ (khai báo ở `legacyHosts`) sẽ tự được chuyển sang địa chỉ mới, giữ nguyên trang đang xem. Khi không còn ai dùng link cũ thì mới xóa dịch vụ cũ.
+4. Firebase → Authentication → Settings → **Authorized domains**: thêm địa chỉ mới nếu đăng nhập quản trị báo lỗi domain.
+Về lâu dài nên mua tên miền riêng (Render → Settings → Custom Domains); `siteUrl` dùng lại được.
+
 ## 3. Đưa lên mạng
 
 **Vercel** (thư mục nằm trong repo): *New Project* → chọn repo → **Root Directory = `to-toan-portal`** → Framework Preset **Other**, để trống Build/Output → Deploy.

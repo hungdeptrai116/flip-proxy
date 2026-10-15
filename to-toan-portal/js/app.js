@@ -7,6 +7,15 @@
 (function () {
   'use strict';
   const TT = window.TT;
+
+  // Đã đổi địa chỉ website: người vào địa chỉ cũ (legacyHosts) tự được chuyển sang siteUrl, giữ nguyên "#/..." đang xem.
+  (function () {
+    const c = window.SITE_CONFIG || {};
+    const base = TT.safeUrl(c.siteUrl);
+    if (!base || !Array.isArray(c.legacyHosts) || c.legacyHosts.indexOf(location.hostname) === -1) return;
+    location.replace(base.replace(/\/+$/, '') + location.pathname + location.search + location.hash);
+  })();
+
   const Store = TT.Store;
   const V = TT.views;
 
