@@ -127,10 +127,10 @@
     </li>`;
   }
 
-  function emptyState(msg) {
+  function emptyState(msg, extra) {
     return html`<div class="rounded-xl border-2 border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-500">
       <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">${icon('book', 'h-6 w-6')}</div>
-      <p class="font-semibold text-slate-700">${msg}</p></div>`;
+      <p class="font-semibold text-slate-700">${msg}</p>${extra || ''}</div>`;
   }
 
   function breadcrumb(items) {
@@ -177,17 +177,20 @@
     const tab = cfg.tabs.find((t) => t.id === st.tab) || cfg.tabs[0];
     const list = browserList(key, tab);
     const shown = list.slice(0, st.shown);
+    // Tab chưa có bài nào thì ẩn (trừ "Tất cả" và tab đang chọn): người lạ không bấm vào ngõ cụt
+    const tabs = cfg.tabs.filter((t) => t.id === 'all' || t.id === tab.id || browserList(key, t).length > 0);
+    const noPostsAtAll = browserList(key, cfg.tabs[0]).length === 0;
 
     return html`
-      ${cfg.tabs.length > 1 ? html`<div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="Lọc theo chuyên mục">
-        ${cfg.tabs.map((t) => {
+      ${tabs.length > 1 ? html`<div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="Lọc theo chuyên mục">
+        ${tabs.map((t) => {
           const active = t.id === tab.id;
           const n = browserList(key, t).length;
           return html`<button type="button" data-action="tab" data-browser="${key}" data-tab="${t.id}" aria-pressed="${String(active)}"
             class="${active ? 'bg-navy text-white shadow' : 'bg-white text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50'} inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">
             ${t.label}<span class="${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'} rounded-full px-2 text-xs">${n}</span></button>`;
         })}</div>` : ''}
-      <div class="mt-4 flex items-center justify-between gap-3">
+      <div class="${noPostsAtAll ? 'hidden' : 'mt-4 flex items-center justify-between gap-3'}">
         <p class="text-sm text-slate-500">${list.length} bài viết</p>
         <div class="inline-flex overflow-hidden rounded-lg ring-1 ring-slate-300" role="group" aria-label="Kiểu hiển thị">
           <button type="button" data-action="view-mode" data-mode="grid" aria-pressed="${String(viewMode === 'grid')}" title="Dạng lưới"
@@ -201,7 +204,9 @@
           ? (viewMode === 'list'
             ? html`<div class="space-y-4">${shown.map(postRow)}</div>`
             : html`<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">${shown.map(postCard)}</div>`)
-          : emptyState('Chưa có bài viết trong mục này.')}
+          : (noPostsAtAll
+            ? emptyState('Mục này đang được cập nhật.', html`<a href="#/hoc-nghe" class="btn btn-accent mt-4">Xem thông tin tuyển sinh học nghề</a>`)
+            : emptyState('Chưa có bài viết trong mục này.'))}
       </div>
       ${list.length > shown.length ? html`<div class="mt-6 text-center">
         <button type="button" data-action="more" data-browser="${key}" class="btn btn-outline-navy btn-lg">Xem thêm bài viết (${shown.length}/${list.length})</button></div>` : ''}`;
@@ -270,13 +275,18 @@
   const NAV = [
     { label: 'Trang chủ', href: '#/', on: (r) => r.name === 'home' },
     { label: 'Tuyển sinh học nghề', href: '#/hoc-nghe', on: (r) => r.name === 'recruit', hot: true },
-    { label: 'Thông báo tuyển sinh', href: '#/muc/tuyen-sinh', on: (r) => r.name === 'group' && r.key === 'tuyen-sinh' },
-    { label: 'Ôn văn hóa', href: '#/muc/de-cuong', on: (r) => r.name === 'group' && /^de-cuong/.test(r.key) },
+    { label: 'Thông báo tuyển sinh', href: '#/muc/tuyen-sinh', on: (r) => r.name === 'group' && r.key === 'tuyen-sinh', cats: ['tuyen-sinh'] },
+    { label: 'Ôn văn hóa', href: '#/muc/de-cuong', on: (r) => r.name === 'group' && /^de-cuong/.test(r.key), cats: ['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12'] },
     { label: 'Giới thiệu', href: '#/gioi-thieu', on: (r) => r.name === 'about' },
     { label: 'Liên hệ', href: '#/lien-he', on: (r) => r.name === 'contact' }
   ];
 
+  // Mục có "cats" chỉ hiện khi đã có ít nhất 1 bài công khai thuộc các chuyên mục đó (chưa có bài = ngõ cụt, không đưa ra)
+  const anyPosts = (cats) => app().visible().some((p) => cats.indexOf(p.category) !== -1);
+  const navItems = () => NAV.filter((it) => !it.cats || anyPosts(it.cats));
+
   function searchForm(q, idSuffix) {
+    if (!app().visible().length) return html``;   // chưa có bài nào thì ô tìm kiếm vô nghĩa
     return html`<form data-form="search" role="search" class="relative w-full">
       <label for="q-${idSuffix}" class="sr-only">Tìm bài viết hoặc đề cương</label>
       <input id="q-${idSuffix}" type="search" name="q" value="${q}" placeholder="Tìm bài viết, đề cương…" autocomplete="off" class="field pl-9">
@@ -286,7 +296,7 @@
 
   function navbar(s, route) {
     const q = route.name === 'search' ? route.q : '';
-    const links = (mobile) => NAV.map((it) => {
+    const links = (mobile) => navItems().map((it) => {
       const on = it.on(route);
       const cls = mobile
         ? (on ? 'bg-white/15 text-white' : (it.hot ? 'text-amber-300 hover:bg-white/10' : 'text-blue-100 hover:bg-white/10')) + ' block rounded-lg px-3 py-2.5 text-sm font-semibold'
@@ -336,15 +346,15 @@
         </div>
         <div>
           <h2 class="text-sm font-bold uppercase tracking-wider text-white">Liên kết nhanh</h2>
-          <ul class="mt-3 space-y-2 text-sm">${NAV.map((it) => html`<li><a href="${it.href}" class="hover:text-white hover:underline">${it.label}</a></li>`)}</ul>
+          <ul class="mt-3 space-y-2 text-sm">${navItems().map((it) => html`<li><a href="${it.href}" class="hover:text-white hover:underline">${it.label}</a></li>`)}</ul>
         </div>
         <div>
           <h2 class="text-sm font-bold uppercase tracking-wider text-white">Chuyên mục</h2>
           <ul class="mt-3 space-y-2 text-sm">
             <li><a href="#/hoc-nghe" class="hover:text-white hover:underline">Tuyển sinh học nghề: điều kiện & hồ sơ</a></li>
-            <li><a href="#/muc/tuyen-sinh" class="hover:text-white hover:underline">Thông báo tuyển sinh</a></li>
-            <li><a href="#/muc/de-cuong" class="hover:text-white hover:underline">Ôn văn hóa</a></li>
-            <li><a href="#/muc/tin-tuc" class="hover:text-white hover:underline">Tin tức & Hoạt động</a></li>
+            ${anyPosts(['tuyen-sinh']) ? html`<li><a href="#/muc/tuyen-sinh" class="hover:text-white hover:underline">Thông báo tuyển sinh</a></li>` : ''}
+            ${anyPosts(['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12']) ? html`<li><a href="#/muc/de-cuong" class="hover:text-white hover:underline">Ôn văn hóa</a></li>` : ''}
+            ${anyPosts(['tin-tuc']) ? html`<li><a href="#/muc/tin-tuc" class="hover:text-white hover:underline">Tin tức & Hoạt động</a></li>` : ''}
           </ul>
           ${s.footerNote ? html`<p class="mt-4 text-sm text-blue-200">${s.footerNote}</p>` : ''}
         </div>
@@ -500,9 +510,12 @@
   }
 
   function statGrid(s) {
-    return html`<div class="grid grid-cols-2 gap-4">${s.stats.map((st, i) => {
-      const v = statValue(st, i, s);
-      return html`<div class="card border-t-4 border-accent p-5 text-center" data-reveal="zoom">
+    // Ô tự đếm tài liệu mà bằng 0 thì ẩn (số "0" trông như site bỏ hoang); ô không có giá trị cũng ẩn
+    const tiles = s.stats.map((st, i) => ({ st: st, v: statValue(st, i, s) })).filter((t) => t.v !== '—' && !(t.st.auto && t.v === '0'));
+    return html`<div class="grid grid-cols-2 gap-4">${tiles.map((t, k) => {
+      const v = t.v, st = t.st;
+      const wide = tiles.length % 2 === 1 && k === tiles.length - 1 ? ' col-span-2' : '';
+      return html`<div class="card border-t-4 border-accent p-5 text-center${wide}" data-reveal="zoom">
         <p class="text-3xl font-extrabold tabular-nums text-navy md:text-4xl"><span data-count aria-hidden="true">${v}</span><span class="sr-only">${v}</span></p>
         <p class="mt-1 text-sm font-semibold text-slate-600">${st.label}</p></div>`;
     })}</div>`;
@@ -518,19 +531,21 @@
       { href: '#/muc/tin-tuc', ic: 'layers', color: 'bg-brand', title: 'Tin tức & Hoạt động',
         desc: 'Thông báo chung và hoạt động liên quan đến tuyển sinh, học tập.', bullets: ['Thông báo mới của Trường', 'Hoạt động của Tổ GDTX', 'Lịch ôn tập, kiểm tra'], cats: ['tin-tuc'], more: 'Xem tin tức' }
     ];
+    const shownCards = cards.filter((c, i) => i === 0 || count(c.cats) > 0);
+    if (shownCards.length < 2) return html``;
     return html`<section class="bg-paper" aria-labelledby="h-features">
       <div class="container-x py-12">
         <div class="mb-8 text-center" data-reveal>
           <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Chuyên mục</p>
           <h2 id="h-features" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Tra cứu nhanh theo nhu cầu</h2></div>
-        <div class="grid gap-6 md:grid-cols-3">
-          ${cards.map((c) => html`<a href="${c.href}" data-reveal class="group flex flex-col rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lift">
+        <div class="grid gap-6 ${shownCards.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}">
+          ${shownCards.map((c) => html`<a href="${c.href}" data-reveal class="group flex flex-col rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lift">
             <span class="flex h-12 w-12 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 ${c.color}">${icon(c.ic, 'h-6 w-6')}</span>
             <h3 class="mt-4 text-lg font-extrabold text-navy-dark group-hover:text-brand">${c.title}</h3>
             <p class="mt-1 text-sm text-slate-600">${c.desc}</p>
             <ul class="mt-3 space-y-1.5 text-sm text-slate-700">${c.bullets.map((b) => html`<li class="flex items-start gap-2"><span class="mt-0.5 text-accent-dark">${icon('check', 'h-4 w-4')}</span>${b}</li>`)}</ul>
             <span class="mt-5 flex items-center justify-between border-t border-slate-200 pt-3 text-sm font-bold text-brand">
-              <span>${count(c.cats)} bài viết</span><span class="inline-flex items-center gap-1">${c.more} ${icon('arrowRight', 'nudge h-4 w-4')}</span></span>
+              <span>${count(c.cats) ? count(c.cats) + ' bài viết' : ''}</span><span class="inline-flex items-center gap-1">${c.more} ${icon('arrowRight', 'nudge h-4 w-4')}</span></span>
           </a>`)}
         </div></div></section>`;
   }
@@ -543,12 +558,12 @@
     return {
       title: 'Tuyển sinh học nghề mỏ hầm lò & Ôn văn hóa — Tổ GDTX, Trường Cao đẳng Than - Khoáng sản Việt Nam',
       body: html`${hero(s)}${TT.views.recruitTeaser ? TT.views.recruitTeaser(s) : ''}${pinned.length ? featured(pinned) : ''}${aboutStats(s)}${featureCards()}
-        <section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
+        ${a.visible().length ? html`<section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
           <div class="mb-5" data-reveal>
             <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Cập nhật liên tục</p>
             <h2 id="h-latest" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Thông báo & tài liệu mới nhất</h2></div>
           ${browserShell('home')}
-        </section>`
+        </section>` : ''}`
     };
   }
 

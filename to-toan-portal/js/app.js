@@ -178,9 +178,18 @@
     renderChrome();
     schedule(false);
   });
+  // Menu/chân trang phụ thuộc việc chuyên mục nào đã có bài → chỉ vẽ lại khung khi "chữ ký" đó đổi
+  let navSig = null;
+  function navSignature() {
+    const cats = {};
+    state.posts.forEach((p) => { if (!p.hidden) cats[p.category] = 1; });
+    return Object.keys(cats).sort().join(',');
+  }
   Store.onPosts((list) => {
     state.posts = list;
     state.loaded.posts = true;
+    const sig = navSignature();
+    if (sig !== navSig) { navSig = sig; renderChrome(); }
     renderTicker();
     schedule(false);
   });

@@ -25,7 +25,7 @@
     return html`<section class="card border-l-4 border-accent p-5" aria-labelledby="${id}">
       <h2 id="${id}" class="text-lg font-extrabold text-navy-dark">Cần tư vấn? Gọi hoặc nhắn trước khi đến</h2>
       <p class="mt-1 text-sm text-slate-600">Hồ sơ và việc nhập học do <strong>Trường</strong> tiếp nhận tại các phân hiệu. Tổ GDTX giúp bạn hiểu rõ điều kiện, hồ sơ và đường đi trước khi đến.</p>
-      ${none ? html`<p class="mt-3 text-sm text-slate-500">Thông tin liên hệ đang được cập nhật.</p>` : html`<div class="mt-4 grid gap-3 sm:grid-cols-2">
+      ${none ? html`<p class="mt-3 text-sm text-slate-500">Thông tin liên hệ đang được cập nhật.</p>` : html`<div class="mt-4 grid gap-3 ${[c.hotline, c.zalo, c.officialPhone].filter(Boolean).length > 1 ? 'sm:grid-cols-2' : ''}">
         ${c.hotline ? html`<a href="${c.hotlineTel}" class="btn btn-accent btn-lg">${icon('phone', 'h-5 w-5')} Gọi ${who}: ${c.hotline}</a>` : ''}
         ${c.zalo ? html`<a href="${c.zalo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">${icon('chat', 'h-5 w-5')} Nhắn Zalo cho ${who}</a>` : ''}
         ${c.officialPhone ? html`<a href="${c.officialTel}" class="btn btn-outline-navy btn-lg sm:col-span-2">${icon('phone', 'h-5 w-5')} ${c.officialName}: ${c.officialPhone}</a>` : ''}
