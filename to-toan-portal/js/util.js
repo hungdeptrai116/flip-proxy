@@ -275,6 +275,54 @@
   }
 
   /* ---------------------------------------------------------------
+   * 8. Hộp thoại trong trang — thay cho confirm()/prompt() của trình duyệt
+   *    (nhiều khung nhúng / ứng dụng di động chặn các hộp thoại gốc và trả về "hủy" ngay)
+   * ------------------------------------------------------------- */
+  function dialog(opts) {
+    return new Promise(function (resolve) {
+      var prev = document.activeElement;
+      var id = 'dlg-' + Math.random().toString(36).slice(2, 7);
+      var wrap = document.createElement('div');
+      wrap.className = 'dlg-backdrop';
+      wrap.innerHTML = html`<div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="${id}-t" aria-describedby="${id}-m">
+        <h2 id="${id}-t" class="dlg-title">${opts.title || ''}</h2>
+        <p id="${id}-m" class="dlg-msg">${opts.message || ''}</p>
+        ${opts.input ? html`<input class="field mt-3" data-dialog="input" value="${opts.value || ''}" aria-labelledby="${id}-m" autocomplete="off" inputmode="url">` : ''}
+        <div class="dlg-actions">
+          <button type="button" class="btn btn-outline" data-dialog="cancel">Hủy</button>
+          <button type="button" class="btn ${opts.danger ? 'bg-red-700 text-white hover:bg-red-800' : 'btn-navy'}" data-dialog="ok">${opts.okLabel || 'Đồng ý'}</button>
+        </div></div>`.s;
+      document.body.appendChild(wrap);
+      var input = wrap.querySelector('[data-dialog="input"]');
+      var ok = wrap.querySelector('[data-dialog="ok"]');
+      var cancel = wrap.querySelector('[data-dialog="cancel"]');
+
+      function close(accepted) {
+        document.removeEventListener('keydown', onKey, true);
+        wrap.remove();
+        if (prev && prev.focus) { try { prev.focus(); } catch (e) { /* bỏ qua */ } }
+        resolve(accepted ? (opts.input ? input.value : true) : (opts.input ? null : false));
+      }
+      function onKey(e) {
+        if (e.key === 'Escape') { e.preventDefault(); close(false); return; }
+        if (e.key === 'Enter' && input && document.activeElement === input) { e.preventDefault(); close(true); return; }
+        if (e.key === 'Tab') {                                   // giữ tiêu điểm trong hộp thoại
+          var items = [input, cancel, ok].filter(Boolean);
+          var i = items.indexOf(document.activeElement);
+          e.preventDefault();
+          items[(i + (e.shiftKey ? items.length - 1 : 1)) % items.length].focus();
+        }
+      }
+      ok.addEventListener('click', function () { close(true); });
+      cancel.addEventListener('click', function () { close(false); });
+      wrap.addEventListener('mousedown', function (e) { if (e.target === wrap) close(false); });
+      document.addEventListener('keydown', onKey, true);
+      (input || (opts.danger ? cancel : ok)).focus();
+      if (input) input.select();
+    });
+  }
+
+  /* ---------------------------------------------------------------
    * Xuất ra namespace
    * ------------------------------------------------------------- */
   TT.Raw = Raw;
@@ -298,4 +346,7 @@
   TT.lsSet = lsSet;
   TT.lsRemove = lsRemove;
   TT.toast = toast;
+  TT.dialog = dialog;
+  TT.confirm = function (message, opts) { return dialog(Object.assign({ message: message }, opts || {})); };
+  TT.ask = function (message, value, opts) { return dialog(Object.assign({ message: message, input: true, value: value || '' }, opts || {})); };
 })();

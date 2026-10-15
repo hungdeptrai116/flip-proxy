@@ -67,12 +67,15 @@
       settings = stored ? TT.mergeSettings(stored) : TT.demoSettings();
       if (!stored) persistSettings();
     }
-    function persistPosts() {
-      if (!TT.lsSet(LS_POSTS, posts)) throw new Error('Không lưu được: bộ nhớ trình duyệt đã đầy hoặc bị chặn.');
+    // Trình duyệt có thể chặn/đầy localStorage (cửa sổ riêng tư, khung nhúng…): vẫn chạy bằng bộ nhớ tạm, chỉ cảnh báo một lần.
+    let warned = false;
+    function warnStorage() {
+      if (warned) return;
+      warned = true;
+      setTimeout(() => TT.toast('Trình duyệt không cho lưu dữ liệu: thay đổi chỉ giữ đến khi tải lại trang.', 'error'), 0);
     }
-    function persistSettings() {
-      if (!TT.lsSet(LS_SETTINGS, settings)) throw new Error('Không lưu được: bộ nhớ trình duyệt đã đầy hoặc bị chặn.');
-    }
+    function persistPosts() { if (!TT.lsSet(LS_POSTS, posts)) warnStorage(); }
+    function persistSettings() { if (!TT.lsSet(LS_SETTINGS, settings)) warnStorage(); }
     function getUser() {
       try {
         const raw = window.sessionStorage.getItem(SS_AUTH);

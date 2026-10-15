@@ -220,12 +220,13 @@
   TT.actions['admin-delete'] = async (el) => {
     const p = findPost(el.dataset.id);
     if (!p) return;
-    if (!window.confirm('Xóa vĩnh viễn bài viết:\n\n“' + p.title + '”\n\nKhông thể hoàn tác.')) return;
+    if (!(await TT.confirm('Xóa vĩnh viễn bài viết:\n\n“' + p.title + '”\n\nKhông thể hoàn tác.', { title: 'Xóa bài viết?', okLabel: 'Xóa bài', danger: true }))) return;
     try { await TT.Store.deletePost(p.id); TT.toast('Đã xóa bài viết.', 'success'); }
     catch (e) { fail(e); }
   };
   TT.actions['admin-seed'] = async () => {
-    if (!window.confirm('Nạp 6 bài viết mẫu (đề cương, tuyển sinh)?')) return;
+    const demo = TT.Store.mode === 'demo';
+    if (!(await TT.confirm(demo ? 'Khôi phục 6 bài mẫu và cài đặt ban đầu? Mọi thay đổi trong chế độ Demo sẽ mất.' : 'Thêm 6 bài mẫu (đề cương, tuyển sinh) vào Firestore? Các bài mẫu cũ cùng ID sẽ bị ghi đè.', { title: demo ? 'Khôi phục dữ liệu mẫu?' : 'Nạp bài mẫu?', okLabel: demo ? 'Khôi phục' : 'Nạp bài mẫu' }))) return;
     try { const n = await TT.Store.seedDemo(); TT.toast('Đã nạp ' + n + ' bài mẫu.', 'success'); }
     catch (e) { fail(e); }
   };
@@ -435,7 +436,7 @@
   }
 
   const LIST_MARK = /^\s*([-*+]|\d+[.)])\s+/;
-  function runTool(ta, id) {
+  async function runTool(ta, id) {
     switch (id) {
       case 'bold': return wrapSel(ta, '**', '**', 'chữ đậm');
       case 'italic': return wrapSel(ta, '*', '*', 'chữ nghiêng');
@@ -449,18 +450,18 @@
       case 'hr': return insertText(ta, '\n\n---\n\n');
       case 'table': return insertText(ta, '\n\n| Cột 1 | Cột 2 | Cột 3 |\n|:--|:--:|--:|\n| a | b | c |\n| d | e | f |\n\n');
       case 'link': {
-        const url = window.prompt('Dán đường link (bắt đầu bằng https://):', 'https://');
+        const url = await TT.ask('Dán đường link (bắt đầu bằng https://):', 'https://', { title: 'Chèn liên kết', okLabel: 'Chèn' });
         if (url === null) return;
         const safe = TT.safeLinkUrl(url);
         if (!safe) return TT.toast('Link không hợp lệ.', 'error');
         return wrapSel(ta, '[', '](' + safe + ')', 'chữ hiển thị');
       }
       case 'image': {
-        const url = window.prompt('Dán link ảnh (bắt đầu bằng https://):', 'https://');
+        const url = await TT.ask('Dán link ảnh (bắt đầu bằng https://):', 'https://', { title: 'Chèn ảnh', okLabel: 'Tiếp' });
         if (url === null) return;
         const safe = TT.safeUrl(url);
         if (!safe) return TT.toast('Link ảnh không hợp lệ.', 'error');
-        const alt = window.prompt('Mô tả ảnh (không bắt buộc):', '') || '';
+        const alt = (await TT.ask('Mô tả ảnh cho người khiếm thị (không bắt buộc):', '', { title: 'Mô tả ảnh', okLabel: 'Chèn ảnh' })) || '';
         return insertText(ta, '\n\n![' + alt.replace(/[\[\]\n]/g, ' ') + '](' + safe + ')\n\n');
       }
       default:
@@ -738,7 +739,7 @@
       if (file.size > 8 * 1024 * 1024) throw new Error('File quá lớn (tối đa 8 MB).');
       const data = JSON.parse(await file.text());
       if (!data || !Array.isArray(data.posts)) throw new Error('File không đúng định dạng sao lưu của website này.');
-      if (!window.confirm('Nhập ' + data.posts.length + ' bài viết từ file “' + file.name + '”?\nCác bài trùng ID sẽ bị ghi đè.')) return;
+      if (!(await TT.confirm('Nhập ' + data.posts.length + ' bài viết từ file “' + file.name + '”?\nCác bài trùng ID sẽ bị ghi đè.', { title: 'Nhập từ file JSON?', okLabel: 'Nhập' }))) return;
       const n = await TT.Store.importAll({ posts: data.posts, settings: data.settings });
       TT.toast('Đã nhập ' + n + ' bài viết.', 'success');
     } catch (e) { fail(e instanceof SyntaxError ? new Error('File JSON bị lỗi, không đọc được.') : e); }
