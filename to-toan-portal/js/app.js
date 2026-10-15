@@ -66,6 +66,22 @@
     $('header').innerHTML = V.chrome.navbar(s, r).s;
     $('footer').innerHTML = V.chrome.footer(s).s;
     $('floating').innerHTML = isAdminRoute(r) ? '' : V.chrome.floating(s).s;
+    renderTicker();
+    if (TT.motion) TT.motion.syncToggle();
+  }
+
+  // Dải "Mới nhất": chỉ dựng lại khi danh sách bài đổi (để hiệu ứng chạy không bị khởi động lại mỗi lần chuyển trang)
+  let tickerSig = null;
+  function renderTicker() {
+    const box = $('ticker');
+    if (!box) return;
+    box.hidden = isAdminRoute(state.route);
+    const list = TT.app.visible().sort(V.parts.byDate).slice(0, 6);
+    const sig = list.map((p) => p.id + '|' + p.title).join('\n');
+    if (sig === tickerSig) return;
+    tickerSig = sig;
+    box.innerHTML = V.chrome.ticker(list).s;
+    if (TT.motion) TT.motion.setupTicker();
   }
 
   function currentView() {
@@ -83,15 +99,24 @@
     }
   }
 
+  // true khi lần vẽ sắp tới là do CHUYỂN TRANG (cần hiệu ứng vào trang)
+  let animateNext = false;
+
   function renderView() {
     const main = $('view');
     let v;
     try {
+      const wasShown = state.shown;
       v = currentView();
       state.shown = isReady();
+      // Hiệu ứng chỉ chạy khi chuyển trang hoặc lần đầu hiện trang thật; cập nhật dữ liệu realtime thì KHÔNG nháy lại.
+      const animate = animateNext || (!wasShown && state.shown);
+      animateNext = false;
       main.innerHTML = V.chrome.errorBanner(state.errors).s + v.body.s;
+      main.classList.toggle('no-anim', !animate);
       document.title = v.title || 'Tổ Toán';
       if (v.mount) v.mount(main);
+      if (animate && TT.motion) TT.motion.afterRender(main, true);
     } catch (e) {
       console.error(e);
       main.innerHTML = '<div class="container-x py-16 text-center"><p class="text-lg font-bold text-red-700">Đã xảy ra lỗi khi hiển thị trang.</p>' +
@@ -100,8 +125,12 @@
   }
 
   let pending = null;
+  // Chưa khởi động xong: dữ liệu (Demo) đến đồng bộ lúc đăng ký → KHÔNG vẽ thừa, vì onRoute() ở cuối sẽ vẽ lần đầu.
+  // (Vẽ thừa ngay sau đó sẽ thay hết nội dung và xóa mất hiệu ứng vào trang.)
+  let booted = false;
   // Gom nhiều cập nhật liền nhau thành 1 lần vẽ. force=true: vẽ cả view tĩnh (trang soạn bài).
   function schedule(force) {
+    if (!booted) return;
     if (pending) { pending.force = pending.force || !!force; return; }
     pending = { force: !!force };
     requestAnimationFrame(() => {
@@ -117,13 +146,14 @@
 
   function onRoute() {
     state.route = parseRoute();
-    const menu = $('mobile-menu');
+    animateNext = true;
     renderChrome();
     renderView();
-    if (menu) menu.classList.add('hidden');
-    window.scrollTo(0, 0);
+    // Lên đầu trang NGAY (không cuộn mượt), nếu không mỗi lần chuyển trang sẽ thấy trang lướt qua
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     const main = $('view');
     if (main) main.focus({ preventScroll: true });
+    if (TT.motion) TT.motion.routeStart();
   }
 
   /* ----------------------------- Dữ liệu ----------------------------- */
@@ -136,6 +166,7 @@
   Store.onPosts((list) => {
     state.posts = list;
     state.loaded.posts = true;
+    renderTicker();
     schedule(false);
   });
   Store.onAuth((u) => {
@@ -172,7 +203,7 @@
   TT.actions['toggle-menu'] = (el) => {
     const menu = $('mobile-menu');
     if (!menu) return;
-    const open = menu.classList.toggle('hidden') === false;
+    const open = menu.classList.toggle('is-open');
     el.setAttribute('aria-expanded', String(open));
   };
   TT.actions['clear-errors'] = () => { state.errors = []; renderView(); };
@@ -224,5 +255,7 @@
   window.addEventListener('hashchange', onRoute);
 
   /* ----------------------------- Khởi động ----------------------------- */
+  if (TT.motion) TT.motion.init();
   onRoute();
+  booted = true;
 })();

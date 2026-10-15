@@ -4,6 +4,8 @@
  *   node serve.js                 → http://localhost:8080
  *   PORT=3000 node serve.js       → đổi cổng
  *   HOST=0.0.0.0 node serve.js    → cho điện thoại cùng Wi-Fi truy cập thử
+ *   DEMO=1 node serve.js          → ép chế độ Demo (bỏ qua firebaseConfig trong config.js) để thử giao diện
+ *                                   mà không đọc/ghi dữ liệu thật
  */
 const http = require('http');
 const fs = require('fs');
@@ -31,6 +33,9 @@ const TYPES = {
   '.txt': 'text/plain; charset=utf-8'
 };
 
+// Chế độ Demo ép buộc: phục vụ config.js rỗng thay cho file thật (không sửa file trên đĩa)
+const DEMO_CONFIG = 'window.SITE_CONFIG = { firebaseConfig: {}, adminEmail: "", demo: { email: "admin@demo.local", password: "demo123" } };\n';
+
 // Không phục vụ file nội bộ của dự án
 const BLOCKED = /^(\/node_modules\/|\/\.git|\/package(-lock)?\.json$|\/serve\.js$|\/tools\/)/;
 
@@ -48,6 +53,10 @@ const server = http.createServer((req, res) => {
   // Chặn thoát khỏi thư mục gốc (../)
   if (file !== ROOT && !file.startsWith(ROOT + path.sep)) {
     res.writeHead(403).end('Không được phép');
+    return;
+  }
+  if (process.env.DEMO === '1' && pathname === '/config.js') {
+    res.writeHead(200, { 'Content-Type': TYPES['.js'], 'Cache-Control': 'no-cache' }).end(DEMO_CONFIG);
     return;
   }
   if (BLOCKED.test(pathname)) {
@@ -71,5 +80,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`✅ Website Tổ Toán đang chạy: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+  console.log(`✅ Website Tổ Toán đang chạy: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}` + (process.env.DEMO === '1' ? '  (ép chế độ DEMO)' : ''));
 });

@@ -72,7 +72,7 @@
   }
 
   function postCard(p) {
-    return html`<article class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-card ring-1 ring-slate-200/70 transition hover:-translate-y-0.5 hover:shadow-lift">
+    return html`<article data-reveal class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-card ring-1 ring-slate-200/70 transition hover:-translate-y-0.5 hover:shadow-lift">
       <a href="${postHref(p)}" class="relative block aspect-video overflow-hidden bg-slate-100" tabindex="-1" aria-hidden="true">
         ${coverImg(p, 'h-full w-full object-cover transition duration-300 group-hover:scale-105')}
         <span class="absolute left-3 top-3">${badge(p.category)}</span>
@@ -91,7 +91,7 @@
   }
 
   function postRow(p) {
-    return html`<article class="group flex overflow-hidden rounded-xl bg-white shadow-card ring-1 ring-slate-200/70 transition hover:shadow-lift">
+    return html`<article data-reveal class="group flex overflow-hidden rounded-xl bg-white shadow-card ring-1 ring-slate-200/70 transition hover:shadow-lift">
       <a href="${postHref(p)}" class="relative block w-32 shrink-0 bg-slate-100 sm:w-72" tabindex="-1" aria-hidden="true">
         ${coverImg(p, 'absolute inset-0 h-full w-full object-cover')}
       </a>
@@ -138,8 +138,8 @@
   function pageHead(title, desc) {
     return html`<section class="hero-bg text-white">
       <div class="container-x py-10 md:py-12">
-        <h1 class="text-2xl font-extrabold tracking-tight md:text-4xl">${title}</h1>
-        ${desc ? html`<p class="mt-2 max-w-3xl text-blue-100">${desc}</p>` : ''}
+        <h1 class="hero-in text-2xl font-extrabold tracking-tight md:text-4xl">${title}</h1>
+        ${desc ? html`<p class="hero-in mt-2 max-w-3xl text-blue-100" style="--d:90ms">${desc}</p>` : ''}
       </div></section>`;
   }
 
@@ -209,6 +209,7 @@
     const el = document.querySelector('[data-browser-root="' + key + '"]');
     if (!el) return;
     el.innerHTML = browserInner(key).s;
+    if (TT.motion) TT.motion.afterRender(el, false);
     if (focusSelector) {
       const f = el.querySelector(focusSelector);
       if (f) f.focus({ preventScroll: true });
@@ -279,7 +280,7 @@
       const on = it.on(route);
       const cls = mobile
         ? (on ? 'bg-white/15 text-white' : 'text-blue-100 hover:bg-white/10') + ' block rounded-lg px-3 py-2.5 text-sm font-semibold'
-        : (on ? 'border-accent text-white' : 'border-transparent text-blue-100 hover:text-white') + ' block border-b-4 px-3 py-3 text-sm font-semibold transition';
+        : 'nav-link';
       return html`<li><a href="${it.href}" ${on ? raw('aria-current="page"') : ''} class="${cls}">${it.label}</a></li>`;
     });
 
@@ -301,14 +302,16 @@
       </div>
       <nav class="hidden bg-navy md:block" aria-label="Menu chính">
         <ul class="container-x flex flex-wrap">${links(false)}</ul></nav>
-      <nav id="mobile-menu" class="hidden bg-navy md:hidden" aria-label="Menu chính (điện thoại)">
-        <div class="container-x space-y-3 py-3">
+      <nav id="mobile-menu" class="mm bg-navy" aria-label="Menu chính (điện thoại)">
+        <div class="mm-inner"><div class="container-x space-y-3 py-3">
           ${searchForm(q, 'm')}
-          <ul class="space-y-1">${links(true)}</ul></div></nav>`;
+          <ul class="space-y-1">${links(true)}</ul></div></div></nav>`;
   }
 
   function footer(s) {
     const year = new Date().getFullYear();
+    const motionOn = !!(TT.motion && TT.motion.isOn());
+    const osReduced = !!(TT.motion && TT.motion.isOsReduced());
     return html`<div class="bg-navy-dark text-blue-100">
       <div class="container-x grid gap-8 py-10 md:grid-cols-3">
         <div>
@@ -338,8 +341,28 @@
       <div class="border-t border-white/10">
         <div class="container-x flex flex-wrap items-center justify-between gap-2 py-4 text-xs text-blue-200">
           <p>© ${year} Tổ Toán — ${s.schoolName}. Bảo lưu mọi quyền.</p>
-          <a href="#/admin" class="underline-offset-2 hover:text-white hover:underline">Quản trị viên đăng nhập</a>
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
+            <button type="button" data-action="toggle-motion" aria-pressed="${String(motionOn)}" ${osReduced ? raw('disabled') : ''}
+              class="underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline">
+              Hiệu ứng chuyển động: <span data-motion-label>${osReduced ? 'Tắt (theo cài đặt thiết bị)' : (motionOn ? 'Bật' : 'Tắt')}</span></button>
+            <a href="#/admin" class="underline-offset-2 hover:text-white hover:underline">Quản trị viên đăng nhập</a>
+          </div>
         </div>
+      </div></div>`;
+  }
+
+  // Dải "Mới nhất": tiêu đề các bài mới, chạy ngang; tạm dừng được (rê chuột / bàn phím / nút)
+  function ticker(list) {
+    if (!list.length) return html``;
+    const items = (dup) => list.map((p) => html`<li><a href="${postHref(p)}" ${dup ? raw('tabindex="-1"') : ''}>${p.title}</a></li>`);
+    return html`<div class="ticker" role="region" aria-label="Thông báo mới nhất">
+      <div class="container-x flex items-center gap-3">
+        <span class="ticker-label">${icon('star', 'h-3 w-3')} Mới nhất</span>
+        <div class="ticker-viewport"><div class="ticker-track" data-ticker-track>
+          <ul class="ticker-list">${items(false)}</ul>
+          <ul class="ticker-list ticker-dup" aria-hidden="true">${items(true)}</ul>
+        </div></div>
+        <button type="button" data-action="toggle-ticker" class="ticker-btn" aria-pressed="false" aria-label="Tạm dừng thông báo chạy">${icon('pause', 'h-4 w-4')}</button>
       </div></div>`;
   }
 
@@ -386,23 +409,33 @@
   /* =====================================================================
    * TRANG CHỦ
    * =================================================================== */
+  // [ký hiệu, x, y, cỡ chữ, thời gian trôi, độ trễ]
+  const SYMBOLS = [
+    ['∑', '6%', '14%', '4.5rem', '26s', '0s'], ['π', '22%', '62%', '3.5rem', '30s', '-6s'],
+    ['∫', '46%', '8%', '5rem', '34s', '-3s'], ['√', '62%', '70%', '4rem', '28s', '-9s'],
+    ['∞', '80%', '18%', '4rem', '32s', '-12s'], ['Δ', '90%', '64%', '3.2rem', '27s', '-4s'],
+    ['x²', '35%', '82%', '3rem', '31s', '-8s'], ['θ', '72%', '40%', '3.4rem', '29s', '-14s']
+  ];
+
   function hero(s) {
     const h = s.hero;
     const icons = ['calendar', 'file', 'target'];
     return html`<section class="hero-bg relative overflow-hidden text-white">
+      <div class="hero-symbols" aria-hidden="true">${SYMBOLS.map((m) =>
+        html`<span style="--x:${m[1]};--y:${m[2]};--s:${m[3]};--t:${m[4]};--dl:${m[5]}">${m[0]}</span>`)}</div>
       <div class="container-x relative grid items-center gap-10 py-12 md:py-16 lg:grid-cols-5 lg:py-20">
         <div class="lg:col-span-3">
-          ${h.badge ? html`<span class="inline-block rounded-full bg-accent px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-navy-dark">${h.badge}</span>` : ''}
-          <h1 class="mt-4 text-3xl font-extrabold leading-[1.3] tracking-tight md:text-4xl md:leading-[1.3] lg:text-[2.6rem]">${h.title}</h1>
-          ${h.subtitle ? html`<p class="mt-4 max-w-2xl text-base text-blue-100 md:text-lg">${h.subtitle}</p>` : ''}
-          <div class="mt-7 flex flex-wrap gap-3">
+          ${h.badge ? html`<span class="hero-in inline-block rounded-full bg-accent px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-navy-dark">${h.badge}</span>` : ''}
+          <h1 class="hero-in mt-4 text-3xl font-extrabold leading-[1.3] tracking-tight md:text-4xl md:leading-[1.3] lg:text-[2.6rem]" style="--d:90ms">${h.title}</h1>
+          ${h.subtitle ? html`<p class="hero-in mt-4 max-w-2xl text-base text-blue-100 md:text-lg" style="--d:180ms">${h.subtitle}</p>` : ''}
+          <div class="hero-in mt-7 flex flex-wrap gap-3" style="--d:270ms">
             ${h.cta1 ? html`<a href="#/muc/tuyen-sinh" class="btn btn-lg btn-accent">${icon('clipboard', 'h-5 w-5')} ${h.cta1}</a>` : ''}
             ${h.cta2 ? html`<a href="#/muc/de-cuong" class="btn btn-lg btn-ghost-light">${icon('download', 'h-5 w-5')} ${h.cta2}</a>` : ''}
           </div>
         </div>
         <div class="lg:col-span-2">
           <ul class="space-y-3 rounded-2xl bg-white/10 p-5 ring-1 ring-white/25 backdrop-blur">
-            ${h.points.map((p, i) => html`<li class="flex gap-3 rounded-xl bg-white/10 p-3.5">
+            ${h.points.map((p, i) => html`<li class="hero-in hero-in-right flex gap-3 rounded-xl bg-white/10 p-3.5" style="--d:${300 + i * 110}ms">
               <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent text-navy-dark">${icon(icons[i] || 'check', 'h-5 w-5')}</span>
               <span class="min-w-0"><span class="block text-xs font-bold uppercase tracking-wider text-blue-200">${p.label}</span>
                 <span class="block text-sm font-semibold text-white">${p.value}</span></span></li>`)}
@@ -414,7 +447,7 @@
   function featured(pinned) {
     return html`<section class="border-b border-slate-200 bg-white" aria-labelledby="h-featured">
       <div class="container-x py-8">
-        <h2 id="h-featured" class="mb-4 flex items-center gap-2 text-xl font-extrabold text-navy-dark">
+        <h2 id="h-featured" data-reveal class="mb-4 flex items-center gap-2 text-xl font-extrabold text-navy-dark">
           <span class="text-accent">${icon('star', 'h-6 w-6')}</span> Bài tiêu điểm</h2>
         ${pinned.length === 1
           ? postRow(pinned[0])
@@ -424,20 +457,23 @@
 
   function aboutStats(s) {
     return html`<section class="container-x grid items-center gap-8 py-12 lg:grid-cols-2" aria-labelledby="h-about">
-      <div>
+      <div data-reveal="left">
         <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Về chúng tôi</p>
         <h2 id="h-about" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">${s.about.title}</h2>
         <div class="prose-math mt-4">${proseHtml(s.about.text)}</div>
-        <a href="#/gioi-thieu" class="btn btn-outline-navy mt-5">Xem thêm giới thiệu ${icon('arrowRight', 'h-4 w-4')}</a>
+        <a href="#/gioi-thieu" class="btn btn-outline-navy mt-5">Xem thêm giới thiệu ${icon('arrowRight', 'nudge h-4 w-4')}</a>
       </div>
       ${statGrid(s)}
     </section>`;
   }
 
   function statGrid(s) {
-    return html`<div class="grid grid-cols-2 gap-4">${s.stats.map((st) => html`<div class="card border-t-4 border-accent p-5 text-center">
-      <p class="text-3xl font-extrabold text-navy md:text-4xl">${statValue(st)}</p>
-      <p class="mt-1 text-sm font-semibold text-slate-600">${st.label}</p></div>`)}</div>`;
+    return html`<div class="grid grid-cols-2 gap-4">${s.stats.map((st) => {
+      const v = statValue(st);
+      return html`<div class="card border-t-4 border-accent p-5 text-center" data-reveal="zoom">
+        <p class="text-3xl font-extrabold tabular-nums text-navy md:text-4xl"><span data-count aria-hidden="true">${v}</span><span class="sr-only">${v}</span></p>
+        <p class="mt-1 text-sm font-semibold text-slate-600">${st.label}</p></div>`;
+    })}</div>`;
   }
 
   function featureCards() {
@@ -452,17 +488,17 @@
     ];
     return html`<section class="bg-white" aria-labelledby="h-features">
       <div class="container-x py-12">
-        <div class="mb-8 text-center">
+        <div class="mb-8 text-center" data-reveal>
           <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Chuyên mục trọng tâm</p>
           <h2 id="h-features" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Tra cứu nhanh theo nhu cầu</h2></div>
         <div class="grid gap-6 md:grid-cols-3">
-          ${cards.map((c) => html`<a href="#/muc/${c.key}" class="group flex flex-col rounded-2xl bg-paper p-6 ring-1 ring-slate-200 transition hover:-translate-y-1 hover:bg-white hover:shadow-lift">
-            <span class="flex h-12 w-12 items-center justify-center rounded-xl text-white ${c.color}">${icon(c.ic, 'h-6 w-6')}</span>
+          ${cards.map((c) => html`<a href="#/muc/${c.key}" data-reveal class="group flex flex-col rounded-2xl bg-paper p-6 ring-1 ring-slate-200 transition hover:-translate-y-1 hover:bg-white hover:shadow-lift">
+            <span class="flex h-12 w-12 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 ${c.color}">${icon(c.ic, 'h-6 w-6')}</span>
             <h3 class="mt-4 text-lg font-extrabold text-navy-dark group-hover:text-brand">${c.title}</h3>
             <p class="mt-1 text-sm text-slate-600">${c.desc}</p>
             <ul class="mt-3 space-y-1.5 text-sm text-slate-700">${c.bullets.map((b) => html`<li class="flex items-start gap-2"><span class="mt-0.5 text-accent-dark">${icon('check', 'h-4 w-4')}</span>${b}</li>`)}</ul>
             <span class="mt-5 flex items-center justify-between border-t border-slate-200 pt-3 text-sm font-bold text-brand">
-              <span>${count(c.cats)} bài viết</span><span class="inline-flex items-center gap-1">Xem chuyên mục ${icon('arrowRight', 'h-4 w-4')}</span></span>
+              <span>${count(c.cats)} bài viết</span><span class="inline-flex items-center gap-1">Xem chuyên mục ${icon('arrowRight', 'nudge h-4 w-4')}</span></span>
           </a>`)}
         </div></div></section>`;
   }
@@ -476,7 +512,7 @@
       title: 'Tổ Toán — Cổng thông tin Tuyển sinh & Đề cương Ôn tập',
       body: html`${hero(s)}${pinned.length ? featured(pinned) : ''}${aboutStats(s)}${featureCards()}
         <section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
-          <div class="mb-5">
+          <div class="mb-5" data-reveal>
             <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Cập nhật liên tục</p>
             <h2 id="h-latest" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Bài đăng & Đề cương mới nhất</h2></div>
           ${browserShell('home')}
@@ -599,7 +635,7 @@
         ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: c.name, href: '#/muc/' + group }, { label: p.title }])}
         <div class="grid gap-8 lg:grid-cols-3">
           <article class="min-w-0 lg:col-span-2">
-            <div class="card overflow-hidden">
+            <div class="card overflow-hidden" data-reveal>
               ${explicitCover ? html`<img src="${explicitCover}" data-fallback="${c.cover}" alt="" class="max-h-80 w-full object-cover">` : ''}
               <div class="p-5 sm:p-8">
                 ${p.hidden ? html`<p class="mb-3 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Bài viết đang ẩn — chỉ quản trị viên nhìn thấy.</p>` : ''}
@@ -612,13 +648,13 @@
                 ${p.content ? html`<div class="prose-math mt-5">${proseHtml(p.content)}</div>` : ''}
               </div>
             </div>
-            ${p.attachments.length ? html`<section class="mt-6" aria-labelledby="h-att">
+            ${p.attachments.length ? html`<section class="mt-6" aria-labelledby="h-att" data-reveal>
               <h2 id="h-att" class="mb-3 flex items-center gap-2 text-xl font-extrabold text-navy-dark">
                 <span class="text-red-700">${icon('file', 'h-6 w-6')}</span> Đề cương đính kèm (${p.attachments.length})</h2>
               <div class="space-y-4">${p.attachments.map((x, i) => attachment(x, i, p.attachments.length))}</div>
             </section>` : ''}
           </article>
-          <div class="lg:col-span-1">${sidebar(p.id)}</div>
+          <div class="lg:col-span-1" data-reveal="right">${sidebar(p.id)}</div>
         </div></section>`
     };
   }
@@ -688,10 +724,15 @@
   }
 
   function loadingView() {
+    const card = html`<div class="card overflow-hidden"><div class="skel aspect-video !rounded-none"></div>
+      <div class="space-y-3 p-4"><div class="skel h-5 w-4/5"></div><div class="skel h-3 w-2/5"></div><div class="skel h-3 w-full"></div><div class="skel h-3 w-3/4"></div></div></div>`;
     return {
       title: 'Đang tải… — Tổ Toán',
-      body: html`<section class="container-x py-24 text-center text-slate-500" role="status">
-        <div class="spinner mx-auto" aria-hidden="true"></div><p class="mt-4 font-semibold">Đang tải dữ liệu…</p></section>`
+      body: html`<div role="status"><span class="sr-only">Đang tải dữ liệu…</span>
+        <section class="hero-bg" aria-hidden="true"><div class="container-x py-14 md:py-20">
+          <div class="skel h-6 w-40 !rounded-full"></div><div class="skel mt-5 h-10 w-full max-w-2xl"></div>
+          <div class="skel mt-3 h-10 w-2/3 max-w-xl"></div><div class="skel mt-7 h-12 w-72 max-w-full"></div></div></section>
+        <section class="container-x py-10" aria-hidden="true"><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">${card}${card}${card}</div></section></div>`
     };
   }
 
@@ -714,7 +755,7 @@
     contact: contactView,
     notFound: notFoundView,
     loading: loadingView,
-    chrome: { demoBanner: demoBanner, topbar: topbar, navbar: navbar, footer: footer, floating: floating, errorBanner: errorBanner },
+    chrome: { demoBanner: demoBanner, topbar: topbar, navbar: navbar, ticker: ticker, footer: footer, floating: floating, errorBanner: errorBanner },
     // dùng chung cho trang quản trị
     parts: { badge: badge, postCard: postCard, pageHead: pageHead, breadcrumb: breadcrumb, emptyState: emptyState, catOf: catOf, summaryOf: summaryOf, byDate: byDate }
   };

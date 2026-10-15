@@ -17,10 +17,14 @@
   <div id="demo-banner"></div>
   <div id="topbar"></div>
   <header id="header" class="sticky top-0 z-40 shadow-sm"></header>
+  <div id="ticker"></div>
   <main id="view" tabindex="-1" class="min-h-[60vh] outline-none"></main>
   <footer id="footer"></footer>
   <div id="floating"></div>
   <div id="toast-root" aria-live="polite"></div>
+  <div id="route-bar" class="route-bar" aria-hidden="true"></div>
+  <div id="read-bar" class="read-bar" aria-hidden="true"></div>
+  <button type="button" id="to-top" class="to-top" aria-label="Lên đầu trang"></button>
 
   <noscript>
     <p style="padding:2rem;text-align:center;font-family:sans-serif">Trang web cần bật JavaScript để hiển thị nội dung.</p>
@@ -36,6 +40,7 @@
   <script src="js/store.js"></script>
   <script src="js/views.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/motion.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
