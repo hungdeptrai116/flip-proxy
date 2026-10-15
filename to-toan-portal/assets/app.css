@@ -62,8 +62,10 @@
 .prose-math hr { border: 0; border-top: 1px solid #e2e8f0; margin: 1.6em 0; }
 .prose-math strong { color: #0f172a; }
 .prose-math .table-wrap { overflow-x: auto; margin: 1.1em 0; }
-.prose-math table { border-collapse: collapse; min-width: 55%; }
-.prose-math th, .prose-math td { border: 1px solid #cbd5e1; padding: .5em .8em; vertical-align: top; }
+.prose-math table { border-collapse: collapse; min-width: 55%; display: block; max-width: 100%; overflow-x: auto; }
+/* overflow-wrap: normal — bảng không được bẻ từng chữ cái trên điện thoại (cuộn ngang thay vì vỡ chữ) */
+.prose-math th, .prose-math td { border: 1px solid #cbd5e1; padding: .5em .8em; vertical-align: top; overflow-wrap: normal; word-break: normal; min-width: 6.75rem; }
+.prose-math td:first-child, .prose-math th:first-child { min-width: 9rem; }
 .prose-math th { background: #eff6ff; color: #1e3a8a; font-weight: 700; }
 .prose-math .math-block { overflow-x: auto; overflow-y: hidden; padding: .15em 0; }
 .prose-math .katex { font-size: 1.08em; }
@@ -283,3 +285,18 @@ html.motion-ok #view.no-anim .hero-in { animation: none; }
   /* In danh sách hồ sơ: chỉ giữ nội dung trang, bỏ khung điều hướng */
   #demo-banner, #topbar, #header, #footer, .no-print { display: none !important; }
 }
+
+/* ---------- Thanh gọi cố định dưới đáy (điện thoại): có chữ, bấm một chạm ---------- */
+.float-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; gap: .5rem;   /* display do class `flex sm:hidden` quyết định (app.css nạp sau tailwind.css nên không đặt display ở đây) */
+  padding: .5rem .75rem calc(.5rem + env(safe-area-inset-bottom, 0px)); background: #fff; box-shadow: 0 -4px 16px rgba(15, 23, 42, .18);
+}
+@media (max-width: 639px) {
+  .to-top { bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)); }   /* nhường chỗ cho thanh gọi */
+  #footer { padding-bottom: 4.5rem; }                                      /* chân trang không bị thanh gọi che */
+}
+@media print { .float-bar { display: none !important; } }
+
+/* ---------- Khối nội dung tĩnh dự phòng (index.html): chỉ hiện khi JS lỗi/quá chậm (>3 giây) hoặc tắt JS ---------- */
+.static-fallback { display: none; }
+html.fb-show .static-fallback { display: block; }

@@ -144,7 +144,7 @@
         <p class="font-semibold text-slate-700">Chưa có bài viết nào.</p>
         <div class="mt-4 flex flex-wrap justify-center gap-3">
           <a href="#/admin/bai-moi" class="btn btn-accent">${icon('plus', 'h-4 w-4')} Viết bài đầu tiên</a>
-          <button type="button" data-action="admin-seed" class="btn btn-outline">Nạp 6 bài mẫu</button></div></div>`;
+          ${TT.Store.mode === 'demo' ? html`<button type="button" data-action="admin-seed" class="btn btn-outline">Nạp 6 bài mẫu</button>` : ''}</div></div>`;
     }
     if (!list.length) return parts().emptyState('Không có bài viết khớp bộ lọc.');
     return html`<ul class="space-y-3">${list.map((p) => html`<li class="card flex flex-wrap items-center gap-3 p-3 ${p.hidden ? 'opacity-70' : ''}">
@@ -226,7 +226,7 @@
   };
   TT.actions['admin-seed'] = async () => {
     const demo = TT.Store.mode === 'demo';
-    if (!(await TT.confirm(demo ? 'Khôi phục 6 bài mẫu và cài đặt ban đầu? Mọi thay đổi trong chế độ Demo sẽ mất.' : 'Thêm 6 bài mẫu (đề cương, tuyển sinh) vào Firestore? Các bài mẫu cũ cùng ID sẽ bị ghi đè.', { title: demo ? 'Khôi phục dữ liệu mẫu?' : 'Nạp bài mẫu?', okLabel: demo ? 'Khôi phục' : 'Nạp bài mẫu' }))) return;
+    if (!(await TT.confirm(demo ? 'Khôi phục 6 bài mẫu và cài đặt ban đầu? Mọi thay đổi trong chế độ Demo sẽ mất.' : 'CẢNH BÁO: 6 bài MẪU (có chữ “mẫu”, số liệu minh họa) sẽ lên website CÔNG KHAI ngay lập tức. Chỉ dùng khi đang thử. Các bài mẫu cũ cùng ID sẽ bị ghi đè. Vẫn nạp?', { title: demo ? 'Khôi phục dữ liệu mẫu?' : 'Nạp bài mẫu?', okLabel: demo ? 'Khôi phục' : 'Nạp bài mẫu' }))) return;
     try { const n = await TT.Store.seedDemo(); TT.toast('Đã nạp ' + n + ' bài mẫu.', 'success'); }
     catch (e) { fail(e); }
   };
@@ -749,9 +749,18 @@
     // ô giá trị bị khóa (disabled) không nằm trong dữ liệu → giữ nguyên giá trị cũ
     const cur = app().settings;
     if (out.stats && out.stats[1] && out.stats[1].value === undefined) out.stats[1].value = cur.stats[1].value;
+    const phoneOk = (v) => { const d = String(v || '').replace(/\D/g, ''); return d.length >= 9 && d.length <= 11; };
+    if (out.hotline && !phoneOk(out.hotline)) { TT.toast('Số điện thoại tư vấn không hợp lệ (cần 9–11 chữ số). Chưa lưu.', 'error'); return; }
+    if (out.recruit && out.recruit.officialPhone && !phoneOk(out.recruit.officialPhone)) { TT.toast('Số điện thoại thứ hai không hợp lệ (cần 9–11 chữ số). Chưa lưu.', 'error'); return; }
+    if (out.zalo && !/^https?:\/\/\S+$/i.test(String(out.zalo).trim())) { TT.toast('Link Zalo phải bắt đầu bằng https:// (VD: https://zalo.me/0912345678). Chưa lưu.', 'error'); return; }
+    if (!out.hotline && !(await TT.confirm('Bạn đang để TRỐNG số điện thoại tư vấn: nút gọi sẽ biến mất khỏi website và ứng viên không còn cách liên hệ. Vẫn lưu?', { title: 'Để trống số điện thoại?', okLabel: 'Vẫn lưu' }))) return;
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
-    try { await TT.Store.saveSettings(out); TT.toast('Đã lưu cài đặt.', 'success'); }
+    try {
+      await TT.Store.saveSettings(out);
+      const shown = app().settings.hotline;
+      TT.toast('Đã lưu cài đặt.' + (shown ? ' Số đang hiển thị trên web: ' + shown + '.' : ''), 'success');
+    }
     catch (e) { fail(e); }
     finally { btn.disabled = false; }
   };

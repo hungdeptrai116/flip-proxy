@@ -361,7 +361,7 @@
       </div>
       <div class="border-t border-white/10">
         <div class="container-x flex flex-wrap items-center justify-between gap-2 py-4 text-xs text-blue-200">
-          <p>© ${year} Tổ GDTX — ${s.schoolName}. Bảo lưu mọi quyền.</p>
+          <p>© ${year} Tổ GDTX — ${s.schoolName}.</p>
           <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
             <button type="button" data-action="toggle-motion" aria-pressed="${String(motionOn)}" ${osReduced ? raw('disabled') : ''}
               class="underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline">
@@ -389,13 +389,18 @@
 
   function floating(s) {
     const btns = [
-      s.hotline && html`<a href="${telHref(s.hotline)}" class="float-btn bg-red-600 hover:bg-red-700" aria-label="Gọi hotline ${s.hotline}">
-        <span class="float-ring bg-red-600" aria-hidden="true"></span>${icon('phone', 'relative h-6 w-6')}<span class="float-tip">Hotline: ${s.hotline}</span></a>`,
+      s.hotline && html`<a href="${telHref(s.hotline)}" class="float-btn bg-red-600 hover:bg-red-700" aria-label="Gọi tư vấn ${s.hotline}">
+        <span class="float-ring bg-red-600" aria-hidden="true"></span>${icon('phone', 'relative h-6 w-6')}<span class="float-tip">Gọi tư vấn: ${s.hotline}</span></a>`,
       s.zalo && TT.safeUrl(s.zalo) && html`<a href="${TT.safeUrl(s.zalo)}" target="_blank" rel="noopener noreferrer" class="float-btn bg-brand hover:bg-brand-dark" aria-label="Nhắn Zalo cho Tổ GDTX">
         <span class="float-ring bg-brand" aria-hidden="true"></span><span class="relative text-sm font-extrabold">Zalo</span><span class="float-tip">Chat Zalo</span></a>`
     ].filter(Boolean);
     if (!btns.length) return html``;
-    return html`<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-3">${btns}</div>`;
+    const zaloUrl = TT.safeUrl(s.zalo);
+    // Điện thoại: thanh cố định dưới đáy CÓ CHỮ (nút tròn không nhãn che mất chữ và khó hiểu); máy tính: nút tròn góc phải
+    const bar = html`<div class="float-bar flex sm:hidden">
+      ${s.hotline ? html`<a href="${telHref(s.hotline)}" class="btn btn-accent flex-1">${icon('phone', 'h-5 w-5')} Gọi tư vấn: ${s.hotline}</a>` : ''}
+      ${zaloUrl ? html`<a href="${zaloUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">${icon('chat', 'h-5 w-5')} Zalo</a>` : ''}</div>`;
+    return html`${bar}<div class="fixed bottom-4 right-4 z-50 hidden flex-col gap-3 sm:flex">${btns}</div>`;
   }
 
   /* =====================================================================
@@ -558,7 +563,7 @@
     return {
       title: 'Tuyển sinh học nghề mỏ hầm lò & Ôn văn hóa — Tổ GDTX, Trường Cao đẳng Than - Khoáng sản Việt Nam',
       body: html`${hero(s)}${TT.views.recruitTeaser ? TT.views.recruitTeaser(s) : ''}${pinned.length ? featured(pinned) : ''}${aboutStats(s)}${featureCards()}
-        ${a.visible().length ? html`<section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
+        ${a.visible().some((p) => !p.pinned) ? html`<section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
           <div class="mb-5" data-reveal>
             <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Cập nhật liên tục</p>
             <h2 id="h-latest" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Thông báo & tài liệu mới nhất</h2></div>
@@ -739,23 +744,24 @@
   function contactView() {
     const s = app().settings;
     const items = [
-      s.hotline && { ic: 'phone', label: 'Hotline', value: s.hotline, href: telHref(s.hotline) },
       s.email && { ic: 'mail', label: 'Email Tổ GDTX', value: s.email, href: 'mailto:' + s.email },
       s.address && { ic: 'pin', label: 'Địa chỉ nhà trường', value: s.address, href: '' },
-      s.zalo && TT.safeUrl(s.zalo) && { ic: 'chat', label: 'Zalo', value: 'Nhắn tin Zalo cho Tổ GDTX', href: TT.safeUrl(s.zalo), ext: true }
     ].filter(Boolean);
+    const P = TT.views.parts;
     return {
       title: 'Liên hệ — Tổ GDTX',
       body: html`${pageHead('Liên hệ Tổ GDTX', s.schoolName)}
         <section class="container-x py-8">
           ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: 'Liên hệ' }])}
-          ${items.length ? html`<div class="grid gap-5 sm:grid-cols-2">${items.map((it) => html`<div class="card flex gap-4 p-5">
+          ${P.contactCard ? P.contactCard(s, 'h-lienhe-page') : ''}
+          ${items.length ? html`<div class="mt-6 grid gap-5 sm:grid-cols-2">${items.map((it) => html`<div class="card flex gap-4 p-5">
             <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-navy text-white">${icon(it.ic, 'h-6 w-6')}</span>
             <div class="min-w-0"><p class="text-sm font-bold uppercase tracking-wider text-slate-500">${it.label}</p>
               ${it.href ? html`<a href="${it.href}" ${it.ext ? raw('target="_blank" rel="noopener noreferrer"') : ''} class="break-words text-lg font-bold text-brand hover:underline">${it.value}</a>`
                 : html`<p class="break-words text-lg font-bold text-navy-dark">${it.value}</p>`}</div></div>`)}</div>`
-            : emptyState('Thông tin liên hệ đang được cập nhật.')}
-          ${app().isAdmin && !items.length ? html`<p class="mt-4 text-sm"><a href="#/admin/cai-dat" class="font-semibold text-brand underline">Nhập thông tin liên hệ trong Quản trị → Cài đặt</a></p>` : ''}
+            : ''}
+          ${P.branchesBlock ? html`<div class="mt-8">${P.branchesBlock(s)}</div>` : ''}
+          ${app().isAdmin && !items.length && !s.hotline ? html`<p class="mt-4 text-sm"><a href="#/admin/cai-dat" class="font-semibold text-brand underline">Nhập thông tin liên hệ trong Quản trị → Cài đặt</a></p>` : ''}
         </section>`
     };
   }

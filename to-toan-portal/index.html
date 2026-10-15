@@ -19,6 +19,9 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <link rel="stylesheet" href="assets/tailwind.css">
   <link rel="stylesheet" href="assets/app.css">
+  <noscript><style>.static-fallback { display: block !important; }</style></noscript>
+  <!-- Nếu sau 3 giây trang chưa được dựng (mạng yếu, script lỗi, trình duyệt cũ) thì hiện khối nội dung tĩnh bên dưới, có sẵn số gọi tư vấn -->
+  <script>setTimeout(function () { document.documentElement.classList.add('fb-show'); }, 3000);</script>
 </head>
 <body class="bg-paper text-slate-800 antialiased">
   <button type="button" class="skip-link" data-action="skip-main">Bỏ qua, đến nội dung chính</button>
@@ -27,7 +30,15 @@
   <div id="topbar"></div>
   <header id="header" class="sticky top-0 z-40 shadow-sm"></header>
   <div id="ticker"></div>
-  <main id="view" tabindex="-1" class="min-h-[60vh] outline-none"></main>
+  <main id="view" tabindex="-1" class="min-h-[60vh] outline-none">
+    <!-- Khối dự phòng: bị thay hết khi trang chạy bình thường. Số điện thoại ở đây phải khớp với mặc định trong js/data.js (có kiểm thử). -->
+    <div class="static-fallback container-x py-10">
+      <h1 class="text-2xl font-extrabold text-navy-dark">Tuyển sinh học nghề mỏ hầm lò — Trường Cao đẳng Than - Khoáng sản Việt Nam</h1>
+      <p class="mt-3 text-slate-700">Nam thanh niên 18 - 35 tuổi, đủ sức khỏe theo quy định. Miễn học phí khi học nghề; thực tập hưởng 85 - 100% lương công nhân; sau đào tạo được bố trí việc làm (theo Thông báo ngày 02/01/2026 của Trường).</p>
+      <p class="mt-5"><a href="tel:0977588915" class="btn btn-accent btn-lg">Gọi tư vấn: 0977 588 915</a></p>
+      <p class="mt-3 text-sm text-slate-600">Trang đang tải. Nếu quá lâu, hãy tải lại trang hoặc gọi số trên.</p>
+    </div>
+  </main>
   <footer id="footer"></footer>
   <div id="floating"></div>
   <div id="toast-root" aria-live="polite"></div>

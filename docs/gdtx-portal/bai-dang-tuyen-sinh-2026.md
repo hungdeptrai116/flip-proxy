@@ -56,9 +56,9 @@ Nam thanh niên, tuổi từ 18 đến 35, đủ sức khỏe theo quy định.
 
 Mẹo: các thông báo của Trường ghi hơi khác nhau giữa “bản sao” và “bản photo công chứng”. Mang bản photo công chứng là đáp ứng cả hai cách ghi.
 
-## Nộp hồ sơ ở đâu?
+## Địa chỉ nhập học
 
-Hồ sơ và việc nhập học do **Trường** tiếp nhận tại 4 phân hiệu. Hãy gọi trước để biết nơi nộp và thời gian tiếp nhận.
+Việc nhập học do **Trường** tổ chức tại 4 phân hiệu (theo thông báo của Trường). Hãy gọi trước để biết nơi nộp hồ sơ và thời gian tiếp nhận.
 
 - **Phân hiệu Hữu Nghị:** Tổ 2, Khu Thanh Sơn 7, Phường Uông Bí, tỉnh Quảng Ninh.
 - **Phân hiệu Hoành Bồ:** Tổ 4, Khu Trới 2, Phường Hoành Bồ, tỉnh Quảng Ninh.

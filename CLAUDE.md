@@ -76,6 +76,10 @@ and **firebase** (Firestore + Auth, SDK loaded by dynamic `import()` from gstati
   on the page). Hero points and stat tiles left blank are *derived* from `recruit` (`TT.recruitInfo`) so there is one
   source of truth. Do not add salary/benefit/age figures that are not in a cited notice. Changing `settings` shape needs no
   rules change (settings are admin-write, unvalidated); changing post categories does.
+- **Public pages render immediately** (`canShow` in `js/app.js`): home/recruit/about/contact show from `DEFAULT_SETTINGS` as soon as settings arrive or after
+  ~0.7 s; only post/group/search routes wait for posts (else a false 404) and admin routes wait for auth. The 0.7 s timer must NOT force a re-render when the page
+  is already shown (it wiped typed input once). Technical error banners are shown to admins only. `index.html` has a `static-fallback` block (phone number must match
+  `DEFAULT_SETTINGS.hotline`; a test checks) that appears if JS fails/slow. Sections with no content (nav items, stat tiles, latest-posts block) are hidden when there are no posts.
 - Changing Tailwind classes in `index.html`/`js/*.js` needs
   `cd to-toan-portal && npm install && npm run build:css` (own `.gitignore`
   covers its `node_modules/`).

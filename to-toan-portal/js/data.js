@@ -98,7 +98,7 @@
     stats: [
       { label: 'Ngành nghề đào tạo', value: '', auto: false },
       { label: 'Tài liệu ôn văn hóa', value: '', auto: true },
-      { label: 'Phân hiệu tiếp nhận', value: '', auto: false },
+      { label: 'Phân hiệu đào tạo', value: '', auto: false },
       { label: 'Học phí khi học nghề', value: 'Miễn', auto: false }
     ],
     recruit: {
@@ -171,6 +171,9 @@
   const STR_LIMIT = 400;
   const clipStr = (v, d, n) => (typeof v === 'string' ? TT.clip(v, n || STR_LIMIT) : d);
 
+  // Link ngoài (Zalo...) phải bắt đầu bằng http(s):// — đường dẫn không có "https://" sẽ thành link hỏng trỏ vào chính website
+  const httpUrl = (v) => { const u = TT.safeUrl(v); return /^https?:\/\//i.test(u) ? u : ''; };
+
   // Danh sách chuỗi: nhận mảng hoặc chuỗi nhiều dòng (ô textarea của trang Quản trị); bỏ dòng trống
   function asLines(v, def, max, n) {
     let arr;
@@ -233,7 +236,7 @@
       hotline: clipStr(r.hotline, d.hotline, 40),
       email: clipStr(r.email, d.email, 120),
       address: clipStr(r.address, d.address, 300),
-      zalo: TT.safeUrl(r.zalo) || (typeof r.zalo === 'string' ? '' : d.zalo),
+      zalo: httpUrl(r.zalo) || (typeof r.zalo === 'string' ? '' : d.zalo),
       defaultAuthor: clipStr(r.defaultAuthor, d.defaultAuthor, 120),
       hero: {
         badge: clipStr(rh.badge, d.hero.badge, 80),

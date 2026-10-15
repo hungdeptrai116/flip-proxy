@@ -44,6 +44,12 @@ ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hi�
 - Không đổi `firestore.rules`: `settings` đã cho admin ghi tự do; bài viết vẫn dùng 6 chuyên mục cũ (nhãn hiển thị đã đổi: `tuyen-sinh` = "Tuyển sinh học nghề", các `de-cuong-*` thuộc "Ôn văn hóa").
 - Xem trước khi chia sẻ link (Zalo/Facebook) lấy từ thẻ Open Graph trong `index.html` và ảnh `assets/og.png`. Địa chỉ ảnh đang là `https://congnhanhamlo.onrender.com/assets/og.png` — **đổi lại khi chuyển sang tên miền riêng**. Preview chỉ có cho cả trang, không riêng từng bài (site dùng `#`).
 
+### Số điện thoại xuất hiện ở đâu (đổi số thì sửa đủ chỗ)
+1. **Quản trị → Cài đặt → Hotline** (nguồn chính — mọi nút gọi, thanh trên cùng, thanh gọi trên điện thoại, trang Liên hệ đều lấy từ đây).
+2. `js/data.js` → `DEFAULT_SETTINGS.hotline` (số hiện khi Firebase chưa trả dữ liệu / chưa lưu cài đặt).
+3. `index.html` → khối `static-fallback` (số hiện khi script lỗi hoặc tải quá 3 giây). Bộ kiểm thử có ca so khớp (2) và (3).
+Cài đặt có kiểm tra: số điện thoại phải 9–11 chữ số, link Zalo phải bắt đầu bằng `https://`, để trống số sẽ hỏi lại.
+
 ### Bài đăng chờ duyệt
 Bài tuyển sinh viết sẵn nằm ở `docs/gdtx-portal/` (ngoài thư mục được đưa lên mạng, có chủ đích): `bai-dang-tuyen-sinh-2026.md` để sếp đọc/duyệt (kèm các điểm cần xác nhận) và `bai-dang-tuyen-sinh-2026.json` để nhập.
 Nhập: *Quản trị → Cài đặt → Nhập từ file JSON* — bài vào ở trạng thái **ẨN**; sau khi duyệt, vào danh sách bài bấm **Hiện**. Nhập lại cùng file sẽ ghi đè (cùng ID), tiện khi sửa theo góp ý của sếp.

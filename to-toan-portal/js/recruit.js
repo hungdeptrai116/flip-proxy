@@ -24,7 +24,7 @@
     const none = !c.hotline && !c.zalo && !c.officialPhone;
     return html`<section class="card border-l-4 border-accent p-5" aria-labelledby="${id}">
       <h2 id="${id}" class="text-lg font-extrabold text-navy-dark">Cần tư vấn? Gọi hoặc nhắn trước khi đến</h2>
-      <p class="mt-1 text-sm text-slate-600">Hồ sơ và việc nhập học do <strong>Trường</strong> tiếp nhận tại các phân hiệu. Tổ GDTX giúp bạn hiểu rõ điều kiện, hồ sơ và đường đi trước khi đến.</p>
+      <p class="mt-1 text-sm text-slate-600">Hồ sơ và việc nhập học do <strong>Trường</strong> tiếp nhận; hãy gọi để biết nơi nộp và thời gian. Tổ GDTX giúp bạn hiểu rõ điều kiện, hồ sơ và đường đi trước khi đến.</p>
       ${none ? html`<p class="mt-3 text-sm text-slate-500">Thông tin liên hệ đang được cập nhật.</p>` : html`<div class="mt-4 grid gap-3 ${[c.hotline, c.zalo, c.officialPhone].filter(Boolean).length > 1 ? 'sm:grid-cols-2' : ''}">
         ${c.hotline ? html`<a href="${c.hotlineTel}" class="btn btn-accent btn-lg">${icon('phone', 'h-5 w-5')} Gọi ${who}: ${c.hotline}</a>` : ''}
         ${c.zalo ? html`<a href="${c.zalo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">${icon('chat', 'h-5 w-5')} Nhắn Zalo cho ${who}</a>` : ''}
@@ -115,13 +115,13 @@
     const c = TT.contactInfo(s);
     const tel = c.officialTel || c.hotlineTel;
     return html`<section id="sec-phanhieu" class="scroll-mt-24" aria-labelledby="h-phanhieu" data-reveal>
-      ${sectionHead('h-phanhieu', 'Địa điểm', 'Phân hiệu tiếp nhận — chọn nơi gần bạn')}
+      ${sectionHead('h-phanhieu', 'Địa điểm', 'Địa chỉ nhập học — chọn phân hiệu gần bạn')}
       <div class="grid gap-5 sm:grid-cols-2">${r.branches.map((b) => html`<article class="card flex flex-col p-5">
         <h3 class="flex items-center gap-2 text-lg font-extrabold text-navy-dark"><span class="text-accent-dark">${icon('pin', 'h-5 w-5')}</span>${b.name}</h3>
         ${b.address ? html`<p class="mt-2 flex-1 text-slate-700">${b.address}</p>` : html`<div class="flex-1"></div>`}
         <div class="mt-4 flex flex-wrap gap-2">
           ${b.map ? html`<a href="${b.map}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-navy btn-sm">${icon('external', 'h-4 w-4')} Chỉ đường (Google Maps)<span class="sr-only"> — ${b.name}</span></a>` : ''}
-          ${tel ? html`<a href="${tel}" class="btn btn-outline btn-sm">${icon('phone', 'h-4 w-4')} Gọi<span class="sr-only"> — ${b.name}</span></a>` : ''}
+          ${tel ? html`<a href="${tel}" class="btn btn-outline btn-sm">${icon('phone', 'h-4 w-4')} Gọi tư vấn<span class="sr-only"> (không phải số của ${b.name})</span></a>` : ''}
         </div></article>`)}</div></section>`;
   }
 
@@ -206,4 +206,5 @@
   V.recruit = recruitView;
   V.recruitTeaser = recruitTeaser;
   V.parts.contactCard = contactCard;
+  V.parts.branchesBlock = (s) => branches(s.recruit, s);
 })();

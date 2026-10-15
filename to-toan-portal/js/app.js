@@ -42,6 +42,16 @@
 
   const $ = (id) => document.getElementById(id);
   const isReady = () => state.loaded.posts && state.loaded.settings && state.loaded.auth;
+  // Trang CÔNG KHAI hiện ngay khi đã có cài đặt, hoặc sau ~0,7 giây dù chưa có (dùng cài đặt mặc định — đã chứa đủ thông tin tuyển sinh thật).
+  // Không bắt khách chờ Firebase (tải SDK + đăng nhập ẩn + Firestore) mới thấy chữ và số điện thoại.
+  // Trang cần danh sách bài (bài viết, chuyên mục, tìm kiếm) vẫn đợi bài về, nếu không sẽ báo "không tìm thấy" oan; trang quản trị đợi đủ (cả đăng nhập).
+  let grace = false;
+  const needsPosts = (r) => r.name === 'post' || r.name === 'group' || r.name === 'search';
+  function canShow(r) {
+    if (/^admin/.test(r.name)) return isReady();
+    if (needsPosts(r)) return state.loaded.posts && (state.loaded.settings || grace);
+    return state.loaded.settings || grace || isReady();
+  }
 
   /* ----------------------------- Định tuyến ----------------------------- */
   const dec = (s) => { try { return decodeURIComponent(s); } catch (e) { return s; } };
@@ -96,7 +106,7 @@
 
   function currentView() {
     const r = state.route;
-    if (!isReady()) return V.loading();
+    if (!canShow(r)) return V.loading();
     if (isAdminRoute(r)) return TT.admin.view(r);
     switch (r.name) {
       case 'home': return V.home();
@@ -119,11 +129,13 @@
     try {
       const wasShown = state.shown;
       v = currentView();
-      state.shown = isReady();
+      state.shown = canShow(state.route);
       // Hiệu ứng chỉ chạy khi chuyển trang hoặc lần đầu hiện trang thật; cập nhật dữ liệu realtime thì KHÔNG nháy lại.
       const animate = animateNext || (!wasShown && state.shown);
       animateNext = false;
-      main.innerHTML = V.chrome.errorBanner(state.errors).s + v.body.s;
+      // Câu lỗi kỹ thuật chỉ dành cho quản trị viên; khách không cần (và không hiểu) chúng
+      const errs = (isAdminRoute(state.route) || state.user) ? state.errors : [];
+      main.innerHTML = V.chrome.errorBanner(errs).s + v.body.s;
       main.classList.toggle('no-anim', !animate);
       document.title = v.title || 'Tổ GDTX';
       if (v.mount) v.mount(main);
@@ -208,6 +220,9 @@
     if (state.errors.indexOf(msg) === -1) state.errors.push(msg);
     schedule(true);
   });
+
+  // Chỉ vẽ lại khi trang CHƯA hiện (đang "Đang tải"). Nếu trang đã hiện mà vẽ ép thêm lần nữa, ô đang gõ (đăng nhập, soạn bài) sẽ bị xóa trắng.
+  setTimeout(() => { grace = true; if (!state.shown) schedule(true); }, 700);
 
   // Quá 15 giây vẫn chưa nhận đủ dữ liệu (mất mạng, sai firebaseConfig…) → hiện lỗi + cho xem trang với dữ liệu rỗng
   setTimeout(() => {
