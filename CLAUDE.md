@@ -19,6 +19,12 @@ Two things share this repo:
    readers get the book without the original site's share buttons, QR codes and
    branding, and without being handed the upstream URL.
 
+3. **Tổ Toán portal** (`to-toan-portal/`) — a separate static site (Vietnamese)
+   for a maths department: admission notices and revision outlines (PDF),
+   one admin posting from the browser. Self-contained; **not** served by
+   `proxy-server.js` and shares no code with the LMS. See "Architecture — Tổ Toán
+   portal" below and `to-toan-portal/README.md`.
+
 There is no build step, no bundler, no linter and no CI. `proxy-server.js` also
 serves `public/` so `npm start` is all that's needed to use the LMS.
 
@@ -38,6 +44,33 @@ package.json            deps and the single `start` script
 package-lock.json       STALE — see "Known rough edges"
 node_modules/           committed to git (~3.6k files) — see "Known rough edges"
 ```
+
+## Architecture — Tổ Toán portal (`to-toan-portal/`)
+
+Vanilla JS + Tailwind (prebuilt `assets/tailwind.css`), hash routing, classic
+scripts (no modules). Two backends behind one `TT.Store` interface in
+`js/store.js`: **demo** (`localStorage`, when `config.js` has no `firebaseConfig`)
+and **firebase** (Firestore + Auth, SDK loaded by dynamic `import()` from gstatic).
+
+- **Never concatenate HTML by hand.** Views use the `html` tagged template in
+  `js/util.js`, which escapes every interpolation unless wrapped in `raw()`.
+  Post bodies go through `js/markdown.js` (escapes first, `safeUrl` for links).
+- `cleanPost()` / `TT.POST_KEYS` in `js/util.js` must stay in sync with
+  `validPost()` in `firestore.rules` (`hasOnly` key list). Change one, change both.
+- `firestore.rules` blocks reads of `hidden == true` posts; the guest query in
+  `store.js` filters `where('hidden','==',false)` to match. Keep them paired.
+- `schedule()` in `js/app.js` skips re-rendering static admin views (editor,
+  settings, login) so typing is not wiped — but only once the real page has been
+  drawn (`state.shown`); otherwise Firebase's event order can strand the
+  "Đang tải" screen.
+- Changing Tailwind classes in `index.html`/`js/*.js` needs
+  `cd to-toan-portal && npm install && npm run build:css` (own `.gitignore`
+  covers its `node_modules/`).
+- Test: `node to-toan-portal/serve.js`, then Playwright from *outside* the repo
+  (same recipe as the LMS). Firebase paths were verified against the real
+  Firestore/Auth **emulators** with `firestore.rules` loaded; the Emulator jar
+  downloads from storage.googleapis.com, whereas `gstatic.com` (the real SDK CDN)
+  may be blocked in sandboxes.
 
 ## Commands
 

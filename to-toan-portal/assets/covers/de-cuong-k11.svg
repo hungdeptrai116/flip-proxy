@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#312e81"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+    <pattern id="p" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".1"/></pattern>
+  </defs>
+  <rect width="800" height="450" fill="url(#g)"/><rect width="800" height="450" fill="url(#p)"/>
+  <circle cx="120" cy="90" r="130" fill="#d97706" fill-opacity=".22"/>
+  <path d="M60 225 H740" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>
+  <path d="M60 225 C140 40 220 40 300 225 S460 410 540 225 S680 40 740 200" fill="none" stroke="#fbbf24" stroke-width="7" stroke-linecap="round"/>
+  <text x="520" y="110" font-family="Georgia,'Times New Roman',serif" font-size="62" font-style="italic" fill="#fff">sin x</text>
+  <text x="70" y="410" font-family="Georgia,'Times New Roman',serif" font-size="110" font-weight="700" fill="#fff" fill-opacity=".9">11</text>
+</svg>

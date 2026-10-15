@@ -1,0 +1,52 @@
+rules_version = '2';
+
+// QUY TẮC BẢO MẬT CHO WEBSITE TỔ TOÁN
+// ------------------------------------------------------------------
+// - Ghi / sửa / xóa: CHỈ tài khoản quản trị (khớp email bên dưới).
+// - Đọc: ai cũng đọc được, NGOẠI TRỪ bài đang ẩn (hidden == true) — chỉ quản trị thấy.
+//   (Nếu để "read: if true" cho cả bài ẩn, ai biết projectId vẫn truy vấn được bài đang ẩn.)
+//
+// TRƯỚC KHI DÁN: thay ADMIN_EMAIL bên dưới bằng email quản trị (viết thường),
+// cùng email với "adminEmail" trong config.js.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'ADMIN_EMAIL@example.com';
+      // Chặt hơn nữa (khuyến nghị nếu muốn): so theo UID thay vì email
+      //   return request.auth != null && request.auth.uid == 'UID_CUA_ADMIN';
+    }
+
+    // Danh sách khóa phải khớp với hàm cleanPost() trong js/util.js
+    function validPost(d) {
+      return d.keys().hasOnly([
+          'title', 'category', 'author', 'cover', 'summary', 'content',
+          'attachments', 'pinned', 'hidden', 'createdAt', 'updatedAt'
+        ])
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 300
+        && d.category in ['tuyen-sinh', 'de-cuong-10', 'de-cuong-k10',
+                          'de-cuong-k11', 'de-cuong-k12', 'tin-tuc']
+        && d.author is string && d.author.size() <= 120
+        && d.cover is string && d.cover.size() <= 2000
+        && d.summary is string && d.summary.size() <= 600
+        && d.content is string && d.content.size() <= 200000
+        && d.attachments is list && d.attachments.size() <= 20
+        && d.pinned is bool
+        && d.hidden is bool
+        && d.createdAt is number
+        && d.updatedAt is number;
+    }
+
+    match /posts/{postId} {
+      allow read: if resource.data.hidden == false || isAdmin();
+      allow create, update: if isAdmin() && validPost(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

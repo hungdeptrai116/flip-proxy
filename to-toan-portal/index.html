@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tổ Toán — Cổng thông tin Tuyển sinh &amp; Đề cương Ôn tập</title>
+  <meta name="description" content="Cổng thông tin của Tổ Toán: thông báo tuyển sinh vào lớp 10, đề cương ôn tập Toán khối 10 - 11 - 12, xem trực tiếp và tải về PDF.">
+  <meta name="theme-color" content="#1e3a8a">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="assets/tailwind.css">
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="bg-paper text-slate-800 antialiased">
+  <button type="button" class="skip-link" data-action="skip-main">Bỏ qua, đến nội dung chính</button>
+
+  <div id="demo-banner"></div>
+  <div id="topbar"></div>
+  <header id="header" class="sticky top-0 z-40 shadow-sm"></header>
+  <main id="view" tabindex="-1" class="min-h-[60vh] outline-none"></main>
+  <footer id="footer"></footer>
+  <div id="floating"></div>
+  <div id="toast-root" aria-live="polite"></div>
+
+  <noscript>
+    <p style="padding:2rem;text-align:center;font-family:sans-serif">Trang web cần bật JavaScript để hiển thị nội dung.</p>
+  </noscript>
+
+  <!-- Cấu hình (sửa file này để chuyển từ Demo sang Firebase) -->
+  <script src="config.js"></script>
+  <!-- KaTeX tải sẵn trong vendor/ (không phụ thuộc CDN) -->
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
