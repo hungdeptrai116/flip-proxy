@@ -70,7 +70,7 @@
     hotline: '0977 588 915',
     email: '',
     address: '',
-    zalo: '',
+    zalo: 'https://zalo.me/0977588915',   // Zalo của ThS. Kiên (cùng số hotline) — đã đồng ý hiển thị
     defaultAuthor: 'Admin Tổ GDTX',
     hero: {
       badge: 'Tuyển sinh học nghề 2026',
