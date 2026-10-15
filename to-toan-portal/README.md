@@ -1,5 +1,9 @@
 # Website Tổ GDTX — Tuyển sinh học nghề & Ôn văn hóa
 
+> **ĐÃ CHUYỂN KHO (2026-10-15):** mã nguồn đang được duy trì ở **`hungdeptrai116/gdtx-tuyensinh`** (nhánh `main`, thư mục `site/`); dịch vụ Render `congnhanhamlo` lấy mã từ đó.
+> Thư mục này (nhánh `claude/to-toan-portal` của kho `flip-proxy`) **đã cũ, không còn được cập nhật** và chỉ còn dùng để hai dịch vụ cũ `to-toan-portal` và `gdtx-tuyensinh` tự chuyển người dùng sang địa chỉ mới.
+> **Đừng xóa nhánh này khi hai dịch vụ đó còn chạy.** Mọi sửa đổi mới làm ở kho mới.
+
 Site tĩnh (HTML + Tailwind + JavaScript thuần), **1 quản trị viên đăng bài trực tiếp trên trình duyệt**.
 Dữ liệu lưu ở Cloud Firestore (chạy thật) hoặc `localStorage` (chạy thử).
 

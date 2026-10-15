@@ -49,6 +49,11 @@ node_modules/           committed to git (~3.6k files) — see "Known rough edge
 
 ## Architecture — Tổ GDTX portal (`to-toan-portal/`)
 
+> **MOVED (2026-10-15):** the portal is now maintained in its own repo, `hungdeptrai116/gdtx-tuyensinh` (`main`, folder `site/`),
+> and the live Render service `congnhanhamlo` deploys from there. What follows (and the `to-toan-portal/` folder on branch
+> `claude/to-toan-portal`) is a **stale copy** kept only so the two legacy Render services `to-toan-portal` / `gdtx-tuyensinh`
+> keep redirecting visitors. Do not delete that branch while they run; make new changes in the new repo.
+
 Vanilla JS + Tailwind (prebuilt `assets/tailwind.css`), hash routing, classic
 scripts (no modules). Two backends behind one `TT.Store` interface in
 `js/store.js`: **demo** (`localStorage`, when `config.js` has no `firebaseConfig`)
