@@ -26,8 +26,8 @@ window.SITE_CONFIG = {
   // Đổi địa chỉ website: điền địa chỉ MỚI vào siteUrl (VD: "https://ten-moi.onrender.com").
   // Ai vào một trong các địa chỉ cũ ở legacyHosts sẽ tự được chuyển sang địa chỉ mới (giữ nguyên trang đang xem).
   // Để siteUrl trống = không chuyển hướng.
-  siteUrl: "https://gdtx-tuyensinh.onrender.com",
-  legacyHosts: ["to-toan-portal.onrender.com"],
+  siteUrl: "https://congnhanhamlo.onrender.com",
+  legacyHosts: ["to-toan-portal.onrender.com", "gdtx-tuyensinh.onrender.com"],
 
   // Phiên bản Firebase JS SDK tải từ CDN (chỉ tải khi chạy chế độ Firebase).
   firebaseVersion: "10.14.1",
