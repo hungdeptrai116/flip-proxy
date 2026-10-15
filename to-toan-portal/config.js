@@ -11,17 +11,17 @@
  */
 window.SITE_CONFIG = {
   firebaseConfig: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: "AIzaSyCfa6NGt3g9fJ72K5E0gkvw0bh-6ykuBv4",
+    authDomain: "to-toan.firebaseapp.com",
+    projectId: "to-toan",
+    storageBucket: "to-toan.firebasestorage.app",
+    messagingSenderId: "313070570225",
+    appId: "1:313070570225:web:1833bb4edbde7eae0ef750"
   },
 
   // Email của tài khoản quản trị duy nhất (viết thường).
   // PHẢI trùng với email trong firestore.rules.
-  adminEmail: "",
+  adminEmail: "nganh1802@gmail.com",
 
   // Phiên bản Firebase JS SDK tải từ CDN (chỉ tải khi chạy chế độ Firebase).
   firebaseVersion: "10.14.1",

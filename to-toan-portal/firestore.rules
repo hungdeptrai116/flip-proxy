@@ -13,7 +13,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email == 'ADMIN_EMAIL@example.com';
+        && request.auth.token.email == 'nganh1802@gmail.com';
       // Chặt hơn nữa (khuyến nghị nếu muốn): so theo UID thay vì email
       //   return request.auth != null && request.auth.uid == 'UID_CUA_ADMIN';
     }
