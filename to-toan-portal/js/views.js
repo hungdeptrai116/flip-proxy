@@ -393,7 +393,7 @@
       <div class="container-x relative grid items-center gap-10 py-12 md:py-16 lg:grid-cols-5 lg:py-20">
         <div class="lg:col-span-3">
           ${h.badge ? html`<span class="inline-block rounded-full bg-accent px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-navy-dark">${h.badge}</span>` : ''}
-          <h1 class="mt-4 text-3xl font-extrabold leading-[1.3] tracking-tight md:text-4xl lg:text-[2.6rem]">${h.title}</h1>
+          <h1 class="mt-4 text-3xl font-extrabold leading-[1.3] tracking-tight md:text-4xl md:leading-[1.3] lg:text-[2.6rem]">${h.title}</h1>
           ${h.subtitle ? html`<p class="mt-4 max-w-2xl text-base text-blue-100 md:text-lg">${h.subtitle}</p>` : ''}
           <div class="mt-7 flex flex-wrap gap-3">
             ${h.cta1 ? html`<a href="#/muc/tuyen-sinh" class="btn btn-lg btn-accent">${icon('clipboard', 'h-5 w-5')} ${h.cta1}</a>` : ''}
