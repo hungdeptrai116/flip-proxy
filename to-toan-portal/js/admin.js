@@ -48,12 +48,12 @@
     const demo = TT.Store.mode === 'demo';
     const d = (window.SITE_CONFIG || {}).demo || {};
     return {
-      title: 'Đăng nhập quản trị — Tổ Toán',
+      title: 'Đăng nhập quản trị — Tổ GDTX',
       body: html`<section class="container-x flex justify-center py-12">
         <div class="card w-full max-w-md p-6 sm:p-8">
           <div class="flex items-center gap-3"><img src="assets/logo.svg" alt="" class="h-12 w-12">
             <div><h1 class="text-xl font-extrabold text-navy-dark">Đăng nhập quản trị</h1>
-              <p class="text-sm text-slate-500">Dành cho quản trị viên Tổ Toán</p></div></div>
+              <p class="text-sm text-slate-500">Dành cho quản trị viên Tổ GDTX</p></div></div>
           ${demo ? html`<p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
             <strong>Chế độ Demo.</strong> Tài khoản mẫu đã điền sẵn: <code>${d.email}</code> / <code>${d.password}</code>.
             Khi chạy thật, đăng nhập bằng tài khoản tạo trong Firebase Authentication.</p>` : ''}
@@ -172,7 +172,7 @@
     const chip = (n, label) => html`<div class="card px-4 py-3"><p class="text-2xl font-extrabold text-navy">${n}</p><p class="text-xs font-semibold text-slate-500">${label}</p></div>`;
     const atts = all.reduce((n, p) => n + p.attachments.length, 0);
     return {
-      title: 'Quản lý bài viết — Tổ Toán',
+      title: 'Quản lý bài viết — Tổ GDTX',
       body: shell('list', html`
         <div class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
           ${chip(all.length, 'Tổng số bài')}${chip(all.filter((p) => !p.hidden).length, 'Đang hiển thị')}
@@ -319,7 +319,7 @@
     const atts = post.attachments && post.attachments.length ? post.attachments : [];
 
     return {
-      title: (id ? 'Sửa bài' : 'Bài mới') + ' — Quản trị Tổ Toán',
+      title: (id ? 'Sửa bài' : 'Bài mới') + ' — Quản trị Tổ GDTX',
       mount: (root) => mountEditor(root, id),
       body: shell(id ? 'list' : 'new', html`
         <form id="post-form" data-form="post" data-id="${id || ''}" class="space-y-6" novalidate>
@@ -634,14 +634,14 @@
     const rowBox = (title, inner) => html`<fieldset class="rounded-lg border border-slate-200 p-3 sm:col-span-2">
       <legend class="px-1 text-sm font-bold text-slate-700">${title}</legend><div class="grid gap-3 sm:grid-cols-2">${inner}</div></fieldset>`;
     return {
-      title: 'Cài đặt — Quản trị Tổ Toán',
+      title: 'Cài đặt — Quản trị Tổ GDTX',
       body: shell('settings', html`
         <form data-form="settings" class="space-y-6" novalidate>
           <div class="card p-5"><h2 class="text-base font-extrabold text-navy-dark">Thông tin chung</h2>
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
-              ${f('Tên trường (hiện cạnh chữ “TỔ TOÁN”)', 'schoolName', s.schoolName, { span: 'sm:col-span-2', max: 200 })}
-              ${f('Số điện thoại tư vấn của Tổ Toán (hotline)', 'hotline', s.hotline, { ph: 'VD: 0912 345 678', max: 40, hint: 'Hiện ở nút gọi nổi và trang Tuyển sinh học nghề, kèm số chính thức của Trường.' })}
-              ${f('Email Tổ Toán', 'email', s.email, { max: 120, type: 'email' })}
+              ${f('Tên trường (hiện cạnh chữ “TỔ GDTX”)', 'schoolName', s.schoolName, { span: 'sm:col-span-2', max: 200 })}
+              ${f('Số điện thoại tư vấn của Tổ GDTX (hotline)', 'hotline', s.hotline, { ph: 'VD: 0912 345 678', max: 40, hint: 'Hiện ở nút gọi nổi và trang Tuyển sinh học nghề, kèm số chính thức của Trường.' })}
+              ${f('Email Tổ GDTX', 'email', s.email, { max: 120, type: 'email' })}
               ${f('Địa chỉ nhà trường', 'address', s.address, { span: 'sm:col-span-2' })}
               ${f('Link Zalo', 'zalo', s.zalo, { ph: 'https://zalo.me/số-điện-thoại', hint: 'Để trống để ẩn nút Zalo nổi.', span: 'sm:col-span-2' })}
               ${f('Tên người đăng mặc định', 'defaultAuthor', s.defaultAuthor, { max: 120 })}
@@ -654,7 +654,7 @@
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
               ${f('Nguồn thông tin (hiện đầu trang)', 'recruit.source', rc.source, { area: true, rows: 2, max: 300, span: 'sm:col-span-2' })}
               ${f('Đã đối chiếu với Trường ngày', 'recruit.checked', rc.checked, { max: 80, ph: 'VD: 20/10/2026', hint: 'Để trống nếu chưa đối chiếu.' })}
-              ${f('Tên người tư vấn (hiện cạnh số của Tổ Toán)', 'recruit.advisor', rc.advisor, { max: 120, ph: 'VD: Thầy Nguyễn Văn A', hint: 'Nên ghi tên thật — số lạ không tên dễ bị nghi là lừa đảo.' })}
+              ${f('Tên người tư vấn (hiện cạnh số của Tổ GDTX)', 'recruit.advisor', rc.advisor, { max: 120, ph: 'VD: Thầy Nguyễn Văn A', hint: 'Nên ghi tên thật — số lạ không tên dễ bị nghi là lừa đảo.' })}
               ${f('Nhãn số điện thoại của Trường', 'recruit.officialName', rc.officialName, { max: 120 })}
               ${f('Số điện thoại của Trường', 'recruit.officialPhone', rc.officialPhone, { max: 40, hint: 'Số ghi trên thông báo chính thức.' })}
               ${f('Đối tượng tuyển sinh', 'recruit.eligibility', rc.eligibility, { area: true, rows: 2, max: 400, span: 'sm:col-span-2' })}

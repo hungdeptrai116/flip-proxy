@@ -2,7 +2,7 @@
   "name": "to-toan-portal",
   "version": "1.0.0",
   "private": true,
-  "description": "Cổng thông tin Tổ Toán THPT: tuyển sinh và đề cương ôn tập (site tĩnh + Firebase)",
+  "description": "Cổng thông tin Tổ GDTX: tuyển sinh học nghề và ôn văn hóa (site tĩnh + Firebase)",
   "scripts": {
     "start": "node serve.js",
     "build:css": "tailwindcss -c tailwind.config.js -i src/input.css -o assets/tailwind.css --minify",

@@ -1,5 +1,5 @@
 /*
- * CẤU HÌNH WEBSITE TỔ TOÁN
+ * CẤU HÌNH WEBSITE TỔ GDTX
  * ------------------------------------------------------------------
  * 1) Để TRỐNG firebaseConfig  → web chạy CHẾ ĐỘ DEMO (dữ liệu mẫu, lưu trong
  *    localStorage của trình duyệt này). Dùng để kiểm tra giao diện và luồng đăng bài.

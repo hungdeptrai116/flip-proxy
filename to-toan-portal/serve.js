@@ -80,5 +80,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`✅ Website Tổ Toán đang chạy: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}` + (process.env.DEMO === '1' ? '  (ép chế độ DEMO)' : ''));
+  console.log(`✅ Website Tổ GDTX đang chạy: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}` + (process.env.DEMO === '1' ? '  (ép chế độ DEMO)' : ''));
 });

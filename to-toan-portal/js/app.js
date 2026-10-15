@@ -116,7 +116,7 @@
       animateNext = false;
       main.innerHTML = V.chrome.errorBanner(state.errors).s + v.body.s;
       main.classList.toggle('no-anim', !animate);
-      document.title = v.title || 'Tổ Toán';
+      document.title = v.title || 'Tổ GDTX';
       if (v.mount) v.mount(main);
       // Hiệu ứng hỏng thì chỉ tắt hiệu ứng — KHÔNG được làm mất nội dung trang
       if (animate && TT.motion) {

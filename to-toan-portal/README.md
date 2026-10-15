@@ -1,4 +1,4 @@
-# Website Tổ Toán — Tuyển sinh học nghề & Ôn văn hóa
+# Website Tổ GDTX — Tuyển sinh học nghề & Ôn văn hóa
 
 Site tĩnh (HTML + Tailwind + JavaScript thuần), **1 quản trị viên đăng bài trực tiếp trên trình duyệt**.
 Dữ liệu lưu ở Cloud Firestore (chạy thật) hoặc `localStorage` (chạy thử).
@@ -40,9 +40,13 @@ ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hi�
 - **Mặc định** chép từ *Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026* của Trường (ngày 02/01/2026) và các poster hướng dẫn hồ sơ / địa chỉ phân hiệu. Nguồn và ngày luôn hiện đầu trang.
 - **Một nguồn dữ liệu:** banner trang chủ (đối tượng, ngành, phân hiệu) và ô số liệu (số ngành, số phân hiệu) tự lấy từ mục này nếu để trống — sửa một chỗ, mọi nơi cập nhật.
 - **Khi Trường đổi thông báo:** sửa tại đây và điền ô *Đã đối chiếu với Trường ngày*. Chỉ đăng thông tin đã được Trường xác nhận.
-- **Số điện thoại:** nhập số tư vấn của Tổ Toán ở *Thông tin chung → Hotline* (và *Tên người tư vấn* — nên ghi tên thật). Trang luôn hiện kèm số của Trường để ứng viên đối chiếu.
+- **Số điện thoại:** nhập số tư vấn của Tổ GDTX ở *Thông tin chung → Hotline* (và *Tên người tư vấn* — nên ghi tên thật). Trang luôn hiện kèm số của Trường để ứng viên đối chiếu.
 - Không đổi `firestore.rules`: `settings` đã cho admin ghi tự do; bài viết vẫn dùng 6 chuyên mục cũ (nhãn hiển thị đã đổi: `tuyen-sinh` = "Tuyển sinh học nghề", các `de-cuong-*` thuộc "Ôn văn hóa").
 - Xem trước khi chia sẻ link (Zalo/Facebook) lấy từ thẻ Open Graph trong `index.html` và ảnh `assets/og.png`. Địa chỉ ảnh đang là `https://to-toan-portal.onrender.com/assets/og.png` — **đổi lại khi chuyển sang tên miền riêng**. Preview chỉ có cho cả trang, không riêng từng bài (site dùng `#`).
+
+### Bài đăng chờ duyệt
+Bài tuyển sinh viết sẵn nằm ở `docs/gdtx-portal/` (ngoài thư mục được đưa lên mạng, có chủ đích): `bai-dang-tuyen-sinh-2026.md` để sếp đọc/duyệt (kèm các điểm cần xác nhận) và `bai-dang-tuyen-sinh-2026.json` để nhập.
+Nhập: *Quản trị → Cài đặt → Nhập từ file JSON* — bài vào ở trạng thái **ẨN**; sau khi duyệt, vào danh sách bài bấm **Hiện**. Nhập lại cùng file sẽ ghi đè (cùng ID), tiện khi sửa theo góp ý của sếp.
 
 ### Trước khi công bố rộng
 Các thông báo/poster của Trường còn vài chỗ ghi khác nhau; cần người phụ trách của Trường xác nhận rồi mới sửa ở Cài đặt:

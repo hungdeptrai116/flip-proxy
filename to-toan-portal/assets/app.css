@@ -172,12 +172,13 @@ html.motion-ok .reveal[data-reveal="zoom"].is-in { animation-name: zoom-in; }
 html.motion-ok .hero-in { animation: rise .75s cubic-bezier(.2, .7, .2, 1) backwards; animation-delay: var(--d, 0ms); }
 html.motion-ok .hero-in.hero-in-right { animation-name: rise-right; }
 
-/* Ký hiệu Toán trôi nhẹ phía sau banner */
+/* Hình trang trí (bánh răng, mũ bảo hộ, đai ốc, sách) trôi nhẹ phía sau banner */
 .hero-symbols { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .hero-symbols span {
   position: absolute; left: var(--x); top: var(--y); user-select: none;
   font: 700 var(--s, 4rem)/1 Georgia, 'Times New Roman', serif; color: rgba(255, 255, 255, .1);
 }
+.hero-symbols svg { display: block; }
 html.motion-ok .hero-symbols span { animation: drift var(--t, 24s) ease-in-out var(--dl, 0s) infinite alternate; }
 @keyframes drift { from { transform: translate3d(0, 0, 0) rotate(-5deg); } to { transform: translate3d(14px, -26px, 0) rotate(6deg); } }
 @media (max-width: 640px) { .hero-symbols span:nth-child(n+6) { display: none; } }

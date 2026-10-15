@@ -67,11 +67,11 @@
   /* ----------------------------- Cài đặt mặc định ----------------------------- */
   TT.DEFAULT_SETTINGS = {
     schoolName: 'Trường Cao đẳng Than - Khoáng sản Việt Nam',
-    hotline: '',
+    hotline: '0977 588 915',
     email: '',
     address: '',
     zalo: '',
-    defaultAuthor: 'Admin Tổ Toán',
+    defaultAuthor: 'Admin Tổ GDTX',
     hero: {
       badge: 'Tuyển sinh học nghề 2026',
       title: 'HỌC NGHỀ MỎ HẦM LÒ — MIỄN HỌC PHÍ, BỐ TRÍ VIỆC LÀM SAU ĐÀO TẠO',
@@ -88,7 +88,7 @@
     },
     about: {
       title: 'Giới thiệu',
-      text: '**Tổ Toán** — Trường Cao đẳng Than - Khoáng sản Việt Nam, với sự đồng ý của nhà trường, giới thiệu thông tin **tuyển sinh học nghề** ' +
+      text: '**Tổ GDTX** (Giáo dục thường xuyên) — Trường Cao đẳng Than - Khoáng sản Việt Nam, với sự đồng ý của nhà trường, giới thiệu thông tin **tuyển sinh học nghề** ' +
         'và đăng tài liệu **ôn văn hóa** cho người học.\n\n' +
         'Website này là **kênh thông tin**: hồ sơ và việc nhập học do **nhà trường** tiếp nhận tại các phân hiệu. ' +
         'Thông tin tuyển sinh lấy từ **thông báo chính thức của Trường** (có ghi nguồn và ngày); ' +
@@ -104,7 +104,7 @@
     recruit: {
       source: 'Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026 của Trường Cao đẳng Than - Khoáng sản Việt Nam (ngày 02/01/2026)',
       checked: '',
-      advisor: '',
+      advisor: 'ThS. Nguyễn Trung Kiên',
       officialName: 'Số điện thoại ghi trên thông báo của Trường',
       officialPhone: '0372 448 111',
       eligibility: 'Nam thanh niên, tuổi từ 18 đến 35; đủ sức khỏe theo quy định.',
@@ -161,7 +161,7 @@
   // Giá trị mẫu chỉ dùng cho DEMO
   TT.DEMO_SETTINGS = {
     hotline: '0900 000 000',
-    email: 'totoan@example.edu.vn',
+    email: 'gdtx@example.edu.vn',
     address: '[Địa chỉ nhà trường — cập nhật trong trang Quản trị]',
     zalo: 'https://zalo.me/0900000000',
     stats: []   // số liệu trang chủ đã tự sinh từ mục "Tuyển sinh học nghề" — không còn số mẫu để khỏi gây hiểu nhầm
@@ -272,7 +272,7 @@
     };
   };
 
-  // Kênh liên hệ để ứng viên gọi/nhắn: số Tổ Toán (nếu có) và số chính thức ghi trên thông báo của Trường
+  // Kênh liên hệ để ứng viên gọi/nhắn: số Tổ GDTX (nếu có) và số chính thức ghi trên thông báo của Trường
   TT.contactInfo = function (s) {
     const digits = (v) => String(v || '').replace(/[^\d+]/g, '');
     const r = s.recruit;
@@ -295,6 +295,7 @@
     base.email = p.email;
     base.address = p.address;
     base.zalo = p.zalo;
+    base.recruit.advisor = '';   // Demo dùng số mẫu nên không gắn tên người thật
     p.stats.forEach((s, i) => {
       if (s.value !== undefined) base.stats[i].value = s.value;
     });
@@ -494,14 +495,14 @@ $$S=\int_0^1(x-x^2)\,dx=\left[\frac{x^2}{2}-\frac{x^3}{3}\right]_0^1=\frac12-\fr
       },
       {
         id: 'demo-tin-tuc',
-        title: 'Tổ Toán mở kênh giải đáp thắc mắc cho ứng viên và học viên (bài mẫu)',
+        title: 'Tổ GDTX mở kênh giải đáp thắc mắc cho ứng viên và học viên (bài mẫu)',
         category: 'tin-tuc',
         pinned: false,
         createdAt: now - 15 * DAY,
         summary: 'Bài tin mẫu cho mục Tin tức & Hoạt động — thay bằng tin thật.',
         content: R`> **Bài mẫu** — thay bằng tin thật.
 
-Để hỗ trợ ứng viên và học viên, Tổ Toán dự kiến:
+Để hỗ trợ ứng viên và học viên, Tổ GDTX dự kiến:
 
 - Giải đáp thắc mắc về tuyển sinh học nghề qua **Zalo / Hotline** ở góc dưới bên phải màn hình.
 - Đăng đề cương ôn văn hóa mới ngay trên website này: xem trực tiếp và tải về dưới dạng PDF.
@@ -513,7 +514,7 @@ Mời bạn theo dõi trang để cập nhật thông tin mới nhất.`,
     ];
 
     return posts.map((p, i) => {
-      const clean = TT.cleanPost(Object.assign({ author: 'Admin Tổ Toán', updatedAt: p.createdAt, hidden: false }, p));
+      const clean = TT.cleanPost(Object.assign({ author: 'Admin Tổ GDTX', updatedAt: p.createdAt, hidden: false }, p));
       clean.id = p.id;
       return clean;
     });

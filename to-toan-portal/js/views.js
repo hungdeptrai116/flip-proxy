@@ -297,10 +297,10 @@
     return html`
       <div class="border-b border-slate-200 bg-white">
         <div class="container-x flex items-center gap-4 py-2.5">
-          <a href="#/" class="flex min-w-0 items-center gap-3" aria-label="Trang chủ — Tổ Toán ${s.schoolName}">
+          <a href="#/" class="flex min-w-0 items-center gap-3" aria-label="Trang chủ — Tổ GDTX ${s.schoolName}">
             <img src="assets/logo.svg" alt="" class="h-11 w-11 shrink-0">
             <span class="min-w-0 leading-tight">
-              <span class="block text-lg font-extrabold tracking-wide text-navy">TỔ TOÁN</span>
+              <span class="block text-lg font-extrabold tracking-wide text-navy">TỔ GDTX</span>
               <span class="block truncate text-[11px] font-semibold uppercase tracking-wide text-slate-600 sm:text-xs">${s.schoolName}</span>
             </span>
           </a>
@@ -326,7 +326,7 @@
       <div class="container-x grid gap-8 py-10 md:grid-cols-3">
         <div>
           <div class="flex items-center gap-3"><img src="assets/logo.svg" alt="" class="h-10 w-10">
-            <div class="leading-tight"><p class="font-extrabold tracking-wide text-white">TỔ TOÁN</p>
+            <div class="leading-tight"><p class="font-extrabold tracking-wide text-white">TỔ GDTX</p>
               <p class="text-xs uppercase text-blue-200">${s.schoolName}</p></div></div>
           <ul class="mt-4 space-y-2 text-sm">
             ${s.address ? html`<li class="flex gap-2">${icon('pin', 'mt-0.5 h-4 w-4 shrink-0')}<span>${s.address}</span></li>` : ''}
@@ -351,7 +351,7 @@
       </div>
       <div class="border-t border-white/10">
         <div class="container-x flex flex-wrap items-center justify-between gap-2 py-4 text-xs text-blue-200">
-          <p>© ${year} Tổ Toán — ${s.schoolName}. Bảo lưu mọi quyền.</p>
+          <p>© ${year} Tổ GDTX — ${s.schoolName}. Bảo lưu mọi quyền.</p>
           <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
             <button type="button" data-action="toggle-motion" aria-pressed="${String(motionOn)}" ${osReduced ? raw('disabled') : ''}
               class="underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline">
@@ -381,7 +381,7 @@
     const btns = [
       s.hotline && html`<a href="${telHref(s.hotline)}" class="float-btn bg-red-600 hover:bg-red-700" aria-label="Gọi hotline ${s.hotline}">
         <span class="float-ring bg-red-600" aria-hidden="true"></span>${icon('phone', 'relative h-6 w-6')}<span class="float-tip">Hotline: ${s.hotline}</span></a>`,
-      s.zalo && TT.safeUrl(s.zalo) && html`<a href="${TT.safeUrl(s.zalo)}" target="_blank" rel="noopener noreferrer" class="float-btn bg-brand hover:bg-brand-dark" aria-label="Nhắn Zalo cho Tổ Toán">
+      s.zalo && TT.safeUrl(s.zalo) && html`<a href="${TT.safeUrl(s.zalo)}" target="_blank" rel="noopener noreferrer" class="float-btn bg-brand hover:bg-brand-dark" aria-label="Nhắn Zalo cho Tổ GDTX">
         <span class="float-ring bg-brand" aria-hidden="true"></span><span class="relative text-sm font-extrabold">Zalo</span><span class="float-tip">Chat Zalo</span></a>`
     ].filter(Boolean);
     if (!btns.length) return html``;
@@ -396,7 +396,7 @@
     const off = s.recruit && s.recruit.officialPhone;
     return html`<section class="${dark ? 'bg-navy text-white' : 'card'} rounded-xl p-5">
       <h2 class="text-base font-extrabold ${dark ? 'text-white' : 'text-navy-dark'}">Giải đáp thắc mắc</h2>
-      ${has ? html`<p class="mt-1 text-sm ${dark ? 'text-blue-100' : 'text-slate-600'}">Cần tư vấn tuyển sinh học nghề hoặc tài liệu ôn văn hóa? Liên hệ Tổ Toán:</p>
+      ${has ? html`<p class="mt-1 text-sm ${dark ? 'text-blue-100' : 'text-slate-600'}">Cần tư vấn tuyển sinh học nghề hoặc tài liệu ôn văn hóa? Liên hệ Tổ GDTX:</p>
         <div class="mt-3 space-y-2">
           ${s.hotline ? html`<a href="${telHref(s.hotline)}" class="btn btn-accent w-full">${icon('phone', 'h-4 w-4')} Gọi ${s.hotline}</a>` : ''}
           ${s.zalo && TT.safeUrl(s.zalo) ? html`<a href="${TT.safeUrl(s.zalo)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-full">${icon('chat', 'h-4 w-4')} Nhắn Zalo</a>` : ''}
@@ -422,15 +422,22 @@
   /* =====================================================================
    * TRANG CHỦ
    * =================================================================== */
-  // [ký hiệu, x, y, cỡ chữ, thời gian trôi, độ trễ]
+  // Hình trang trí trôi nhẹ sau banner: bánh răng, mũ bảo hộ, đai ốc, sách (nét mảnh, mờ) — thay cho ký hiệu Toán cũ
+  const ORN = {
+    gear: '<circle cx="50" cy="50" r="18"/><circle cx="50" cy="50" r="33" stroke-dasharray="13 9" stroke-width="12"/>',
+    helmet: '<path d="M14 64Q14 26 50 26Q86 26 86 64Z"/><path d="M8 68H92"/><path d="M50 20V64"/>',
+    hex: '<polygon points="50,6 90,28 90,72 50,94 10,72 10,28"/><circle cx="50" cy="50" r="16"/>',
+    book: '<path d="M50 28c-10-7-24-8-36-6v48c12-2 26-1 36 6 10-7 24-8 36-6V22c-12-2-26-1-36 6z"/><path d="M50 28v48"/>'
+  };
+  // [hình, x, y, cỡ, thời gian trôi, độ trễ]
   const SYMBOLS = [
-    ['∑', '6%', '14%', '4.5rem', '26s', '0s'], ['π', '22%', '62%', '3.5rem', '30s', '-6s'],
-    ['∫', '46%', '8%', '5rem', '34s', '-3s'], ['√', '62%', '70%', '4rem', '28s', '-9s'],
-    ['∞', '80%', '18%', '4rem', '32s', '-12s'], ['Δ', '90%', '64%', '3.2rem', '27s', '-4s'],
-    ['x²', '35%', '82%', '3rem', '31s', '-8s'], ['θ', '72%', '40%', '3.4rem', '29s', '-14s']
+    ['gear', '6%', '14%', '4.5rem', '26s', '0s'], ['helmet', '22%', '62%', '4rem', '30s', '-6s'],
+    ['hex', '46%', '8%', '4.5rem', '34s', '-3s'], ['book', '62%', '70%', '4rem', '28s', '-9s'],
+    ['gear', '80%', '18%', '4rem', '32s', '-12s'], ['hex', '90%', '64%', '3.2rem', '27s', '-4s'],
+    ['helmet', '35%', '82%', '3rem', '31s', '-8s'], ['book', '72%', '40%', '3.4rem', '29s', '-14s']
   ];
 
-  // Nút "Gọi tư vấn": số Tổ Toán → Zalo → số của Trường → trang Liên hệ
+  // Nút "Gọi tư vấn": số Tổ GDTX → Zalo → số của Trường → trang Liên hệ
   function callHref(s) {
     const c = TT.contactInfo(s);
     if (c.hotlineTel) return { href: c.hotlineTel, ext: false };
@@ -447,7 +454,7 @@
     const call = callHref(s);
     return html`<section class="hero-bg relative overflow-hidden text-white">
       <div class="hero-symbols" aria-hidden="true">${SYMBOLS.map((m) =>
-        html`<span style="--x:${m[1]};--y:${m[2]};--s:${m[3]};--t:${m[4]};--dl:${m[5]}">${m[0]}</span>`)}</div>
+        html`<span style="--x:${m[1]};--y:${m[2]};--s:${m[3]};--t:${m[4]};--dl:${m[5]}"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="width:var(--s);height:var(--s)">${raw(ORN[m[0]])}</svg></span>`)}</div>
       <div class="container-x relative grid items-center gap-10 py-12 md:py-16 lg:grid-cols-5 lg:py-20">
         <div class="lg:col-span-3">
           ${h.badge ? html`<span class="hero-in inline-block rounded-full bg-accent px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-navy-dark">${h.badge}</span>` : ''}
@@ -509,7 +516,7 @@
       { href: '#/muc/de-cuong', ic: 'cap', color: 'bg-accent text-navy-dark', title: 'Ôn văn hóa',
         desc: 'Đề cương và tài liệu ôn tập, xem trực tiếp và tải PDF.', bullets: ['Đề cương theo từng khối lớp', 'Xem ngay trên điện thoại', 'Tải PDF về máy'], cats: ['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12'], more: 'Xem tài liệu' },
       { href: '#/muc/tin-tuc', ic: 'layers', color: 'bg-brand', title: 'Tin tức & Hoạt động',
-        desc: 'Thông báo chung và hoạt động liên quan đến tuyển sinh, học tập.', bullets: ['Thông báo mới của Trường', 'Hoạt động của Tổ Toán', 'Lịch ôn tập, kiểm tra'], cats: ['tin-tuc'], more: 'Xem tin tức' }
+        desc: 'Thông báo chung và hoạt động liên quan đến tuyển sinh, học tập.', bullets: ['Thông báo mới của Trường', 'Hoạt động của Tổ GDTX', 'Lịch ôn tập, kiểm tra'], cats: ['tin-tuc'], more: 'Xem tin tức' }
     ];
     return html`<section class="bg-paper" aria-labelledby="h-features">
       <div class="container-x py-12">
@@ -534,7 +541,7 @@
     const pinned = a.visible().filter((p) => p.pinned).sort(byDate).slice(0, 3);
     registerBrowser('home', { tabs: TT.HOME_TABS, base: () => a.visible(), excludePinnedOnAll: pinned.length > 0 });
     return {
-      title: 'Tuyển sinh học nghề mỏ hầm lò & Ôn văn hóa — Tổ Toán, Trường Cao đẳng Than - Khoáng sản Việt Nam',
+      title: 'Tuyển sinh học nghề mỏ hầm lò & Ôn văn hóa — Tổ GDTX, Trường Cao đẳng Than - Khoáng sản Việt Nam',
       body: html`${hero(s)}${TT.views.recruitTeaser ? TT.views.recruitTeaser(s) : ''}${pinned.length ? featured(pinned) : ''}${aboutStats(s)}${featureCards()}
         <section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
           <div class="mb-5" data-reveal>
@@ -558,7 +565,7 @@
       : [{ id: 'all', label: 'Tất cả', cats: g.cats }];
     registerBrowser(bk, { tabs: tabs, base: () => a.visible(), excludePinnedOnAll: false });
     return {
-      title: g.title + ' — Tổ Toán',
+      title: g.title + ' — Tổ GDTX',
       body: html`${pageHead(g.title, g.desc)}
         <section class="container-x py-8">
           ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: g.title }])}
@@ -655,7 +662,7 @@
     const group = ({ 'tuyen-sinh': 'tuyen-sinh', 'tin-tuc': 'tin-tuc', 'de-cuong-10': 'de-cuong-10' })[p.category] || 'de-cuong-thpt';
     const explicitCover = TT.safeUrl(p.cover);
     return {
-      title: p.title + ' — Tổ Toán',
+      title: p.title + ' — Tổ GDTX',
       body: html`<section class="container-x py-8">
         ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: c.name, href: '#/muc/' + group }, { label: p.title }])}
         <div class="grid gap-8 lg:grid-cols-3">
@@ -690,7 +697,7 @@
   function searchView(q) {
     const results = searchPosts(app().visible(), q);
     return {
-      title: 'Tìm kiếm: ' + q + ' — Tổ Toán',
+      title: 'Tìm kiếm: ' + q + ' — Tổ GDTX',
       body: html`${pageHead('Kết quả tìm kiếm', q ? 'Từ khóa: “' + q + '” — ' + results.length + ' kết quả' : 'Nhập từ khóa vào ô tìm kiếm.')}
         <section class="container-x py-8">
           ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: 'Tìm kiếm' }])}
@@ -703,10 +710,10 @@
   function aboutView() {
     const s = app().settings;
     return {
-      title: s.about.title + ' — Tổ Toán',
+      title: s.about.title + ' — Tổ GDTX',
       body: html`${pageHead(s.about.title, s.schoolName)}
         <section class="container-x py-8">
-          ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: 'Giới thiệu Tổ Toán' }])}
+          ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: 'Giới thiệu Tổ GDTX' }])}
           <div class="grid gap-8 lg:grid-cols-3">
             <div class="card p-5 sm:p-8 lg:col-span-2"><div class="prose-math">${proseHtml(s.about.text)}</div></div>
             <div class="lg:col-span-1">${statGrid(s)}<div class="mt-6">${contactBox(s, true)}</div></div>
@@ -718,13 +725,13 @@
     const s = app().settings;
     const items = [
       s.hotline && { ic: 'phone', label: 'Hotline', value: s.hotline, href: telHref(s.hotline) },
-      s.email && { ic: 'mail', label: 'Email Tổ Toán', value: s.email, href: 'mailto:' + s.email },
+      s.email && { ic: 'mail', label: 'Email Tổ GDTX', value: s.email, href: 'mailto:' + s.email },
       s.address && { ic: 'pin', label: 'Địa chỉ nhà trường', value: s.address, href: '' },
-      s.zalo && TT.safeUrl(s.zalo) && { ic: 'chat', label: 'Zalo', value: 'Nhắn tin Zalo cho Tổ Toán', href: TT.safeUrl(s.zalo), ext: true }
+      s.zalo && TT.safeUrl(s.zalo) && { ic: 'chat', label: 'Zalo', value: 'Nhắn tin Zalo cho Tổ GDTX', href: TT.safeUrl(s.zalo), ext: true }
     ].filter(Boolean);
     return {
-      title: 'Liên hệ — Tổ Toán',
-      body: html`${pageHead('Liên hệ Tổ Toán', s.schoolName)}
+      title: 'Liên hệ — Tổ GDTX',
+      body: html`${pageHead('Liên hệ Tổ GDTX', s.schoolName)}
         <section class="container-x py-8">
           ${breadcrumb([{ label: 'Trang chủ', href: '#/' }, { label: 'Liên hệ' }])}
           ${items.length ? html`<div class="grid gap-5 sm:grid-cols-2">${items.map((it) => html`<div class="card flex gap-4 p-5">
@@ -740,7 +747,7 @@
 
   function notFoundView(msg) {
     return {
-      title: 'Không tìm thấy — Tổ Toán',
+      title: 'Không tìm thấy — Tổ GDTX',
       body: html`<section class="container-x py-20 text-center">
         <p class="text-6xl font-extrabold text-navy/20">404</p>
         <h1 class="mt-2 text-2xl font-extrabold text-navy-dark">${msg || 'Không tìm thấy trang này.'}</h1>
@@ -752,7 +759,7 @@
     const card = html`<div class="card overflow-hidden"><div class="skel aspect-video !rounded-none"></div>
       <div class="space-y-3 p-4"><div class="skel h-5 w-4/5"></div><div class="skel h-3 w-2/5"></div><div class="skel h-3 w-full"></div><div class="skel h-3 w-3/4"></div></div></div>`;
     return {
-      title: 'Đang tải… — Tổ Toán',
+      title: 'Đang tải… — Tổ GDTX',
       body: html`<div role="status"><span class="sr-only">Đang tải dữ liệu…</span>
         <section class="hero-bg" aria-hidden="true"><div class="container-x py-14 md:py-20">
           <div class="skel h-6 w-40 !rounded-full"></div><div class="skel mt-5 h-10 w-full max-w-2xl"></div>

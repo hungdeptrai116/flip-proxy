@@ -19,11 +19,13 @@ Two things share this repo:
    readers get the book without the original site's share buttons, QR codes and
    branding, and without being handed the upstream URL.
 
-3. **Tổ Toán portal** (`to-toan-portal/`) — a separate static site (Vietnamese)
-   for a maths department: admission notices and revision outlines (PDF),
-   one admin posting from the browser. Self-contained; **not** served by
-   `proxy-server.js` and shares no code with the LMS. See "Architecture — Tổ Toán
-   portal" below and `to-toan-portal/README.md`.
+3. **Tổ GDTX portal** (`to-toan-portal/`; the directory keeps its old name, the site was
+   renamed from "Tổ Toán" to "Tổ GDTX" = Giáo dục thường xuyên) — a separate static site
+   (Vietnamese) for a college department: vocational-training recruitment notices plus
+   "ôn văn hóa" revision material (PDF), one admin posting from the browser. Self-contained;
+   **not** served by `proxy-server.js` and shares no code with the LMS. See "Architecture — Tổ GDTX
+   portal" below and `to-toan-portal/README.md`. Drafts awaiting approval live in `docs/gdtx-portal/`
+   (outside the published folder on purpose).
 
 There is no build step, no bundler, no linter and no CI. `proxy-server.js` also
 serves `public/` so `npm start` is all that's needed to use the LMS.
@@ -45,7 +47,7 @@ package-lock.json       STALE — see "Known rough edges"
 node_modules/           committed to git (~3.6k files) — see "Known rough edges"
 ```
 
-## Architecture — Tổ Toán portal (`to-toan-portal/`)
+## Architecture — Tổ GDTX portal (`to-toan-portal/`)
 
 Vanilla JS + Tailwind (prebuilt `assets/tailwind.css`), hash routing, classic
 scripts (no modules). Two backends behind one `TT.Store` interface in

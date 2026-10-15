@@ -17,14 +17,14 @@
   TT.actions = TT.actions || {};
 
   /* ----------------------------- Liên hệ ----------------------------- */
-  // Hai số, dán nhãn rõ: số Tổ Toán (tư vấn) và số ghi trên thông báo của Trường
+  // Hai số, dán nhãn rõ: số Tổ GDTX (tư vấn) và số ghi trên thông báo của Trường
   function contactCard(s, id) {
     const c = TT.contactInfo(s);
-    const who = c.advisor ? c.advisor + ' (Tổ Toán)' : 'Tổ Toán';
+    const who = c.advisor ? c.advisor + ' (Tổ GDTX)' : 'Tổ GDTX';
     const none = !c.hotline && !c.zalo && !c.officialPhone;
     return html`<section class="card border-l-4 border-accent p-5" aria-labelledby="${id}">
       <h2 id="${id}" class="text-lg font-extrabold text-navy-dark">Cần tư vấn? Gọi hoặc nhắn trước khi đến</h2>
-      <p class="mt-1 text-sm text-slate-600">Hồ sơ và việc nhập học do <strong>Trường</strong> tiếp nhận tại các phân hiệu. Tổ Toán giúp bạn hiểu rõ điều kiện, hồ sơ và đường đi trước khi đến.</p>
+      <p class="mt-1 text-sm text-slate-600">Hồ sơ và việc nhập học do <strong>Trường</strong> tiếp nhận tại các phân hiệu. Tổ GDTX giúp bạn hiểu rõ điều kiện, hồ sơ và đường đi trước khi đến.</p>
       ${none ? html`<p class="mt-3 text-sm text-slate-500">Thông tin liên hệ đang được cập nhật.</p>` : html`<div class="mt-4 grid gap-3 sm:grid-cols-2">
         ${c.hotline ? html`<a href="${c.hotlineTel}" class="btn btn-accent btn-lg">${icon('phone', 'h-5 w-5')} Gọi ${who}: ${c.hotline}</a>` : ''}
         ${c.zalo ? html`<a href="${c.zalo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">${icon('chat', 'h-5 w-5')} Nhắn Zalo cho ${who}</a>` : ''}
@@ -139,7 +139,7 @@
     return html`<p class="mb-5 rounded-lg bg-slate-100 p-3 text-sm text-slate-600">
       <strong class="text-slate-800">Nguồn:</strong> ${r.source}.
       ${r.checked ? html` Đã đối chiếu với Trường ngày ${r.checked}.` : ''}
-      Website này là kênh thông tin của Tổ Toán; hồ sơ và nhập học do Trường tiếp nhận. Nếu có khác biệt, hãy theo hướng dẫn của Trường.</p>`;
+      Website này là kênh thông tin của Tổ GDTX; hồ sơ và nhập học do Trường tiếp nhận. Nếu có khác biệt, hãy theo hướng dẫn của Trường.</p>`;
   }
 
   function tocNav(r) {
