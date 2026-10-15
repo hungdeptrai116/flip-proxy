@@ -64,6 +64,7 @@ js/admin.js           trang quản trị
 js/app.js             định tuyến, trạng thái, sự kiện
 assets/               logo, ảnh bìa mặc định, PDF mẫu, CSS
 vendor/katex/         KaTeX 0.16.9 (đã kèm, chạy offline)
+assets/fonts/         Be Vietnam Pro (font thiết kế cho dấu tiếng Việt)
 ```
 
 Sửa giao diện bằng Tailwind: `npm install` rồi `npm run build:css` (file `assets/tailwind.css` đã build sẵn nên chỉ cần khi đổi class).
@@ -81,4 +82,4 @@ Sửa giao diện bằng Tailwind: `npm install` rồi `npm run build:css` (file
 - Firebase SDK tải từ `www.gstatic.com`. Mạng nhà trường chặn domain này thì web ở chế độ Firebase sẽ không tải được dữ liệu (sau 15 giây hiện thông báo lỗi). Cách xử lý nâng cao: đóng gói SDK bằng esbuild thành các module ESM và trỏ `firebaseBaseUrl` trong `config.js` tới đó (xem chú thích trong file).
 - Dữ liệu và số liệu trong Demo (hotline, số giáo viên, điểm trung bình…) chỉ là **mẫu**. Ở chế độ Firebase, mục chưa nhập hiển thị "—" hoặc bị ẩn, không có số liệu bịa.
 
-KaTeX và Tailwind CSS đều theo giấy phép MIT.
+KaTeX và Tailwind CSS theo giấy phép MIT. Font **Be Vietnam Pro** (đã kèm trong `assets/fonts/`, chạy offline) theo SIL Open Font License 1.1, xem `assets/fonts/OFL-LICENSE.txt`.

@@ -3,6 +3,9 @@ module.exports = {
   content: ['./index.html', './js/**/*.js'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Be Vietnam Pro"', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif']
+      },
       colors: {
         navy: { DEFAULT: '#1e3a8a', dark: '#172554', light: '#dbeafe' },
         brand: { DEFAULT: '#2563eb', dark: '#1d4ed8', light: '#eff6ff' },

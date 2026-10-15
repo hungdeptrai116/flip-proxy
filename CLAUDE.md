@@ -63,6 +63,10 @@ and **firebase** (Firestore + Auth, SDK loaded by dynamic `import()` from gstati
   settings, login) so typing is not wiped — but only once the real page has been
   drawn (`state.shown`); otherwise Firebase's event order can strand the
   "Đang tải" screen.
+- Touch targets: `assets/app.css` forces ≥44px for controls under
+  `@media (pointer: coarse), (max-width: 640px)`. A new button/link/input type
+  must be added to that rule. Audited at 390px (targets, contrast, labels,
+  keyboard focus) — keep body text ≥4.5:1 and every input labelled.
 - Changing Tailwind classes in `index.html`/`js/*.js` needs
   `cd to-toan-portal && npm install && npm run build:css` (own `.gitignore`
   covers its `node_modules/`).

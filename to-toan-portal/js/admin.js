@@ -240,7 +240,7 @@
     { id: 'h3', label: 'H3', title: 'Tiêu đề nhỏ' },
     { id: 'ul', ic: 'list', title: 'Danh sách gạch đầu dòng' },
     { id: 'ol', label: '1.', title: 'Danh sách đánh số' },
-    { id: 'quote', label: '❝', title: 'Khung trích dẫn / lưu ý' },
+    { id: 'quote', ic: 'quote', title: 'Khung trích dẫn / lưu ý' },
     { id: 'link', ic: 'link', title: 'Chèn liên kết' },
     { id: 'image', ic: 'image', title: 'Chèn ảnh (dán link ảnh)' },
     { id: 'table', ic: 'table', title: 'Chèn bảng' },
@@ -272,10 +272,10 @@
   function attRow(a) {
     return html`<div class="rounded-lg border border-slate-200 bg-slate-50 p-3" data-att-row>
       <div class="grid gap-3 sm:grid-cols-5">
-        <div class="sm:col-span-2"><label class="label">Tên tài liệu</label>
-          <input name="att_title" class="field" maxlength="200" value="${a.title}" placeholder="VD: Đề cương Đại số 9 - Ôn vào 10"></div>
-        <div class="sm:col-span-3"><label class="label">Link Google Drive hoặc link PDF</label>
-          <input name="att_url" class="field" data-input="att-url" value="${a.url}" placeholder="https://drive.google.com/file/d/…/view" inputmode="url" autocomplete="off"></div>
+        <label class="block sm:col-span-2"><span class="label">Tên tài liệu</span>
+          <input name="att_title" class="field" maxlength="200" value="${a.title}" placeholder="VD: Đề cương Đại số 9 - Ôn vào 10"></label>
+        <label class="block sm:col-span-3"><span class="label">Link Google Drive hoặc link PDF</span>
+          <input name="att_url" class="field" data-input="att-url" value="${a.url}" placeholder="https://drive.google.com/file/d/…/view" inputmode="url" autocomplete="off"></label>
       </div>
       <div class="mt-2 flex items-start justify-between gap-3">
         <p class="text-xs" data-detect>${detectHtml(a.url)}</p>
@@ -289,11 +289,11 @@
     const L = TT.parseLink(url);
     if (!L) return html`<span class="font-semibold text-red-700">Link không hợp lệ — chỉ nhận địa chỉ bắt đầu bằng http:// hoặc https://</span>`;
     if (L.kind === 'drive' || L.kind === 'gdoc') {
-      return html`<span class="font-semibold text-emerald-700">✓ Nhận diện ${L.label}</span> <span class="text-slate-500">(ID: ${L.id.slice(0, 8)}…) — tự tạo link Xem trước và Tải xuống. Nhớ chia sẻ file ở chế độ “Bất kỳ ai có đường liên kết”.</span>`;
+      return html`<span class="inline-flex items-center gap-1 font-semibold text-emerald-700">${icon('check', 'h-3.5 w-3.5')}Nhận diện ${L.label}</span> <span class="text-slate-500">(ID: ${L.id.slice(0, 8)}…) — tự tạo link Xem trước và Tải xuống. Nhớ chia sẻ file ở chế độ “Bất kỳ ai có đường liên kết”.</span>`;
     }
-    if (L.kind === 'folder') return html`<span class="font-semibold text-emerald-700">✓ Thư mục Google Drive</span> <span class="text-slate-500">— hiển thị danh sách file, không có nút Tải xuống.</span>`;
-    if (L.kind === 'office') return html`<span class="font-semibold text-emerald-700">✓ Tài liệu Office</span> <span class="text-slate-500">— xem qua Google Viewer.</span>`;
-    return html`<span class="font-semibold text-emerald-700">✓ Liên kết trực tiếp</span> <span class="text-slate-500">— một số trang web không cho nhúng khung xem; nút Tải vẫn hoạt động.</span>`;
+    if (L.kind === 'folder') return html`<span class="inline-flex items-center gap-1 font-semibold text-emerald-700">${icon('check', 'h-3.5 w-3.5')}Thư mục Google Drive</span> <span class="text-slate-500">— hiển thị danh sách file, không có nút Tải xuống.</span>`;
+    if (L.kind === 'office') return html`<span class="inline-flex items-center gap-1 font-semibold text-emerald-700">${icon('check', 'h-3.5 w-3.5')}Tài liệu Office</span> <span class="text-slate-500">— xem qua Google Viewer.</span>`;
+    return html`<span class="inline-flex items-center gap-1 font-semibold text-emerald-700">${icon('check', 'h-3.5 w-3.5')}Liên kết trực tiếp</span> <span class="text-slate-500">— một số trang web không cho nhúng khung xem; nút Tải vẫn hoạt động.</span>`;
   }
 
   function editorView(id) {
@@ -374,7 +374,7 @@
               <textarea id="f-content" name="content" rows="18" spellcheck="true" class="block min-h-[22rem] w-full resize-y border-0 p-3 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand/40"
                 placeholder="Gõ nội dung ở đây. Hỗ trợ Markdown và công thức Toán $x^2$…">${post.content}</textarea>
               <div class="max-h-[34rem] overflow-auto border-t border-slate-300 bg-white p-4 lg:border-l lg:border-t-0">
-                <p class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">Xem trước</p>
+                <p class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Xem trước</p>
                 <div id="preview" class="prose-math" aria-live="polite"></div></div>
             </div>
           </div>
@@ -496,7 +496,7 @@
 
     const renderPreview = () => {
       const out = TT.md.render(ta.value);
-      preview.innerHTML = out || '<p class="text-slate-400">Xem trước sẽ hiện ở đây…</p>';
+      preview.innerHTML = out || '<p class="text-slate-500">Xem trước sẽ hiện ở đây…</p>';
     };
     const renderPreviewSoon = TT.debounce(renderPreview, 150);
     renderPreview();

@@ -269,7 +269,7 @@
     return html`<form data-form="search" role="search" class="relative w-full">
       <label for="q-${idSuffix}" class="sr-only">Tìm bài viết hoặc đề cương</label>
       <input id="q-${idSuffix}" type="search" name="q" value="${q}" placeholder="Tìm bài viết, đề cương…" autocomplete="off" class="field pl-9">
-      <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${icon('search', 'h-4 w-4')}</span>
+      <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">${icon('search', 'h-4 w-4')}</span>
     </form>`;
   }
 
