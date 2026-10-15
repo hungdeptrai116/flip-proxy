@@ -50,6 +50,24 @@ ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hi�
 3. `index.html` → khối `static-fallback` (số hiện khi script lỗi hoặc tải quá 3 giây). Bộ kiểm thử có ca so khớp (2) và (3).
 Cài đặt có kiểm tra: số điện thoại phải 9–11 chữ số, link Zalo phải bắt đầu bằng `https://`, để trống số sẽ hỏi lại.
 
+### Thống kê lượt truy cập (GoatCounter)
+Để biết web có mang được ứng viên về không: có bao nhiêu người vào, trang nào được xem, **bao nhiêu lượt bấm Gọi / Zalo / Chỉ đường**, và **kênh nào** dẫn người vào. Đếm ẩn danh, không cookie, không lưu số điện thoại hay thông tin cá nhân (site vẫn không thu dữ liệu cá nhân).
+
+1. Vào <https://www.goatcounter.com> → *Sign up* → ô **Code** bạn đặt (VD `congnhanhamlo`) chính là mã; bảng thống kê nằm ở `https://MÃ.goatcounter.com`.
+2. **Quản trị → Cài đặt → Thống kê lượt truy cập** → dán mã (hoặc dán cả địa chỉ bảng thống kê, web tự rút mã) → *Lưu*. Có hiệu lực với khách từ lần tải trang kế tiếp. Không phải sửa mã hay deploy lại. (Cách khác: điền `goatcounter` trong `config.js`; mã ở Cài đặt được ưu tiên.)
+3. **Để trống = web không tải script nào và không gửi gì ra ngoài.** Chân trang chỉ ghi dòng "đếm lượt truy cập ẩn danh" khi bộ đếm đang bật.
+
+**Đếm gì:** lượt xem từng trang (web dùng `#/…` nên đếm bằng tay mỗi lần đổi trang; trang tìm kiếm chỉ gửi "/tim-kiem", không gửi từ khóa của khách) và các sự kiện `goi-dien` (bấm số điện thoại), `zalo`, `chi-duong` (Google Maps), `mo-tai-lieu` (Drive/PDF). Tiêu đề sự kiện ghi bấm ở trang nào.
+**Không đếm:** trang quản trị; chính quản trị viên khi đang đăng nhập; trình duyệt bật *Do Not Track* hoặc *Global Privacy Control*; người dùng trình chặn quảng cáo (nên con số luôn **thấp hơn thực tế** — dùng để so sánh kênh với nhau, đừng coi là số tuyệt đối).
+
+**Theo dõi từng kênh:** mỗi nơi đăng link dùng một link riêng có `?ref=tên-kênh` (VD `https://congnhanhamlo.onrender.com/?ref=zalo-nhom-1`) — tạo nhanh bằng ô *Tạo link theo kênh* ngay trong Cài đặt (tự bỏ dấu). GoatCounter đọc sẵn `ref`, `utm_source`, `src`, `source` (**không** đọc `nguon`). Lượt xem đầu tiên mang kênh; web rồi xóa `?ref=…` khỏi thanh địa chỉ để các lần chuyển trang sau không bị gán lại. Sự kiện bấm Gọi/Zalo mang cùng thẻ kênh (xem trong *Events* của bảng thống kê).
+
+Căn cứ kỹ thuật và giới hạn:
+- Mọi chi tiết API (`count()`, tham số, quy tắc mã site 2–50 ký tự `a–z 0–9 -`) đọc từ **mã nguồn** `count.js`/backend của GoatCounter trên GitHub, không phải đoán. Mã nguồn có thể đổi theo bản mới; nếu số đếm bất thường, đối chiếu lại `js/analytics.js` với `count.js` hiện hành.
+- **Điều khoản gói miễn phí chưa xác minh được trên trang chính thức** (bị chặn trong môi trường soạn). Bản sao trong kho mã nguồn ghi "miễn phí cho mức dùng công khai hợp lý, website cá nhân hay doanh nghiệp nhỏ–vừa đều được", nhưng một số trang bên thứ ba ghi "chỉ phi thương mại". **Người phụ trách cần đọc `goatcounter.com/help/terms` trước khi dùng chính thức.** Nếu không phù hợp: GoatCounter tự cài đặt được, hoặc đổi sang Umami; chỉ cần thay `js/analytics.js` (giữ nguyên các lệnh gọi `configure/pageview` trong `app.js`).
+- Máy chủ GoatCounter đặt ở châu Âu; chưa đánh giá quy định bảo vệ dữ liệu cá nhân của Việt Nam đối với việc này — nên hỏi bộ phận pháp chế của Trường nếu cần.
+- Kiểm thử: `analytics.test.js` trong thư mục `tests/` ở gốc kho (script GoatCounter thật bị chặn và thay bằng bản giả ghi lại mọi lệnh đếm) + 4 ca trong bộ Firebase Emulator.
+
 ### Bài đăng chờ duyệt
 Bài tuyển sinh viết sẵn nằm ở `docs/gdtx-portal/` (ngoài thư mục được đưa lên mạng, có chủ đích): `bai-dang-tuyen-sinh-2026.md` để sếp đọc/duyệt (kèm các điểm cần xác nhận) và `bai-dang-tuyen-sinh-2026.json` để nhập.
 Nhập: *Quản trị → Cài đặt → Nhập từ file JSON* — bài vào ở trạng thái **ẨN**; sau khi duyệt, vào danh sách bài bấm **Hiện**. Nhập lại cùng file sẽ ghi đè (cùng ID), tiện khi sửa theo góp ý của sếp.
@@ -98,6 +116,7 @@ js/util.js            escape an toàn, icon, kiểm tra URL, nhận diện link 
 js/markdown.js        Markdown + KaTeX, không chèn HTML thô
 js/data.js            chuyên mục, cài đặt mặc định (gồm mục tuyển sinh học nghề), 6 bài demo
 js/recruit.js         trang #/hoc-nghe và khối giới thiệu nhanh ở trang chủ
+js/analytics.js       bộ đếm lượt truy cập ẩn danh (GoatCounter); tắt hẳn khi chưa có mã
 js/store.js           lớp dữ liệu: Demo (localStorage) / Firebase (Firestore + Auth)
 js/views.js           giao diện công khai
 js/admin.js           trang quản trị

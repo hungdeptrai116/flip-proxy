@@ -139,6 +139,8 @@
       main.classList.toggle('no-anim', !animate);
       document.title = v.title || 'Tổ GDTX';
       if (v.mount) v.mount(main);
+      // Bộ đếm lượt truy cập: chỉ khi trang THẬT đã hiện và đã biết có phải quản trị viên không (không đếm quản trị viên)
+      if (state.shown && state.loaded.auth && TT.analytics) TT.analytics.pageview();
       // Hiệu ứng hỏng thì chỉ tắt hiệu ứng — KHÔNG được làm mất nội dung trang
       if (animate && TT.motion) {
         try { TT.motion.afterRender(main, true); }
@@ -187,6 +189,8 @@
   Store.onSettings((s) => {
     state.settings = s;
     state.loaded.settings = true;
+    // Mã bộ đếm: ưu tiên mã admin nhập ở Cài đặt, rồi đến config.js; không có mã = không tải, không gửi gì
+    if (TT.analytics) TT.analytics.configure(s.analyticsCode || (window.SITE_CONFIG || {}).goatcounter);
     renderChrome();
     schedule(false);
   });

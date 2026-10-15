@@ -362,6 +362,7 @@
       <div class="border-t border-white/10">
         <div class="container-x flex flex-wrap items-center justify-between gap-2 py-4 text-xs text-blue-200">
           <p>© ${year} Tổ GDTX — ${s.schoolName}.</p>
+          ${TT.analytics && TT.analytics.enabled() ? html`<p class="w-full">Website đếm lượt truy cập ẩn danh: không cookie, không lưu số điện thoại hay thông tin cá nhân. Bật “Không theo dõi” (Do Not Track) trên trình duyệt để không bị đếm.</p>` : ''}
           <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
             <button type="button" data-action="toggle-motion" aria-pressed="${String(motionOn)}" ${osReduced ? raw('disabled') : ''}
               class="underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline">

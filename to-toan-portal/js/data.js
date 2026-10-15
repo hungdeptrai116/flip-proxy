@@ -71,6 +71,7 @@
     email: '',
     address: '',
     zalo: 'https://zalo.me/0977588915',   // Zalo của ThS. Kiên (cùng số hotline) — đã đồng ý hiển thị
+    analyticsCode: '',                    // mã site GoatCounter (xem js/analytics.js); trống = KHÔNG đếm gì
     defaultAuthor: 'Admin Tổ GDTX',
     hero: {
       badge: 'Tuyển sinh học nghề 2026',
@@ -174,6 +175,18 @@
   // Link ngoài (Zalo...) phải bắt đầu bằng http(s):// — đường dẫn không có "https://" sẽ thành link hỏng trỏ vào chính website
   const httpUrl = (v) => { const u = TT.safeUrl(v); return /^https?:\/\//i.test(u) ? u : ''; };
 
+  // Mã site GoatCounter = phần tên miền con trong https://MÃ.goatcounter.com. Quy tắc của GoatCounter (site.go):
+  // 2–50 ký tự, chỉ a–z, 0–9 và dấu gạch ngang, không bắt đầu bằng gạch. Sai quy tắc → '' (tắt bộ đếm), không bao giờ ghép bừa vào địa chỉ.
+  // Thẻ kênh dẫn vào (?ref=…): bỏ dấu tiếng Việt, chữ thường, chỉ a–z 0–9 . _ -. Dùng chung cho công cụ tạo link (admin) và bộ đếm,
+  // để link tạo ra và thẻ ghi nhận luôn khớp nhau.
+  TT.channelSlug = (v) => String(v == null ? '' : v).replace(/đ/g, 'd').replace(/Đ/g, 'D').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+
+  TT.cleanAnalyticsCode = (v) => {
+    const c = typeof v === 'string' ? v.trim().toLowerCase() : '';
+    return /^[a-z0-9][a-z0-9-]{1,49}$/.test(c) ? c : '';
+  };
+
   // Danh sách chuỗi: nhận mảng hoặc chuỗi nhiều dòng (ô textarea của trang Quản trị); bỏ dòng trống
   function asLines(v, def, max, n) {
     let arr;
@@ -237,6 +250,7 @@
       email: clipStr(r.email, d.email, 120),
       address: clipStr(r.address, d.address, 300),
       zalo: httpUrl(r.zalo) || (typeof r.zalo === 'string' ? '' : d.zalo),
+      analyticsCode: TT.cleanAnalyticsCode(r.analyticsCode),
       defaultAuthor: clipStr(r.defaultAuthor, d.defaultAuthor, 120),
       hero: {
         badge: clipStr(rh.badge, d.hero.badge, 80),

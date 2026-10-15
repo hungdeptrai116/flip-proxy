@@ -80,6 +80,14 @@ and **firebase** (Firestore + Auth, SDK loaded by dynamic `import()` from gstati
   ~0.7 s; only post/group/search routes wait for posts (else a false 404) and admin routes wait for auth. The 0.7 s timer must NOT force a re-render when the page
   is already shown (it wiped typed input once). Technical error banners are shown to admins only. `index.html` has a `static-fallback` block (phone number must match
   `DEFAULT_SETTINGS.hotline`; a test checks) that appears if JS fails/slow. Sections with no content (nav items, stat tiles, latest-posts block) are hidden when there are no posts.
+- **Visit counter** (`js/analytics.js`, GoatCounter, no cookies): inert until a valid site code exists
+  (`settings.analyticsCode` from Admin → Cài đặt, else `SITE_CONFIG.goatcounter`) — then it injects `gc.zgo.at/count.js`
+  with `no_onload` and counts by hand: one pageview per route (`app.js` `renderView` → `TT.analytics.pageview()`, only
+  once `state.shown && state.loaded.auth` so admins are never counted) plus click events for `tel:`/Zalo/Maps/Drive links.
+  Never send the search query (the title of `#/tim-kiem/…` contains it — `pageview()` substitutes a constant).
+  Channel = `?ref=` (GoatCounter reads `ref`/`utm_source`/`src`/`source`, **not** `nguon`); only the first hit carries it, then
+  `stripSource()` removes it from the URL. Honors DNT/GPC. API facts come from GoatCounter's own source (`count.js`, `hit.go`,
+  `site.go` — site code is 2–50 chars of `a-z0-9-`); re-check them if counts look wrong. Tests stub the script — see `tests/`.
 - Changing Tailwind classes in `index.html`/`js/*.js` needs
   `cd to-toan-portal && npm install && npm run build:css` (own `.gitignore`
   covers its `node_modules/`).

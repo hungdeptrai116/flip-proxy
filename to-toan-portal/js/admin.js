@@ -614,6 +614,9 @@
   /* =====================================================================
    * Cài đặt chung + sao lưu
    * =================================================================== */
+  // Link mở bảng thống kê GoatCounter của mã đã lưu (mã đã qua TT.cleanAnalyticsCode nên chỉ gồm a–z 0–9 và '-')
+  const gcLink = (code) => html`<a href="${'https://' + code + '.goatcounter.com'}" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand underline">Mở bảng thống kê: ${code}.goatcounter.com</a>`;
+
   function settingsView() {
     const s = app().settings;
     const demo = TT.Store.mode === 'demo';
@@ -704,6 +707,21 @@
                     Tự đếm số tài liệu đính kèm đang hiển thị</label>` : ''}</div>`)}
             </div></div>
 
+          <div class="card p-5" id="thong-ke"><h2 class="text-base font-extrabold text-navy-dark">Thống kê lượt truy cập</h2>
+            <p class="hint">Đếm ẩn danh (GoatCounter): số người vào web, trang nào được xem, bao nhiêu lượt bấm <strong>Gọi / Zalo / Chỉ đường</strong> và <strong>kênh nào</strong> dẫn người vào.
+              Không cookie, không lưu số điện thoại hay thông tin cá nhân. Không đếm bạn khi đang đăng nhập quản trị, và không đếm trình duyệt bật “Không theo dõi”. Một số người dùng trình chặn quảng cáo sẽ không bị đếm nên con số luôn thấp hơn thực tế.</p>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              ${f('Mã GoatCounter', 'analyticsCode', s.analyticsCode, { ph: 'VD: congnhanhamlo', max: 80, span: 'sm:col-span-2',
+                hint: 'Lấy mã: vào goatcounter.com → Sign up → ô “Code” bạn đặt chính là mã (địa chỉ bảng thống kê sẽ là MÃ.goatcounter.com). Dán mã vào đây rồi Lưu; có hiệu lực với khách từ lần tải trang kế tiếp. Để trống = không đếm gì.' })}
+              <p id="gc-link" class="text-sm sm:col-span-2" ${s.analyticsCode ? '' : raw('hidden')}>${s.analyticsCode ? gcLink(s.analyticsCode) : ''}</p>
+              <div class="sm:col-span-2"><label class="label" for="chan-name">Tạo link theo kênh (để biết kênh nào hiệu quả)</label>
+                <input id="chan-name" class="field" maxlength="60" data-input="chan-link" placeholder="Tên kênh, VD: Zalo nhóm 1 / Facebook / Tờ rơi xã A" autocomplete="off">
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <input id="chan-out" class="field min-w-0 flex-1" readonly aria-label="Link đã tạo" placeholder="Link sẽ hiện ở đây">
+                  <button type="button" data-action="copy-chan-link" class="btn btn-outline">${icon('check', 'h-4 w-4')} Sao chép link</button></div>
+                <p class="hint">Mỗi nơi đăng link dùng một link riêng (Zalo nhóm, Facebook, mã QR trên tờ rơi…). Trong bảng thống kê, mục <strong>Campaigns/Referrers</strong> sẽ hiện từng kênh, và mục <strong>Events</strong> hiện số lượt bấm Gọi/Zalo kèm kênh.</p></div>
+            </div></div>
+
           <div class="sticky bottom-0 z-30 -mx-4 flex items-center gap-3 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-xl sm:border">
             <button type="submit" class="btn btn-accent btn-lg">${icon('check', 'h-5 w-5')} Lưu cài đặt</button>
             <a href="#/admin" class="btn btn-outline btn-lg">Quay lại</a></div>
@@ -734,6 +752,21 @@
     });
   }
 
+  // Tên kênh → thẻ ngắn không dấu (TT.channelSlug, cùng cách js/analytics.js làm sạch ?ref=) → link có ?ref=
+  TT.inputs['chan-link'] = (el) => {
+    const out = document.getElementById('chan-out');
+    if (!out) return;
+    const slug = TT.channelSlug(el.value);
+    const base = TT.safeUrl((window.SITE_CONFIG || {}).siteUrl) || location.origin;
+    out.value = slug ? base.replace(/\/+$/, '') + '/?ref=' + slug : '';
+  };
+  TT.actions['copy-chan-link'] = async () => {
+    const out = document.getElementById('chan-out');
+    if (!out || !out.value) { TT.toast('Hãy nhập tên kênh trước.', 'error'); return; }
+    try { await navigator.clipboard.writeText(out.value); TT.toast('Đã sao chép: ' + out.value, 'success'); }
+    catch (e) { out.focus(); out.select(); TT.toast('Link đang được chọn — nhấn Ctrl+C để sao chép.'); }
+  };
+
   TT.inputs['stat-auto'] = (el) => {
     const v = document.getElementById('s-stats.1.value');
     if (v) v.disabled = el.checked;
@@ -753,11 +786,17 @@
     if (out.hotline && !phoneOk(out.hotline)) { TT.toast('Số điện thoại tư vấn không hợp lệ (cần 9–11 chữ số). Chưa lưu.', 'error'); return; }
     if (out.recruit && out.recruit.officialPhone && !phoneOk(out.recruit.officialPhone)) { TT.toast('Số điện thoại thứ hai không hợp lệ (cần 9–11 chữ số). Chưa lưu.', 'error'); return; }
     if (out.zalo && !/^https?:\/\/\S+$/i.test(String(out.zalo).trim())) { TT.toast('Link Zalo phải bắt đầu bằng https:// (VD: https://zalo.me/0912345678). Chưa lưu.', 'error'); return; }
+    // Cho phép dán cả địa chỉ bảng thống kê (https://MÃ.goatcounter.com) — tự rút ra phần MÃ
+    if (typeof out.analyticsCode === 'string') out.analyticsCode = out.analyticsCode.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\.goatcounter\.com.*$/, '');
+    if (out.analyticsCode && !TT.cleanAnalyticsCode(out.analyticsCode)) { TT.toast('Mã GoatCounter chỉ gồm chữ thường a–z, số và dấu gạch ngang (2–50 ký tự), VD: congnhanhamlo. Chưa lưu.', 'error'); return; }
     if (!out.hotline && !(await TT.confirm('Bạn đang để TRỐNG số điện thoại tư vấn: nút gọi sẽ biến mất khỏi website và ứng viên không còn cách liên hệ. Vẫn lưu?', { title: 'Để trống số điện thoại?', okLabel: 'Vẫn lưu' }))) return;
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
     try {
       await TT.Store.saveSettings(out);
+      // Trang Cài đặt không tự vẽ lại khi lưu (để không mất chữ đang gõ) → cập nhật tay link bảng thống kê
+      const gl = document.getElementById('gc-link');
+      if (gl) { const c = app().settings.analyticsCode; gl.hidden = !c; gl.innerHTML = c ? gcLink(c).s : ''; }
       const shown = app().settings.hotline;
       TT.toast('Đã lưu cài đặt.' + (shown ? ' Số đang hiển thị trên web: ' + shown + '.' : ''), 'success');
     }

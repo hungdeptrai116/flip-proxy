@@ -29,6 +29,11 @@ window.SITE_CONFIG = {
   siteUrl: "https://congnhanhamlo.onrender.com",
   legacyHosts: ["to-toan-portal.onrender.com", "gdtx-tuyensinh.onrender.com"],
 
+  // (Tuỳ chọn) Mã site GoatCounter để đếm lượt truy cập ẩn danh — phần "MÃ" trong https://MÃ.goatcounter.com.
+  // Cách dễ hơn: nhập ở Quản trị → Cài đặt → Thống kê lượt truy cập (không cần sửa file, không cần deploy).
+  // Mã nhập ở Cài đặt được ưu tiên; để trống cả hai = KHÔNG đếm gì. Xem js/analytics.js.
+  goatcounter: "",
+
   // Phiên bản Firebase JS SDK tải từ CDN (chỉ tải khi chạy chế độ Firebase).
   firebaseVersion: "10.14.1",
 
