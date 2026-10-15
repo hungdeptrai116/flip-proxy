@@ -42,7 +42,7 @@ ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hi�
 - **Khi Trường đổi thông báo:** sửa tại đây và điền ô *Đã đối chiếu với Trường ngày*. Chỉ đăng thông tin đã được Trường xác nhận.
 - **Số điện thoại:** nhập số tư vấn của Tổ GDTX ở *Thông tin chung → Hotline* và *Tên người tư vấn* (nên ghi tên thật). Mặc định **chỉ hiện số tư vấn này**; số điện thoại thứ hai (ví dụ số của Trường) để trống thì không hiện — muốn hiện thì điền ở Cài đặt. Nút "Gọi" ở các phân hiệu cũng gọi số tư vấn.
 - Không đổi `firestore.rules`: `settings` đã cho admin ghi tự do; bài viết vẫn dùng 6 chuyên mục cũ (nhãn hiển thị đã đổi: `tuyen-sinh` = "Tuyển sinh học nghề", các `de-cuong-*` thuộc "Ôn văn hóa").
-- Xem trước khi chia sẻ link (Zalo/Facebook) lấy từ thẻ Open Graph trong `index.html` và ảnh `assets/og.png`. Địa chỉ ảnh đang là `https://to-toan-portal.onrender.com/assets/og.png` — **đổi lại khi chuyển sang tên miền riêng**. Preview chỉ có cho cả trang, không riêng từng bài (site dùng `#`).
+- Xem trước khi chia sẻ link (Zalo/Facebook) lấy từ thẻ Open Graph trong `index.html` và ảnh `assets/og.png`. Địa chỉ ảnh đang là `https://gdtx-tuyensinh.onrender.com/assets/og.png` — **đổi lại khi chuyển sang tên miền riêng**. Preview chỉ có cho cả trang, không riêng từng bài (site dùng `#`).
 
 ### Bài đăng chờ duyệt
 Bài tuyển sinh viết sẵn nằm ở `docs/gdtx-portal/` (ngoài thư mục được đưa lên mạng, có chủ đích): `bai-dang-tuyen-sinh-2026.md` để sếp đọc/duyệt (kèm các điểm cần xác nhận) và `bai-dang-tuyen-sinh-2026.json` để nhập.
@@ -54,6 +54,7 @@ Các thông báo/poster của Trường còn vài chỗ ghi khác nhau; cần ng
 số ảnh 3x4 (05 hay 06) · giấy khai sinh là bản sao hay photo công chứng · nơi nộp hồ sơ (địa phương hay phân hiệu) · cách Trường ghi nhận người giới thiệu.
 
 ## Đổi địa chỉ website (tên miền phụ `*.onrender.com`)
+**Đã đổi:** địa chỉ hiện tại là `https://gdtx-tuyensinh.onrender.com` (dịch vụ Render `gdtx-tuyensinh`); địa chỉ cũ `to-toan-portal.onrender.com` được giữ để tự chuyển sang địa chỉ mới. Các bước dưới đây dùng khi cần đổi lần nữa.
 Tên `ten-dich-vu.onrender.com` được đặt lúc **tạo** dịch vụ trên Render và (theo hiểu biết của người viết, chưa kiểm chứng) **đổi tên dịch vụ sau đó không đổi địa chỉ**. Muốn địa chỉ mới:
 1. Render → **New → Static Site** → cùng repo/nhánh, *Build Command* `echo "Site tinh, khong can build"`, *Publish Directory* `to-toan-portal`, đặt **tên mới** (tên này thành địa chỉ). Không dùng chữ "tkv"/"vinacomin" trong tên để không bị hiểu là trang chính thức.
 2. Trong `config.js` điền `siteUrl: "https://ten-moi.onrender.com"`; trong `index.html` đổi địa chỉ ở thẻ `og:image` sang tên mới. Đẩy code lên.
