@@ -105,8 +105,9 @@
       source: 'Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026 của Trường Cao đẳng Than - Khoáng sản Việt Nam (ngày 02/01/2026)',
       checked: '',
       advisor: 'ThS. Nguyễn Trung Kiên',
-      officialName: 'Số điện thoại ghi trên thông báo của Trường',
-      officialPhone: '0372 448 111',
+      officialName: '',
+      officialPhone: '',
+      referralNote: 'Khi đến phân hiệu nộp hồ sơ, hãy cho biết bạn được ThS. Nguyễn Trung Kiên tư vấn.',
       eligibility: 'Nam thanh niên, tuổi từ 18 đến 35; đủ sức khỏe theo quy định.',
       programs: [
         { name: 'Khai thác mỏ hầm lò / Xây dựng mỏ hầm lò', level: 'Sơ cấp', require: 'Đọc, viết thành thạo', train: '3,2 tháng', practice: '3,7 tháng' },
@@ -195,6 +196,7 @@
       advisor: s(r.advisor, d.advisor, 120),
       officialName: s(r.officialName, d.officialName, 120),
       officialPhone: s(r.officialPhone, d.officialPhone, 40),
+      referralNote: s(r.referralNote, d.referralNote, 300),
       eligibility: s(r.eligibility, d.eligibility, 400),
       programs: asRows(r.programs, d.programs, 4, (x) => {
         const name = clipStr(x.name, '', 160);
@@ -296,6 +298,7 @@
     base.address = p.address;
     base.zalo = p.zalo;
     base.recruit.advisor = '';   // Demo dùng số mẫu nên không gắn tên người thật
+    base.recruit.referralNote = '';
     p.stats.forEach((s, i) => {
       if (s.value !== undefined) base.stats[i].value = s.value;
     });

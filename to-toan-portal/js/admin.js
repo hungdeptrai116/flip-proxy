@@ -343,7 +343,7 @@
             <div class="grid gap-4 sm:grid-cols-3">
               <div class="sm:col-span-2"><label class="label" for="f-cover">Link ảnh đại diện</label>
                 <input id="f-cover" name="cover" class="field" inputmode="url" value="${post.cover}" placeholder="Để trống = dùng ảnh mặc định của chuyên mục">
-                <p class="hint">Dán link ảnh (https://…). Bỏ trống thì hệ thống tự dùng ảnh Toán học mặc định theo chuyên mục.</p></div>
+                <p class="hint">Dán link ảnh (https://…). Bỏ trống thì hệ thống tự dùng ảnh mặc định theo chuyên mục.</p></div>
               <div><span class="label">Ảnh sẽ hiển thị</span>
                 <img id="cover-preview" alt="Ảnh đại diện" class="aspect-video w-full rounded-lg object-cover ring-1 ring-slate-200" src="${TT.safeUrl(post.cover) || CATS[post.category].cover}"></div>
             </div>
@@ -655,8 +655,9 @@
               ${f('Nguồn thông tin (hiện đầu trang)', 'recruit.source', rc.source, { area: true, rows: 2, max: 300, span: 'sm:col-span-2' })}
               ${f('Đã đối chiếu với Trường ngày', 'recruit.checked', rc.checked, { max: 80, ph: 'VD: 20/10/2026', hint: 'Để trống nếu chưa đối chiếu.' })}
               ${f('Tên người tư vấn (hiện cạnh số của Tổ GDTX)', 'recruit.advisor', rc.advisor, { max: 120, ph: 'VD: Thầy Nguyễn Văn A', hint: 'Nên ghi tên thật — số lạ không tên dễ bị nghi là lừa đảo.' })}
-              ${f('Nhãn số điện thoại của Trường', 'recruit.officialName', rc.officialName, { max: 120 })}
-              ${f('Số điện thoại của Trường', 'recruit.officialPhone', rc.officialPhone, { max: 40, hint: 'Số ghi trên thông báo chính thức.' })}
+              ${f('Nhãn số điện thoại thứ hai (nếu muốn hiện)', 'recruit.officialName', rc.officialName, { max: 120, ph: 'VD: Số điện thoại của Trường', hint: 'Để trống cả hai ô này = chỉ hiện số tư vấn của Tổ GDTX.' })}
+              ${f('Số điện thoại thứ hai (nếu muốn hiện)', 'recruit.officialPhone', rc.officialPhone, { max: 40, ph: 'VD: số ghi trên thông báo của Trường' })}
+              ${f('Dòng nhắc ứng viên khi đến nộp hồ sơ', 'recruit.referralNote', rc.referralNote, { area: true, rows: 2, max: 300, span: 'sm:col-span-2', hint: 'Hiện dưới các nút gọi. Để trống để ẩn.' })}
               ${f('Đối tượng tuyển sinh', 'recruit.eligibility', rc.eligibility, { area: true, rows: 2, max: 400, span: 'sm:col-span-2' })}
               ${slots(rc.programs, 4, 4).map((p, i) => rowBox('Ngành nghề ' + (i + 1) + (i >= 2 ? ' (để trống nếu không dùng)' : ''), html`
                 ${f('Tên ngành nghề', 'recruit.programs.' + i + '.name', p.name || '', { max: 160, span: 'sm:col-span-2' })}

@@ -70,7 +70,8 @@ Bản đồ từng phân hiệu và danh sách hồ sơ tích được có tại
 ## Liên hệ tư vấn
 
 - **ThS. Nguyễn Trung Kiên (Tổ GDTX):** [0977 588 915](tel:0977588915)
-- **Số điện thoại ghi trên thông báo của Trường:** [0372 448 111](tel:0372448111)
+
+Khi đến phân hiệu nộp hồ sơ, hãy cho biết bạn được ThS. Nguyễn Trung Kiên tư vấn.
 
 *Nguồn: Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026 của Trường Cao đẳng Than - Khoáng sản Việt Nam (ngày 02/01/2026). Tổ GDTX là kênh thông tin; hồ sơ và nhập học do Trường tiếp nhận.*
 
@@ -86,7 +87,9 @@ Bài chép đúng Thông báo ngày 02/01/2026 của Trường. Các điểm dư
 4. **Nơi làm việc sau đào tạo:** công ty/mỏ/tỉnh nào; làm trong hầm lò hay trên mặt bằng mỏ? Bài ghi “thông báo không nêu”.
 5. **Hồ sơ:** 05 hay 06 ảnh 3x4? Giấy khai sinh là bản sao hay photo công chứng? Nộp ở địa phương (Phòng Văn hóa - Xã hội) hay nộp thẳng phân hiệu? Bài đang ghi 06 ảnh, bản sao giấy khai sinh, và “gọi trước để biết nơi nộp”.
 6. **Thời gian đào tạo** (3,2 / 3,7 / 9,1 / 3,9 tháng): đúng chưa?
-7. **Liên hệ:** đồng ý đăng số ThS. Nguyễn Trung Kiên (0977 588 915) và số của Trường (0372 448 111)?
-8. **Ghi nhận chỉ tiêu:** ứng viên do Tổ GDTX giới thiệu thì Trường ghi nhận thế nào (mã/tên người giới thiệu)?
+7. **Liên hệ:** đồng ý đăng số ThS. Nguyễn Trung Kiên (0977 588 915) làm đầu mối tư vấn duy nhất?
+8. **Ghi nhận chỉ tiêu:** bài có dòng “Khi đến phân hiệu nộp hồ sơ, hãy cho biết bạn được ThS. Nguyễn Trung Kiên tư vấn.” Trường có ghi nhận người giới thiệu theo cách này không, hay cần cách khác (mã giới thiệu, danh sách ứng viên…)?
 
-Sau khi duyệt: nhập file `bai-dang-tuyen-sinh-2026.json` (Quản trị → Cài đặt → Nhập từ file JSON), rồi bấm **Hiện** ở danh sách bài.
+**Cách đăng sau khi duyệt** (chọn một):
+- *Dán tay:* Quản trị → **Bài mới** → dán tiêu đề, tóm tắt, nội dung ở trên → chọn chuyên mục “Tuyển sinh học nghề” → tích “Ghim” → **Lưu & Đăng bài**.
+- *Nhập file:* Quản trị → Cài đặt → **Nhập từ file JSON** → chọn `bai-dang-tuyen-sinh-2026.json` (bài vào ở trạng thái ẨN) → vào danh sách bài bấm **Hiện**.

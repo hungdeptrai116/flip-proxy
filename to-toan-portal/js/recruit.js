@@ -17,7 +17,7 @@
   TT.actions = TT.actions || {};
 
   /* ----------------------------- Liên hệ ----------------------------- */
-  // Hai số, dán nhãn rõ: số Tổ GDTX (tư vấn) và số ghi trên thông báo của Trường
+  // Số tư vấn của Tổ GDTX (kèm tên người tư vấn); số thứ hai (ví dụ số của Trường) chỉ hiện khi admin điền
   function contactCard(s, id) {
     const c = TT.contactInfo(s);
     const who = c.advisor ? c.advisor + ' (Tổ GDTX)' : 'Tổ GDTX';
@@ -30,6 +30,7 @@
         ${c.zalo ? html`<a href="${c.zalo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">${icon('chat', 'h-5 w-5')} Nhắn Zalo cho ${who}</a>` : ''}
         ${c.officialPhone ? html`<a href="${c.officialTel}" class="btn btn-outline-navy btn-lg sm:col-span-2">${icon('phone', 'h-5 w-5')} ${c.officialName}: ${c.officialPhone}</a>` : ''}
       </div>`}
+      ${s.recruit.referralNote ? html`<p class="mt-3 rounded-lg bg-accent-light p-3 text-sm font-semibold text-navy-dark">${s.recruit.referralNote}</p>` : ''}
       ${none && app().isAdmin ? html`<p class="mt-2 text-sm"><a href="#/admin/cai-dat" class="font-semibold text-brand underline">Nhập số điện thoại / Zalo trong Quản trị → Cài đặt</a></p>` : ''}
     </section>`;
   }

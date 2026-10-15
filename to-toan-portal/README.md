@@ -35,12 +35,12 @@ Tải lại trang: banner Demo biến mất. Vào `#/admin`, đăng nhập, **C�
 ## Mục "Tuyển sinh học nghề" (trang `#/hoc-nghe`)
 
 Toàn bộ nội dung trang này nằm trong **Quản trị → Cài đặt → Tuyển sinh học nghề** (lưu ở `settings/site.recruit`), **không phải sửa mã**:
-ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hiệu (kèm link Google Maps), hỏi đáp, tên người tư vấn, số điện thoại của Trường.
+ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hiệu (kèm link Google Maps), hỏi đáp, tên người tư vấn, dòng nhắc ứng viên khi đến nộp hồ sơ.
 
 - **Mặc định** chép từ *Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026* của Trường (ngày 02/01/2026) và các poster hướng dẫn hồ sơ / địa chỉ phân hiệu. Nguồn và ngày luôn hiện đầu trang.
 - **Một nguồn dữ liệu:** banner trang chủ (đối tượng, ngành, phân hiệu) và ô số liệu (số ngành, số phân hiệu) tự lấy từ mục này nếu để trống — sửa một chỗ, mọi nơi cập nhật.
 - **Khi Trường đổi thông báo:** sửa tại đây và điền ô *Đã đối chiếu với Trường ngày*. Chỉ đăng thông tin đã được Trường xác nhận.
-- **Số điện thoại:** nhập số tư vấn của Tổ GDTX ở *Thông tin chung → Hotline* (và *Tên người tư vấn* — nên ghi tên thật). Trang luôn hiện kèm số của Trường để ứng viên đối chiếu.
+- **Số điện thoại:** nhập số tư vấn của Tổ GDTX ở *Thông tin chung → Hotline* và *Tên người tư vấn* (nên ghi tên thật). Mặc định **chỉ hiện số tư vấn này**; số điện thoại thứ hai (ví dụ số của Trường) để trống thì không hiện — muốn hiện thì điền ở Cài đặt. Nút "Gọi" ở các phân hiệu cũng gọi số tư vấn.
 - Không đổi `firestore.rules`: `settings` đã cho admin ghi tự do; bài viết vẫn dùng 6 chuyên mục cũ (nhãn hiển thị đã đổi: `tuyen-sinh` = "Tuyển sinh học nghề", các `de-cuong-*` thuộc "Ôn văn hóa").
 - Xem trước khi chia sẻ link (Zalo/Facebook) lấy từ thẻ Open Graph trong `index.html` và ảnh `assets/og.png`. Địa chỉ ảnh đang là `https://to-toan-portal.onrender.com/assets/og.png` — **đổi lại khi chuyển sang tên miền riêng**. Preview chỉ có cho cả trang, không riêng từng bài (site dùng `#`).
 
