@@ -35,9 +35,15 @@
   }
   TT.searchPosts = searchPosts;
 
-  function statValue(stat) {
+  // Ô số liệu: nhập tay → dùng giá trị đó; để TRỐNG → ô 1 tự đếm số ngành, ô 3 tự đếm số phân hiệu (không lệch với mục Tuyển sinh học nghề)
+  function statValue(stat, i, s) {
     if (stat.auto) {
       return String(app().visible().reduce((n, p) => n + p.attachments.length, 0));
+    }
+    if (!stat.value && s) {
+      const info = TT.recruitInfo(s);
+      if (i === 0 && info.programCount) return String(info.programCount);
+      if (i === 2 && info.branchCount) return String(info.branchCount);
     }
     return stat.value || '—';
   }
@@ -260,12 +266,13 @@
       <div class="container-x flex flex-wrap items-center gap-x-5 gap-y-1 py-1.5">${items}</div></div>`;
   }
 
+  // "hot": mục trọng tâm (tuyển sinh học nghề) — nổi bật hơn các mục còn lại
   const NAV = [
     { label: 'Trang chủ', href: '#/', on: (r) => r.name === 'home' },
-    { label: 'Giới thiệu Tổ Toán', href: '#/gioi-thieu', on: (r) => r.name === 'about' },
-    { label: 'Thông tin Tuyển sinh', href: '#/muc/tuyen-sinh', on: (r) => r.name === 'group' && r.key === 'tuyen-sinh' },
-    { label: 'Đề cương Ôn tập', href: '#/muc/de-cuong', on: (r) => r.name === 'group' && /^de-cuong/.test(r.key) },
-    { label: 'Tin tức & Hoạt động', href: '#/muc/tin-tuc', on: (r) => r.name === 'group' && r.key === 'tin-tuc' },
+    { label: 'Tuyển sinh học nghề', href: '#/hoc-nghe', on: (r) => r.name === 'recruit', hot: true },
+    { label: 'Thông báo tuyển sinh', href: '#/muc/tuyen-sinh', on: (r) => r.name === 'group' && r.key === 'tuyen-sinh' },
+    { label: 'Ôn văn hóa', href: '#/muc/de-cuong', on: (r) => r.name === 'group' && /^de-cuong/.test(r.key) },
+    { label: 'Giới thiệu', href: '#/gioi-thieu', on: (r) => r.name === 'about' },
     { label: 'Liên hệ', href: '#/lien-he', on: (r) => r.name === 'contact' }
   ];
 
@@ -282,8 +289,8 @@
     const links = (mobile) => NAV.map((it) => {
       const on = it.on(route);
       const cls = mobile
-        ? (on ? 'bg-white/15 text-white' : 'text-blue-100 hover:bg-white/10') + ' block rounded-lg px-3 py-2.5 text-sm font-semibold'
-        : 'nav-link';
+        ? (on ? 'bg-white/15 text-white' : (it.hot ? 'text-amber-300 hover:bg-white/10' : 'text-blue-100 hover:bg-white/10')) + ' block rounded-lg px-3 py-2.5 text-sm font-semibold'
+        : 'nav-link' + (it.hot ? ' nav-link-hot' : '');
       return html`<li><a href="${it.href}" ${on ? raw('aria-current="page"') : ''} class="${cls}">${it.label}</a></li>`;
     });
 
@@ -334,9 +341,10 @@
         <div>
           <h2 class="text-sm font-bold uppercase tracking-wider text-white">Chuyên mục</h2>
           <ul class="mt-3 space-y-2 text-sm">
-            <li><a href="#/muc/tuyen-sinh" class="hover:text-white hover:underline">Quy chế & Thông báo Tuyển sinh</a></li>
-            <li><a href="#/muc/de-cuong-10" class="hover:text-white hover:underline">Đề cương Ôn tập vào 10</a></li>
-            <li><a href="#/muc/de-cuong-thpt" class="hover:text-white hover:underline">Đề cương Khối 10 - 11 - 12</a></li>
+            <li><a href="#/hoc-nghe" class="hover:text-white hover:underline">Tuyển sinh học nghề: điều kiện & hồ sơ</a></li>
+            <li><a href="#/muc/tuyen-sinh" class="hover:text-white hover:underline">Thông báo tuyển sinh</a></li>
+            <li><a href="#/muc/de-cuong" class="hover:text-white hover:underline">Ôn văn hóa</a></li>
+            <li><a href="#/muc/tin-tuc" class="hover:text-white hover:underline">Tin tức & Hoạt động</a></li>
           </ul>
           ${s.footerNote ? html`<p class="mt-4 text-sm text-blue-200">${s.footerNote}</p>` : ''}
         </div>
@@ -385,13 +393,15 @@
    * =================================================================== */
   function contactBox(s, dark) {
     const has = s.hotline || s.email || s.zalo;
+    const off = s.recruit && s.recruit.officialPhone;
     return html`<section class="${dark ? 'bg-navy text-white' : 'card'} rounded-xl p-5">
       <h2 class="text-base font-extrabold ${dark ? 'text-white' : 'text-navy-dark'}">Giải đáp thắc mắc</h2>
-      ${has ? html`<p class="mt-1 text-sm ${dark ? 'text-blue-100' : 'text-slate-600'}">Cần hỗ trợ về tuyển sinh hoặc đề cương? Liên hệ Tổ Toán:</p>
+      ${has ? html`<p class="mt-1 text-sm ${dark ? 'text-blue-100' : 'text-slate-600'}">Cần tư vấn tuyển sinh học nghề hoặc tài liệu ôn văn hóa? Liên hệ Tổ Toán:</p>
         <div class="mt-3 space-y-2">
           ${s.hotline ? html`<a href="${telHref(s.hotline)}" class="btn btn-accent w-full">${icon('phone', 'h-4 w-4')} Gọi ${s.hotline}</a>` : ''}
           ${s.zalo && TT.safeUrl(s.zalo) ? html`<a href="${TT.safeUrl(s.zalo)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-full">${icon('chat', 'h-4 w-4')} Nhắn Zalo</a>` : ''}
           ${s.email ? html`<a href="mailto:${s.email}" class="btn btn-outline w-full">${icon('mail', 'h-4 w-4')} ${s.email}</a>` : ''}
+          ${off ? html`<p class="pt-1 text-sm ${dark ? 'text-blue-100' : 'text-slate-600'}">${s.recruit.officialName}: <a href="${telHref(off)}" class="font-bold underline">${off}</a></p>` : ''}
         </div>`
         : html`<p class="mt-1 text-sm ${dark ? 'text-blue-100' : 'text-slate-600'}">Thông tin liên hệ đang được cập nhật.</p>`}
     </section>`;
@@ -420,9 +430,21 @@
     ['x²', '35%', '82%', '3rem', '31s', '-8s'], ['θ', '72%', '40%', '3.4rem', '29s', '-14s']
   ];
 
+  // Nút "Gọi tư vấn": số Tổ Toán → Zalo → số của Trường → trang Liên hệ
+  function callHref(s) {
+    const c = TT.contactInfo(s);
+    if (c.hotlineTel) return { href: c.hotlineTel, ext: false };
+    if (c.zalo) return { href: c.zalo, ext: true };
+    if (c.officialTel) return { href: c.officialTel, ext: false };
+    return { href: '#/lien-he', ext: false };
+  }
+
   function hero(s) {
     const h = s.hero;
-    const icons = ['calendar', 'file', 'target'];
+    const icons = ['target', 'cap', 'pin'];
+    const info = TT.recruitInfo(s);
+    const derived = [info.eligibility, info.programsText, info.branchesText];
+    const call = callHref(s);
     return html`<section class="hero-bg relative overflow-hidden text-white">
       <div class="hero-symbols" aria-hidden="true">${SYMBOLS.map((m) =>
         html`<span style="--x:${m[1]};--y:${m[2]};--s:${m[3]};--t:${m[4]};--dl:${m[5]}">${m[0]}</span>`)}</div>
@@ -432,13 +454,13 @@
           <h1 class="hero-in mt-4 text-3xl font-extrabold leading-[1.3] tracking-tight md:text-4xl md:leading-[1.3] lg:text-[2.6rem]" style="--d:90ms">${h.title}</h1>
           ${h.subtitle ? html`<p class="hero-in mt-4 max-w-2xl text-base text-blue-100 md:text-lg" style="--d:180ms">${h.subtitle}</p>` : ''}
           <div class="hero-in mt-7 flex flex-wrap gap-3" style="--d:270ms">
-            ${h.cta1 ? html`<a href="#/muc/tuyen-sinh" class="btn btn-lg btn-accent">${icon('clipboard', 'h-5 w-5')} ${h.cta1}</a>` : ''}
-            ${h.cta2 ? html`<a href="#/muc/de-cuong" class="btn btn-lg btn-ghost-light">${icon('download', 'h-5 w-5')} ${h.cta2}</a>` : ''}
+            ${h.cta1 ? html`<a href="#/hoc-nghe" class="btn btn-lg btn-accent">${icon('clipboard', 'h-5 w-5')} ${h.cta1}</a>` : ''}
+            ${h.cta2 ? html`<a href="${call.href}" ${call.ext ? raw('target="_blank" rel="noopener noreferrer"') : ''} class="btn btn-lg btn-ghost-light">${icon('phone', 'h-5 w-5')} ${h.cta2}</a>` : ''}
           </div>
         </div>
         <div class="lg:col-span-2">
           <ul class="space-y-3 rounded-2xl bg-white/10 p-5 ring-1 ring-white/25 backdrop-blur">
-            ${h.points.map((p, i) => html`<li class="hero-in hero-in-right flex gap-3 rounded-xl bg-white/10 p-3.5" style="--d:${300 + i * 110}ms">
+            ${h.points.map((p, i) => ({ label: p.label, value: p.value || derived[i] || '' })).filter((p) => p.value).map((p, i) => html`<li class="hero-in hero-in-right flex gap-3 rounded-xl bg-white/10 p-3.5" style="--d:${300 + i * 110}ms">
               <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent text-navy-dark">${icon(icons[i] || 'check', 'h-5 w-5')}</span>
               <span class="min-w-0"><span class="block text-xs font-bold uppercase tracking-wider text-blue-200">${p.label}</span>
                 <span class="block text-sm font-semibold text-white">${p.value}</span></span></li>`)}
@@ -471,8 +493,8 @@
   }
 
   function statGrid(s) {
-    return html`<div class="grid grid-cols-2 gap-4">${s.stats.map((st) => {
-      const v = statValue(st);
+    return html`<div class="grid grid-cols-2 gap-4">${s.stats.map((st, i) => {
+      const v = statValue(st, i, s);
       return html`<div class="card border-t-4 border-accent p-5 text-center" data-reveal="zoom">
         <p class="text-3xl font-extrabold tabular-nums text-navy md:text-4xl"><span data-count aria-hidden="true">${v}</span><span class="sr-only">${v}</span></p>
         <p class="mt-1 text-sm font-semibold text-slate-600">${st.label}</p></div>`;
@@ -482,26 +504,26 @@
   function featureCards() {
     const count = (cats) => app().visible().filter((p) => cats.indexOf(p.category) !== -1).length;
     const cards = [
-      { key: 'tuyen-sinh', ic: 'clipboard', color: 'bg-navy', title: 'Quy chế & Thông báo Tuyển sinh',
-        desc: 'Thông tin chính thức về kỳ tuyển sinh vào lớp 10.', bullets: ['Chỉ tiêu và điều kiện dự tuyển', 'Lịch thi và hồ sơ cần chuẩn bị', 'Cấu trúc đề thi'], cats: ['tuyen-sinh'] },
-      { key: 'de-cuong-10', ic: 'layers', color: 'bg-accent text-navy-dark', title: 'Đề cương Ôn tập Tuyển sinh vào 10',
-        desc: 'Tổng hợp chuyên đề ôn thi, xem trực tiếp và tải PDF.', bullets: ['Chuyên đề Đại số', 'Chuyên đề Hình học', 'Toán thực tế'], cats: ['de-cuong-10'] },
-      { key: 'de-cuong-thpt', ic: 'cap', color: 'bg-brand', title: 'Đề cương Ôn tập Khối 10 - 11 - 12',
-        desc: 'Đề cương theo từng khối lớp, bám chương trình.', bullets: ['Đề cương giữa kỳ', 'Đề cương cuối kỳ', 'Ôn thi Tốt nghiệp THPT'], cats: ['de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12'] }
+      { href: '#/hoc-nghe', ic: 'clipboard', color: 'bg-navy', title: 'Tuyển sinh học nghề',
+        desc: 'Thông tin theo thông báo của Trường, đọc nhanh trên điện thoại.', bullets: ['Ngành nghề, điều kiện, quyền lợi', 'Hồ sơ cần chuẩn bị (có danh sách tích được)', 'Phân hiệu, bản đồ và số điện thoại tư vấn'], cats: ['tuyen-sinh'], more: 'Xem điều kiện & hồ sơ' },
+      { href: '#/muc/de-cuong', ic: 'cap', color: 'bg-accent text-navy-dark', title: 'Ôn văn hóa',
+        desc: 'Đề cương và tài liệu ôn tập, xem trực tiếp và tải PDF.', bullets: ['Đề cương theo từng khối lớp', 'Xem ngay trên điện thoại', 'Tải PDF về máy'], cats: ['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12'], more: 'Xem tài liệu' },
+      { href: '#/muc/tin-tuc', ic: 'layers', color: 'bg-brand', title: 'Tin tức & Hoạt động',
+        desc: 'Thông báo chung và hoạt động liên quan đến tuyển sinh, học tập.', bullets: ['Thông báo mới của Trường', 'Hoạt động của Tổ Toán', 'Lịch ôn tập, kiểm tra'], cats: ['tin-tuc'], more: 'Xem tin tức' }
     ];
-    return html`<section class="bg-white" aria-labelledby="h-features">
+    return html`<section class="bg-paper" aria-labelledby="h-features">
       <div class="container-x py-12">
         <div class="mb-8 text-center" data-reveal>
-          <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Chuyên mục trọng tâm</p>
+          <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Chuyên mục</p>
           <h2 id="h-features" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Tra cứu nhanh theo nhu cầu</h2></div>
         <div class="grid gap-6 md:grid-cols-3">
-          ${cards.map((c) => html`<a href="#/muc/${c.key}" data-reveal class="group flex flex-col rounded-2xl bg-paper p-6 ring-1 ring-slate-200 transition hover:-translate-y-1 hover:bg-white hover:shadow-lift">
+          ${cards.map((c) => html`<a href="${c.href}" data-reveal class="group flex flex-col rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lift">
             <span class="flex h-12 w-12 items-center justify-center rounded-xl text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 ${c.color}">${icon(c.ic, 'h-6 w-6')}</span>
             <h3 class="mt-4 text-lg font-extrabold text-navy-dark group-hover:text-brand">${c.title}</h3>
             <p class="mt-1 text-sm text-slate-600">${c.desc}</p>
             <ul class="mt-3 space-y-1.5 text-sm text-slate-700">${c.bullets.map((b) => html`<li class="flex items-start gap-2"><span class="mt-0.5 text-accent-dark">${icon('check', 'h-4 w-4')}</span>${b}</li>`)}</ul>
             <span class="mt-5 flex items-center justify-between border-t border-slate-200 pt-3 text-sm font-bold text-brand">
-              <span>${count(c.cats)} bài viết</span><span class="inline-flex items-center gap-1">Xem chuyên mục ${icon('arrowRight', 'nudge h-4 w-4')}</span></span>
+              <span>${count(c.cats)} bài viết</span><span class="inline-flex items-center gap-1">${c.more} ${icon('arrowRight', 'nudge h-4 w-4')}</span></span>
           </a>`)}
         </div></div></section>`;
   }
@@ -512,12 +534,12 @@
     const pinned = a.visible().filter((p) => p.pinned).sort(byDate).slice(0, 3);
     registerBrowser('home', { tabs: TT.HOME_TABS, base: () => a.visible(), excludePinnedOnAll: pinned.length > 0 });
     return {
-      title: 'Tổ Toán — Cổng thông tin Tuyển sinh & Đề cương Ôn tập',
-      body: html`${hero(s)}${pinned.length ? featured(pinned) : ''}${aboutStats(s)}${featureCards()}
+      title: 'Tuyển sinh học nghề mỏ hầm lò & Ôn văn hóa — Tổ Toán, Trường Cao đẳng Than - Khoáng sản Việt Nam',
+      body: html`${hero(s)}${TT.views.recruitTeaser ? TT.views.recruitTeaser(s) : ''}${pinned.length ? featured(pinned) : ''}${aboutStats(s)}${featureCards()}
         <section id="bai-dang" class="container-x py-12" aria-labelledby="h-latest">
           <div class="mb-5" data-reveal>
             <p class="text-sm font-bold uppercase tracking-wider text-accent-dark">Cập nhật liên tục</p>
-            <h2 id="h-latest" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Bài đăng & Đề cương mới nhất</h2></div>
+            <h2 id="h-latest" class="mt-1 text-2xl font-extrabold text-navy-dark md:text-3xl">Thông báo & tài liệu mới nhất</h2></div>
           ${browserShell('home')}
         </section>`
     };

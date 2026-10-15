@@ -42,6 +42,7 @@
     const a = segs[0], b = segs[1], c = segs[2];
     if (!a) return { name: 'home' };
     switch (a) {
+      case 'hoc-nghe': return { name: 'recruit' };
       case 'gioi-thieu': return { name: 'about' };
       case 'lien-he': return { name: 'contact' };
       case 'muc': return b ? { name: 'group', key: b } : { name: 'home' };
@@ -90,6 +91,7 @@
     if (isAdminRoute(r)) return TT.admin.view(r);
     switch (r.name) {
       case 'home': return V.home();
+      case 'recruit': return V.recruit();
       case 'about': return V.about();
       case 'contact': return V.contact();
       case 'group': return V.group(r.key);

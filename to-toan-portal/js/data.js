@@ -4,6 +4,12 @@
  * Mọi số liệu / thông tin liên hệ trong DEMO chỉ là DỮ LIỆU MẪU để xem giao diện.
  * Ở chế độ Firebase, giá trị mặc định (DEFAULT_SETTINGS) KHÔNG chứa số liệu bịa:
  * mục nào chưa nhập sẽ hiện "—" hoặc bị ẩn.
+ *
+ * Ngoại lệ có chủ đích: DEFAULT_SETTINGS.recruit (tuyển sinh học nghề) chép từ
+ * "Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026" của
+ * Trường Cao đẳng Than - Khoáng sản VN (ngày 02/01/2026) và các poster hướng dẫn hồ sơ /
+ * địa chỉ phân hiệu của Trường. Nguồn được ghi ngay trên trang. Quản trị viên sửa được trong
+ * Cài đặt; khi Trường đổi thông báo thì sửa ở đó, không sửa mã.
  */
 (function () {
   'use strict';
@@ -12,7 +18,7 @@
   /* ----------------------------- Chuyên mục ----------------------------- */
   // Lớp màu viết nguyên văn để Tailwind quét được khi build
   TT.CATS = {
-    'tuyen-sinh': { id: 'tuyen-sinh', name: 'Thông tin tuyển sinh', tab: 'Thông tin Tuyển sinh', badge: 'bg-navy text-white', cover: 'assets/covers/tuyen-sinh.svg' },
+    'tuyen-sinh': { id: 'tuyen-sinh', name: 'Tuyển sinh học nghề', tab: 'Tuyển sinh học nghề', badge: 'bg-navy text-white', cover: 'assets/covers/tuyen-sinh.svg' },
     'de-cuong-10': { id: 'de-cuong-10', name: 'Đề cương vào 10', tab: 'Đề cương vào 10', badge: 'bg-accent text-navy-dark', cover: 'assets/covers/de-cuong-10.svg' },
     'de-cuong-k10': { id: 'de-cuong-k10', name: 'Đề cương Khối 10', tab: 'Đề cương Khối 10', badge: 'bg-brand text-white', cover: 'assets/covers/de-cuong-k10.svg' },
     'de-cuong-k11': { id: 'de-cuong-k11', name: 'Đề cương Khối 11', tab: 'Đề cương Khối 11', badge: 'bg-indigo-600 text-white', cover: 'assets/covers/de-cuong-k11.svg' },
@@ -21,26 +27,24 @@
   };
   TT.CAT_ORDER = ['tuyen-sinh', 'de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12', 'tin-tuc'];
 
-  // Các tab lọc ở trang chủ (đúng thứ tự theo yêu cầu)
+  // Các tab lọc ở trang chủ: trọng tâm là tuyển sinh học nghề; tài liệu ôn văn hóa gom chung một tab
   TT.HOME_TABS = [
     { id: 'all', label: 'Tất cả', cats: null },
-    { id: 'tuyen-sinh', label: 'Thông tin Tuyển sinh', cats: ['tuyen-sinh'] },
-    { id: 'de-cuong-10', label: 'Đề cương vào 10', cats: ['de-cuong-10'] },
-    { id: 'de-cuong-k10', label: 'Đề cương Khối 10', cats: ['de-cuong-k10'] },
-    { id: 'de-cuong-k11', label: 'Đề cương Khối 11', cats: ['de-cuong-k11'] },
-    { id: 'de-cuong-k12', label: 'Đề cương Khối 12', cats: ['de-cuong-k12'] }
+    { id: 'tuyen-sinh', label: 'Tuyển sinh học nghề', cats: ['tuyen-sinh'] },
+    { id: 'on-van-hoa', label: 'Ôn văn hóa', cats: ['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12'] },
+    { id: 'tin-tuc', label: 'Tin tức', cats: ['tin-tuc'] }
   ];
 
   // Trang chuyên mục: #/muc/<khóa>
   TT.GROUPS = {
     'tuyen-sinh': {
-      title: 'Thông tin Tuyển sinh',
-      desc: 'Quy chế, chỉ tiêu, điều kiện, lịch thi và cấu trúc đề tuyển sinh vào lớp 10.',
+      title: 'Thông báo tuyển sinh học nghề',
+      desc: 'Thông báo, hướng dẫn hồ sơ và tin mới về tuyển sinh học nghề của Trường Cao đẳng Than - Khoáng sản Việt Nam.',
       cats: ['tuyen-sinh']
     },
     'de-cuong': {
-      title: 'Đề cương Ôn tập',
-      desc: 'Tổng hợp đề cương ôn tập môn Toán: tuyển sinh vào 10 và các khối 10 - 11 - 12.',
+      title: 'Ôn văn hóa',
+      desc: 'Đề cương và tài liệu ôn tập văn hóa (môn Toán) — xem trực tiếp trên điện thoại, tải về dạng PDF.',
       cats: ['de-cuong-10', 'de-cuong-k10', 'de-cuong-k11', 'de-cuong-k12']
     },
     'de-cuong-10': {
@@ -55,7 +59,7 @@
     },
     'tin-tuc': {
       title: 'Tin tức & Hoạt động',
-      desc: 'Hoạt động chuyên môn và thông báo chung của Tổ Toán.',
+      desc: 'Tin tức, hoạt động và thông báo chung liên quan đến tuyển sinh và học tập.',
       cats: ['tin-tuc']
     }
   };
@@ -69,29 +73,88 @@
     zalo: '',
     defaultAuthor: 'Admin Tổ Toán',
     hero: {
-      badge: 'Năm học 2026 - 2027',
-      title: 'CỔNG THÔNG TIN TUYỂN SINH VÀO LỚP 10 & ĐỀ CƯƠNG ÔN TẬP MÔN TOÁN NĂM HỌC 2026 - 2027',
-      subtitle: 'Nơi đăng tải thông báo tuyển sinh, đề cương ôn tập và tài liệu của Tổ Toán — xem trực tiếp trên điện thoại, tải về dưới dạng PDF.',
+      badge: 'Tuyển sinh học nghề 2026',
+      title: 'HỌC NGHỀ MỎ HẦM LÒ — MIỄN HỌC PHÍ, BỐ TRÍ VIỆC LÀM SAU ĐÀO TẠO',
+      subtitle: 'Trường Cao đẳng Than - Khoáng sản Việt Nam tuyển học viên học nghề hầm lò theo Thông báo ngày 02/01/2026: ' +
+        'miễn học phí, miễn ăn ở khi học; thực tập được hưởng 85 - 100% lương công nhân; sau đào tạo được bố trí việc làm, ký HĐLĐ dài hạn.',
+      // value để TRỐNG = tự lấy từ mục "Tuyển sinh học nghề" (một nguồn dữ liệu, không lệch số)
       points: [
-        { label: 'Lịch thi dự kiến', value: 'Cập nhật theo thông báo chính thức' },
-        { label: 'Cấu trúc đề minh họa', value: 'Xem đề minh họa trong mục Đề cương' },
-        { label: 'Định hướng học tập', value: 'Ôn theo chuyên đề: Đại số - Hình học - Toán thực tế' }
+        { label: 'Đối tượng', value: '' },
+        { label: 'Ngành đào tạo', value: '' },
+        { label: 'Nơi học', value: '' }
       ],
-      cta1: 'Xem Thông Báo Tuyển Sinh',
-      cta2: 'Tải Đề Cương Ôn Tập'
+      cta1: 'Xem điều kiện & hồ sơ',
+      cta2: 'Gọi tư vấn ngay'
     },
     about: {
-      title: 'Giới thiệu về Tổ Toán',
-      text: 'Tổ Toán phụ trách giảng dạy môn Toán, tổ chức ôn tập và hỗ trợ công tác tuyển sinh của nhà trường.\n\n' +
-        'Website này là nơi đăng tải **thông báo chính thức** và **đề cương ôn tập** để học sinh, phụ huynh tra cứu nhanh, ' +
-        'xem trực tiếp và tải về khi cần.'
+      title: 'Giới thiệu',
+      text: '**Tổ Toán** — Trường Cao đẳng Than - Khoáng sản Việt Nam, với sự đồng ý của nhà trường, giới thiệu thông tin **tuyển sinh học nghề** ' +
+        'và đăng tài liệu **ôn văn hóa** cho người học.\n\n' +
+        'Website này là **kênh thông tin**: hồ sơ và việc nhập học do **nhà trường** tiếp nhận tại các phân hiệu. ' +
+        'Thông tin tuyển sinh lấy từ **thông báo chính thức của Trường** (có ghi nguồn và ngày); ' +
+        'nếu có khác biệt, hãy theo hướng dẫn của Trường.'
     },
+    // value để TRỐNG ở ô 1 và 3 = tự đếm từ số ngành / số phân hiệu đã nhập; ô 2 tự đếm tài liệu ôn văn hóa
     stats: [
-      { label: 'Giáo viên trong tổ', value: '—', auto: false },
-      { label: 'Đề cương & chuyên đề đã phát hành', value: '', auto: true },
-      { label: 'Tỷ lệ đỗ / Điểm trung bình', value: '—', auto: false },
-      { label: 'Năm truyền thống', value: '—', auto: false }
+      { label: 'Ngành nghề đào tạo', value: '', auto: false },
+      { label: 'Tài liệu ôn văn hóa', value: '', auto: true },
+      { label: 'Phân hiệu tiếp nhận', value: '', auto: false },
+      { label: 'Học phí khi học nghề', value: 'Miễn', auto: false }
     ],
+    recruit: {
+      source: 'Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026 của Trường Cao đẳng Than - Khoáng sản Việt Nam (ngày 02/01/2026)',
+      checked: '',
+      advisor: '',
+      officialName: 'Số điện thoại ghi trên thông báo của Trường',
+      officialPhone: '0372 448 111',
+      eligibility: 'Nam thanh niên, tuổi từ 18 đến 35; đủ sức khỏe theo quy định.',
+      programs: [
+        { name: 'Khai thác mỏ hầm lò / Xây dựng mỏ hầm lò', level: 'Sơ cấp', require: 'Đọc, viết thành thạo', train: '3,2 tháng', practice: '3,7 tháng' },
+        { name: 'Cơ điện mỏ hầm lò', level: 'Trung cấp', require: 'THPT trở lên', train: '9,1 tháng', practice: '3,9 tháng' }
+      ],
+      learnBenefits: [
+        'Miễn toàn bộ kinh phí đào tạo nghề.',
+        'Miễn phí ăn 3 bữa/ngày, 7 ngày/tuần (mức ăn 90.000 đ/ngày) và miễn phí ở trong thời gian đào tạo tại trường.',
+        'Học Trung cấp nghề được cấp học bổng bằng tiền, mức tối đa 1.000.000 đồng/tháng.',
+        'Thời gian thực tập sản xuất tại công ty được hưởng 85 - 100% lương công nhân chính thức.'
+      ],
+      workBenefits: [
+        'Được bố trí việc làm ngay sau khi đào tạo nghề.',
+        'Được ký hợp đồng lao động dài hạn, đóng đầy đủ bảo hiểm theo quy định của Nhà nước.',
+        'Lương bình quân từ 20 - 25 triệu đồng/tháng.',
+        'Thời gian làm việc 8 giờ/ngày, 5 ngày/tuần, 20 - 22 công/tháng; có thưởng lễ, tết, lương tháng 13.',
+        'Công ty có nhà ở chung cư, xe ô tô đưa đón, ăn tự chọn miễn phí; chế độ tham quan nghỉ mát và khám sức khỏe hằng năm.'
+      ],
+      documents: [
+        '01 bản Sơ yếu lý lịch (dán ảnh, có xác nhận/đóng dấu của chính quyền địa phương).',
+        '01 bản sao Giấy khai sinh.',
+        '01 bản công chứng Căn cước công dân.',
+        '01 bản công chứng Bằng tốt nghiệp văn hóa (nếu có).',
+        '06 ảnh 3x4.'
+      ],
+      documentsNote: 'Các thông báo của Trường ghi hơi khác nhau giữa “bản sao” và “bản photo công chứng”. Mang bản photo công chứng là đáp ứng cả hai cách ghi; hãy hỏi tư vấn nếu cần chắc chắn.',
+      steps: [
+        'Liên hệ tư vấn để biết ngành phù hợp và phân hiệu gần nhất.',
+        'Chuẩn bị đủ hồ sơ theo danh sách bên dưới.',
+        'Nộp hồ sơ theo hướng dẫn của Trường (hỏi tư vấn để biết nơi nộp).',
+        'Học nghề tại phân hiệu, sau đó thực tập sản xuất tại công ty.',
+        'Được bố trí việc làm và ký hợp đồng lao động dài hạn.'
+      ],
+      branches: [
+        { name: 'Phân hiệu Hữu Nghị', address: 'Tổ 2, Khu Thanh Sơn 7, Phường Uông Bí, tỉnh Quảng Ninh', map: 'https://maps.app.goo.gl/roxAz4Y69kPgdob69' },
+        { name: 'Phân hiệu Hoành Bồ', address: 'Tổ 4, Khu Trới 2, Phường Hoành Bồ, tỉnh Quảng Ninh', map: 'https://maps.app.goo.gl/hx9yWTb1udprxPob6' },
+        { name: 'Phân hiệu Cẩm Phả', address: '156 Đặng Châu Tuệ, Phường Quang Hanh, tỉnh Quảng Ninh', map: 'https://maps.app.goo.gl/th2FfVGEwbDyHghk9' },
+        { name: 'Phân hiệu Việt Bắc', address: 'Tổ dân phố Sơn Cẩm, Phường Quan Triều, tỉnh Thái Nguyên', map: 'https://maps.app.goo.gl/RNZq3kgTRsdKsueD6' }
+      ],
+      faq: [
+        { q: 'Học nghề có phải đóng tiền không?', a: 'Theo thông báo: miễn toàn bộ kinh phí đào tạo nghề; trong thời gian đào tạo tại trường được miễn học phí, miễn tiền ăn và ở.' },
+        { q: 'Thực tập có được trả lương không?', a: 'Có. Thời gian thực tập sản xuất tại công ty được hưởng 85 - 100% lương công nhân chính thức.' },
+        { q: 'Tôi chưa học hết THPT thì đăng ký được không?', a: 'Ngành Khai thác mỏ / Xây dựng mỏ hầm lò (sơ cấp) yêu cầu đọc, viết thành thạo. Ngành Cơ điện mỏ hầm lò (trung cấp) yêu cầu THPT trở lên.' },
+        { q: 'Học xong tôi làm việc ở đâu?', a: 'Thông báo ghi: được bố trí việc làm ngay sau khi đào tạo nghề, ký hợp đồng lao động dài hạn. Thông báo không nêu cụ thể công ty, mỏ hay địa điểm làm việc — hãy hỏi tư vấn trước khi quyết định.' },
+        { q: 'Mức lương 20 - 25 triệu đồng/tháng được hiểu thế nào?', a: 'Thông báo ghi là “lương bình quân”. Cách tính và mức cụ thể theo từng vị trí không được nêu trong thông báo — hãy hỏi tư vấn để được giải đáp.' },
+        { q: 'Công việc cụ thể là gì, làm trong hầm lò hay trên mặt bằng mỏ?', a: 'Cả hai ngành đều là nghề mỏ hầm lò. Thông báo không mô tả vị trí làm việc cụ thể — hãy hỏi tư vấn và tìm hiểu thực tế tại phân hiệu trước khi đăng ký.' }
+      ]
+    },
     footerNote: ''
   };
 
@@ -101,13 +164,59 @@
     email: 'totoan@example.edu.vn',
     address: '[Địa chỉ nhà trường — cập nhật trong trang Quản trị]',
     zalo: 'https://zalo.me/0900000000',
-    stats: [
-      { value: '12' }, { auto: true }, { value: '7,5' }, { value: '25' }
-    ]
+    stats: []   // số liệu trang chủ đã tự sinh từ mục "Tuyển sinh học nghề" — không còn số mẫu để khỏi gây hiểu nhầm
   };
 
   const STR_LIMIT = 400;
   const clipStr = (v, d, n) => (typeof v === 'string' ? TT.clip(v, n || STR_LIMIT) : d);
+
+  // Danh sách chuỗi: nhận mảng hoặc chuỗi nhiều dòng (ô textarea của trang Quản trị); bỏ dòng trống
+  function asLines(v, def, max, n) {
+    let arr;
+    if (Array.isArray(v)) arr = v;
+    else if (typeof v === 'string') arr = v.split(/\r?\n/);
+    else return def.slice();
+    return arr.map((x) => (typeof x === 'string' ? TT.clip(x.trim(), max) : '')).filter(Boolean).slice(0, n);
+  }
+  // Danh sách đối tượng: mỗi dòng đi qua make(); make trả null → bỏ dòng (ô để trống)
+  function asRows(v, def, n, make) {
+    if (!Array.isArray(v)) return def.map((x) => Object.assign({}, x));
+    return v.map((x) => make(x && typeof x === 'object' ? x : {})).filter(Boolean).slice(0, n);
+  }
+
+  // Mục "Tuyển sinh học nghề": làm sạch từng trường. Chưa lưu gì → dùng mặc định (thông báo 02/01/2026).
+  function mergeRecruit(remote) {
+    const d = TT.DEFAULT_SETTINGS.recruit;
+    const r = remote && typeof remote === 'object' ? remote : {};
+    const s = (v, def, n) => clipStr(v, def, n);
+    return {
+      source: s(r.source, d.source, 300),
+      checked: s(r.checked, d.checked, 80),
+      advisor: s(r.advisor, d.advisor, 120),
+      officialName: s(r.officialName, d.officialName, 120),
+      officialPhone: s(r.officialPhone, d.officialPhone, 40),
+      eligibility: s(r.eligibility, d.eligibility, 400),
+      programs: asRows(r.programs, d.programs, 4, (x) => {
+        const name = clipStr(x.name, '', 160);
+        if (!name) return null;
+        return { name: name, level: clipStr(x.level, '', 60), require: clipStr(x.require, '', 120), train: clipStr(x.train, '', 60), practice: clipStr(x.practice, '', 60) };
+      }),
+      learnBenefits: asLines(r.learnBenefits, d.learnBenefits, 300, 8),
+      workBenefits: asLines(r.workBenefits, d.workBenefits, 300, 10),
+      documents: asLines(r.documents, d.documents, 300, 12),
+      documentsNote: s(r.documentsNote, d.documentsNote, 400),
+      steps: asLines(r.steps, d.steps, 300, 8),
+      branches: asRows(r.branches, d.branches, 8, (x) => {
+        const name = clipStr(x.name, '', 120);
+        if (!name) return null;
+        return { name: name, address: clipStr(x.address, '', 300), map: TT.safeUrl(x.map) || '' };
+      }),
+      faq: asRows(r.faq, d.faq, 10, (x) => {
+        const q = clipStr(x.q, '', 300), a = clipStr(x.a, '', 1200);
+        return q && a ? { q: q, a: a } : null;
+      })
+    };
+  }
 
   // Làm sạch + gộp với mặc định (dùng cho cả dữ liệu đọc về lẫn dữ liệu sắp lưu)
   TT.mergeSettings = function (remote) {
@@ -144,7 +253,37 @@
         value: clipStr((rs[i] || {}).value, s.value, 40),
         auto: i === 1 ? ((rs[i] || {}).auto === undefined ? s.auto : (rs[i] || {}).auto === true) : false
       })),
+      recruit: mergeRecruit(r.recruit),
       footerNote: clipStr(r.footerNote, d.footerNote, 300)
+    };
+  };
+
+  // Các câu tóm tắt TỰ SINH từ mục "Tuyển sinh học nghề" — dùng cho banner trang chủ và ô số liệu,
+  // để chỉ phải sửa số liệu ở MỘT chỗ (tránh lệch giữa các nơi hiển thị).
+  TT.recruitInfo = function (s) {
+    const r = s.recruit;
+    const short = (n) => n.replace(/^Phân hiệu\s+/i, '');
+    return {
+      eligibility: r.eligibility,
+      programsText: r.programs.map((p) => p.name + (p.level ? ' (' + p.level.toLowerCase() + ')' : '')).join(' · '),
+      branchesText: r.branches.length ? r.branches.length + ' phân hiệu: ' + r.branches.map((b) => short(b.name)).join(', ') : '',
+      programCount: r.programs.length,
+      branchCount: r.branches.length
+    };
+  };
+
+  // Kênh liên hệ để ứng viên gọi/nhắn: số Tổ Toán (nếu có) và số chính thức ghi trên thông báo của Trường
+  TT.contactInfo = function (s) {
+    const digits = (v) => String(v || '').replace(/[^\d+]/g, '');
+    const r = s.recruit;
+    return {
+      hotline: s.hotline || '',
+      hotlineTel: s.hotline ? 'tel:' + digits(s.hotline) : '',
+      zalo: TT.safeUrl(s.zalo) || '',
+      advisor: r.advisor || '',
+      officialPhone: r.officialPhone || '',
+      officialTel: r.officialPhone ? 'tel:' + digits(r.officialPhone) : '',
+      officialName: r.officialName || ''
     };
   };
 
@@ -172,46 +311,33 @@
     const posts = [
       {
         id: 'demo-tuyen-sinh',
-        title: 'Thông báo tuyển sinh vào lớp 10 năm học 2026 - 2027 (nội dung mẫu)',
+        title: 'Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026 (bài mẫu)',
         category: 'tuyen-sinh',
         pinned: true,
         createdAt: now - 1 * DAY,
-        summary: 'Mẫu thông báo tuyển sinh: đối tượng, chỉ tiêu, lịch tuyển sinh và hồ sơ. Các mục trong ngoặc vuông là chỗ trống để thay bằng thông tin chính thức.',
-        content: R`> **Đây là nội dung mẫu.** Các mục trong ngoặc vuông như [điền thông tin] là chỗ trống — hãy thay bằng thông tin chính thức của nhà trường và cơ quan quản lý giáo dục.
+        summary: 'Tóm tắt Thông báo ngày 02/01/2026 của Trường Cao đẳng Than - Khoáng sản Việt Nam: ngành nghề, đối tượng, quyền lợi và hồ sơ. Chi tiết đầy đủ ở trang Tuyển sinh học nghề.',
+        content: R`> **Bài mẫu** — nội dung chép từ Thông báo ngày 02/01/2026 của Trường. Khi Trường có thông báo mới, hãy đăng bài mới và cập nhật mục **Tuyển sinh học nghề** trong Cài đặt.
 
-## 1. Đối tượng và điều kiện dự tuyển
+## Ngành nghề tuyển sinh
 
-- Học sinh đã hoàn thành chương trình Trung học cơ sở.
-- Điều kiện về hạnh kiểm, học lực: **[điền theo quy chế tuyển sinh hiện hành]**.
-- Độ tuổi dự tuyển: **[điền theo quy định]**.
+| Nghề đào tạo | Trình độ | Học tại trường | Thực tập sản xuất |
+|:--|:--|:--:|:--:|
+| Khai thác mỏ hầm lò / Xây dựng mỏ hầm lò | Sơ cấp (đọc, viết thành thạo) | 3,2 tháng | 3,7 tháng |
+| Cơ điện mỏ hầm lò | Trung cấp (THPT trở lên) | 9,1 tháng | 3,9 tháng |
 
-## 2. Chỉ tiêu tuyển sinh
+## Đối tượng
 
-| Nội dung | Số lớp | Chỉ tiêu |
-|:--|:--:|:--:|
-| Lớp 10 [tên chương trình / ban] | [điền] | [điền] |
+Nam thanh niên, tuổi từ 18 đến 35; đủ sức khỏe theo quy định.
 
-## 3. Lịch tuyển sinh dự kiến
+## Quyền lợi
 
-| Mốc thời gian | Ngày dự kiến |
-|:--|:--|
-| Nhận hồ sơ đăng ký | [dd/mm/yyyy - dd/mm/yyyy] |
-| Thi môn Toán | [dd/mm/yyyy], thời gian làm bài [điền] phút |
-| Công bố điểm | [dd/mm/yyyy] |
+- **Khi học nghề:** miễn toàn bộ kinh phí đào tạo; miễn phí ăn, ở; học Trung cấp nghề được cấp học bổng tối đa 1.000.000 đồng/tháng.
+- **Thực tập sản xuất:** hưởng 85 - 100% lương công nhân chính thức.
+- **Khi đi làm:** được bố trí việc làm ngay sau đào tạo, ký hợp đồng lao động dài hạn, đóng đầy đủ bảo hiểm.
 
-## 4. Cấu trúc đề minh họa môn Toán
+## Hồ sơ
 
-Tổ Toán đăng đề minh họa và đáp án ở mục **Đề cương vào 10**. Cấu trúc đề chính thức (số câu, thang điểm) do **[cơ quan ban hành]** quy định — sẽ cập nhật tại đây khi có văn bản.
-
-Gợi ý khi làm bài: đọc lướt toàn đề, làm các câu nhận biết và thông hiểu trước, dành thời gian còn lại cho câu vận dụng.
-
-## 5. Hồ sơ cần chuẩn bị
-
-1. Đơn đăng ký dự tuyển theo mẫu.
-2. Bản sao giấy khai sinh.
-3. Học bạ THCS và giấy chứng nhận tốt nghiệp (hoặc giấy tờ tương đương): **[điền]**.
-
-**Giải đáp thắc mắc:** xem khung thông tin liên hệ bên phải hoặc mục *Liên hệ*.`,
+Xem danh sách đầy đủ và phân hiệu tiếp nhận tại trang **Tuyển sinh học nghề**.`,
         attachments: []
       },
       {
@@ -368,20 +494,20 @@ $$S=\int_0^1(x-x^2)\,dx=\left[\frac{x^2}{2}-\frac{x^3}{3}\right]_0^1=\frac12-\fr
       },
       {
         id: 'demo-tin-tuc',
-        title: 'Tổ Toán mở kênh giải đáp thắc mắc cho học sinh và phụ huynh (bài mẫu)',
+        title: 'Tổ Toán mở kênh giải đáp thắc mắc cho ứng viên và học viên (bài mẫu)',
         category: 'tin-tuc',
         pinned: false,
         createdAt: now - 15 * DAY,
-        summary: 'Bài tin mẫu cho mục Tin tức & Hoạt động — thay bằng tin thật của Tổ Toán.',
-        content: R`> **Bài mẫu** — thay bằng tin thật của Tổ Toán.
+        summary: 'Bài tin mẫu cho mục Tin tức & Hoạt động — thay bằng tin thật.',
+        content: R`> **Bài mẫu** — thay bằng tin thật.
 
-Để hỗ trợ học sinh ôn tập, Tổ Toán dự kiến:
+Để hỗ trợ ứng viên và học viên, Tổ Toán dự kiến:
 
-- Đăng đề cương mới ngay trên website này: xem trực tiếp và tải về dưới dạng PDF.
-- Tiếp nhận câu hỏi qua **Zalo / Hotline** ở góc dưới bên phải màn hình.
-- Công bố lịch ôn tập, lịch kiểm tra tại mục **Tin tức & Hoạt động**.
+- Giải đáp thắc mắc về tuyển sinh học nghề qua **Zalo / Hotline** ở góc dưới bên phải màn hình.
+- Đăng đề cương ôn văn hóa mới ngay trên website này: xem trực tiếp và tải về dưới dạng PDF.
+- Công bố lịch ôn tập tại mục **Tin tức & Hoạt động**.
 
-Mời học sinh và phụ huynh theo dõi trang để cập nhật thông tin mới nhất.`,
+Mời bạn theo dõi trang để cập nhật thông tin mới nhất.`,
         attachments: []
       }
     ];

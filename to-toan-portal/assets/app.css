@@ -130,7 +130,7 @@ html.motion-ok .float-ring { display: block; animation: pulse-ring 2s ease-out 4
 /* ---------- Vùng chạm tối thiểu 44px trên điện thoại / màn hình cảm ứng ---------- */
 @media (pointer: coarse), (max-width: 640px) {
   .btn, .field,
-  [data-action="tab"], [data-action="view-mode"], [data-action="toggle-menu"],
+  [data-action="tab"], [data-action="view-mode"], [data-action="toggle-menu"], [data-action="scroll-to"],
   #mobile-menu a { min-height: 44px; }
   [data-action="toggle-menu"], [data-action="view-mode"], .btn-sm, [data-md] { min-width: 44px; }
   [data-md], summary { min-height: 44px; }
@@ -206,6 +206,8 @@ html.motion-ok .route-bar.run { animation: route-run .75s ease-out forwards; }
   transform: scaleX(0); transform-origin: left center; transition: transform .28s cubic-bezier(.2, .7, .2, 1);
 }
 .nav-link:hover, .nav-link[aria-current="page"] { color: #fff; }
+/* Mục trọng tâm (Tuyển sinh học nghề): chữ vàng để nổi hơn các mục khác (vàng #fcd34d trên nền navy: tương phản > 7:1) */
+.nav-link-hot { color: #fcd34d; font-weight: 700; }
 .nav-link:hover::after, .nav-link[aria-current="page"]::after { transform: scaleX(1); }
 
 /* Menu điện thoại: trượt mở bằng grid-template-rows (đóng thì ẩn khỏi thứ tự Tab) */
@@ -276,4 +278,6 @@ html.motion-ok #view.no-anim .hero-in { animation: none; }
 @media print {
   .reveal, .reveal:not(.is-in), .hero-in { opacity: 1 !important; transform: none !important; animation: none !important; }
   .ticker, .route-bar, .read-bar, .to-top, #floating { display: none !important; }
+  /* In danh sách hồ sơ: chỉ giữ nội dung trang, bỏ khung điều hướng */
+  #demo-banner, #topbar, #header, #footer, .no-print { display: none !important; }
 }

@@ -67,6 +67,13 @@ and **firebase** (Firestore + Auth, SDK loaded by dynamic `import()` from gstati
   `@media (pointer: coarse), (max-width: 640px)`. A new button/link/input type
   must be added to that rule. Audited at 390px (targets, contrast, labels,
   keyboard focus) — keep body text ≥4.5:1 and every input labelled.
+- **Purpose is worker recruitment, not school admissions.** The site is an information channel for a vocational
+  college's "học nghề → bố trí việc làm" intake (underground-mine trades) plus an "ôn văn hóa" area. It must not collect
+  hồ sơ or personal data (no forms) — candidates are sent to the school by phone/Zalo/branch. The structured page
+  `#/hoc-nghe` (`js/recruit.js`) renders `settings.recruit` (defaults copied from the school's dated notice, source shown
+  on the page). Hero points and stat tiles left blank are *derived* from `recruit` (`TT.recruitInfo`) so there is one
+  source of truth. Do not add salary/benefit/age figures that are not in a cited notice. Changing `settings` shape needs no
+  rules change (settings are admin-write, unvalidated); changing post categories does.
 - Changing Tailwind classes in `index.html`/`js/*.js` needs
   `cd to-toan-portal && npm install && npm run build:css` (own `.gitignore`
   covers its `node_modules/`).

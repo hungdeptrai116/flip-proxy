@@ -625,6 +625,14 @@
           : html`<input id="s-${name}" name="${name}" class="field" maxlength="${opts.max || 300}" value="${value}" ${opts.type ? raw('type="' + opts.type + '"') : ''} ${opts.ph ? raw('placeholder="' + esc(opts.ph) + '"') : ''}>`}
         ${opts.hint ? html`<p class="hint">${opts.hint}</p>` : ''}</div>`;
     };
+    // Danh sách nhiều dòng: mỗi dòng một mục (dòng trống bị bỏ)
+    const lines = (label, name, arr, hint) => f(label, name, (arr || []).join('\n'),
+      { area: true, rows: Math.max(4, (arr || []).length + 1), max: 4000, span: 'sm:col-span-2', hint: hint || 'Mỗi dòng một mục. Dòng trống sẽ bị bỏ.' });
+    // Đủ số ô để thêm mục mới mà không cần nút "thêm": ô để trống sẽ bị bỏ khi lưu
+    const slots = (list, min, max) => { const n = Math.min(max, Math.max(min, list.length)); const out = []; for (let i = 0; i < n; i++) out.push(list[i] || {}); return out; };
+    const rc = s.recruit;
+    const rowBox = (title, inner) => html`<fieldset class="rounded-lg border border-slate-200 p-3 sm:col-span-2">
+      <legend class="px-1 text-sm font-bold text-slate-700">${title}</legend><div class="grid gap-3 sm:grid-cols-2">${inner}</div></fieldset>`;
     return {
       title: 'Cài đặt — Quản trị Tổ Toán',
       body: shell('settings', html`
@@ -632,12 +640,42 @@
           <div class="card p-5"><h2 class="text-base font-extrabold text-navy-dark">Thông tin chung</h2>
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
               ${f('Tên trường (hiện cạnh chữ “TỔ TOÁN”)', 'schoolName', s.schoolName, { span: 'sm:col-span-2', max: 200 })}
-              ${f('Số điện thoại / Hotline', 'hotline', s.hotline, { ph: 'VD: 0912 345 678', max: 40 })}
+              ${f('Số điện thoại tư vấn của Tổ Toán (hotline)', 'hotline', s.hotline, { ph: 'VD: 0912 345 678', max: 40, hint: 'Hiện ở nút gọi nổi và trang Tuyển sinh học nghề, kèm số chính thức của Trường.' })}
               ${f('Email Tổ Toán', 'email', s.email, { max: 120, type: 'email' })}
               ${f('Địa chỉ nhà trường', 'address', s.address, { span: 'sm:col-span-2' })}
               ${f('Link Zalo', 'zalo', s.zalo, { ph: 'https://zalo.me/số-điện-thoại', hint: 'Để trống để ẩn nút Zalo nổi.', span: 'sm:col-span-2' })}
               ${f('Tên người đăng mặc định', 'defaultAuthor', s.defaultAuthor, { max: 120 })}
               ${f('Ghi chú chân trang', 'footerNote', s.footerNote, { max: 300 })}
+            </div></div>
+
+          <div class="card p-5"><h2 class="text-base font-extrabold text-navy-dark">Tuyển sinh học nghề (trang #/hoc-nghe)</h2>
+            <p class="hint">Dữ liệu này hiện ở trang <strong>Tuyển sinh học nghề</strong>, banner và ô số liệu trang chủ — sửa ở MỘT chỗ này. Mặc định chép từ Thông báo ngày 02/01/2026 của Trường;
+              khi Trường đổi thông báo hãy sửa tại đây và ghi lại ngày đối chiếu. Chỉ đăng thông tin đã được Trường xác nhận.</p>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              ${f('Nguồn thông tin (hiện đầu trang)', 'recruit.source', rc.source, { area: true, rows: 2, max: 300, span: 'sm:col-span-2' })}
+              ${f('Đã đối chiếu với Trường ngày', 'recruit.checked', rc.checked, { max: 80, ph: 'VD: 20/10/2026', hint: 'Để trống nếu chưa đối chiếu.' })}
+              ${f('Tên người tư vấn (hiện cạnh số của Tổ Toán)', 'recruit.advisor', rc.advisor, { max: 120, ph: 'VD: Thầy Nguyễn Văn A', hint: 'Nên ghi tên thật — số lạ không tên dễ bị nghi là lừa đảo.' })}
+              ${f('Nhãn số điện thoại của Trường', 'recruit.officialName', rc.officialName, { max: 120 })}
+              ${f('Số điện thoại của Trường', 'recruit.officialPhone', rc.officialPhone, { max: 40, hint: 'Số ghi trên thông báo chính thức.' })}
+              ${f('Đối tượng tuyển sinh', 'recruit.eligibility', rc.eligibility, { area: true, rows: 2, max: 400, span: 'sm:col-span-2' })}
+              ${slots(rc.programs, 4, 4).map((p, i) => rowBox('Ngành nghề ' + (i + 1) + (i >= 2 ? ' (để trống nếu không dùng)' : ''), html`
+                ${f('Tên ngành nghề', 'recruit.programs.' + i + '.name', p.name || '', { max: 160, span: 'sm:col-span-2' })}
+                ${f('Trình độ', 'recruit.programs.' + i + '.level', p.level || '', { max: 60, ph: 'Sơ cấp / Trung cấp' })}
+                ${f('Yêu cầu trình độ đầu vào', 'recruit.programs.' + i + '.require', p.require || '', { max: 120 })}
+                ${f('Thời gian học tại trường', 'recruit.programs.' + i + '.train', p.train || '', { max: 60, ph: 'VD: 3,2 tháng' })}
+                ${f('Thời gian thực tập sản xuất', 'recruit.programs.' + i + '.practice', p.practice || '', { max: 60, ph: 'VD: 3,7 tháng' })}`))}
+              ${lines('Quyền lợi khi đi học nghề', 'recruit.learnBenefits', rc.learnBenefits)}
+              ${lines('Quyền lợi khi đi làm', 'recruit.workBenefits', rc.workBenefits)}
+              ${lines('Lộ trình (các bước)', 'recruit.steps', rc.steps)}
+              ${lines('Hồ sơ cần chuẩn bị', 'recruit.documents', rc.documents)}
+              ${f('Ghi chú dưới danh sách hồ sơ', 'recruit.documentsNote', rc.documentsNote, { area: true, rows: 2, max: 400, span: 'sm:col-span-2', hint: 'Để trống để ẩn ghi chú.' })}
+              ${slots(rc.branches, 6, 8).map((b, i) => rowBox('Phân hiệu ' + (i + 1) + (i >= rc.branches.length ? ' (để trống nếu không dùng)' : ''), html`
+                ${f('Tên phân hiệu', 'recruit.branches.' + i + '.name', b.name || '', { max: 120, span: 'sm:col-span-2' })}
+                ${f('Địa chỉ', 'recruit.branches.' + i + '.address', b.address || '', { max: 300, span: 'sm:col-span-2' })}
+                ${f('Link Google Maps', 'recruit.branches.' + i + '.map', b.map || '', { max: 300, ph: 'https://maps.app.goo.gl/…', span: 'sm:col-span-2' })}`))}
+              ${slots(rc.faq, 8, 10).map((q, i) => rowBox('Hỏi đáp ' + (i + 1) + (i >= rc.faq.length ? ' (để trống nếu không dùng)' : ''), html`
+                ${f('Câu hỏi', 'recruit.faq.' + i + '.q', q.q || '', { max: 300, span: 'sm:col-span-2' })}
+                ${f('Trả lời', 'recruit.faq.' + i + '.a', q.a || '', { area: true, rows: 3, max: 1200, span: 'sm:col-span-2' })}`))}
             </div></div>
 
           <div class="card p-5"><h2 class="text-base font-extrabold text-navy-dark">Banner trang chủ</h2>
@@ -647,9 +685,9 @@
               ${f('Mô tả ngắn', 'hero.subtitle', s.hero.subtitle, { area: true, rows: 2, max: 500, span: 'sm:col-span-2' })}
               ${s.hero.points.map((p, i) => html`
                 ${f('Thông tin cốt lõi ' + (i + 1) + ' — tiêu đề', 'hero.points.' + i + '.label', p.label, { max: 80 })}
-                ${f('Thông tin cốt lõi ' + (i + 1) + ' — nội dung', 'hero.points.' + i + '.value', p.value, { max: 200 })}`)}
-              ${f('Nút 1 (→ Thông tin Tuyển sinh)', 'hero.cta1', s.hero.cta1, { max: 60 })}
-              ${f('Nút 2 (→ Đề cương Ôn tập)', 'hero.cta2', s.hero.cta2, { max: 60 })}
+                ${f('Thông tin cốt lõi ' + (i + 1) + ' — nội dung', 'hero.points.' + i + '.value', p.value, { max: 200, hint: 'Để trống = tự lấy từ mục “Tuyển sinh học nghề” (khuyến nghị, để không bị lệch số).' })}`)}
+              ${f('Nút 1 (→ trang Tuyển sinh học nghề)', 'hero.cta1', s.hero.cta1, { max: 60 })}
+              ${f('Nút 2 (→ gọi số tư vấn; chưa có thì Zalo, rồi số của Trường)', 'hero.cta2', s.hero.cta2, { max: 60 })}
             </div></div>
 
           <div class="card p-5"><h2 class="text-base font-extrabold text-navy-dark">Giới thiệu & số liệu</h2>
@@ -660,6 +698,7 @@
                 ${f('Số liệu ' + (i + 1) + ' — nhãn', 'stats.' + i + '.label', st.label, { max: 80 })}
                 <div><label class="label" for="s-stats.${i}.value">Số liệu ${i + 1} — giá trị</label>
                   <input id="s-stats.${i}.value" name="stats.${i}.value" class="field" maxlength="40" value="${st.value}" ${st.auto ? raw('disabled') : ''}>
+                  ${i === 0 || i === 2 ? html`<p class="hint">Để trống = tự đếm từ mục “Tuyển sinh học nghề”.</p>` : ''}
                   ${i === 1 ? html`<label class="mt-2 flex items-center gap-2 text-sm"><input type="checkbox" name="stats.1.auto" data-input="stat-auto" class="h-4 w-4 rounded border-slate-300 text-brand" ${st.auto ? raw('checked') : ''}>
                     Tự đếm số tài liệu đính kèm đang hiển thị</label>` : ''}</div>`)}
             </div></div>

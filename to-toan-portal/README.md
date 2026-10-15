@@ -1,7 +1,10 @@
-# Website Tổ Toán — Cổng thông tin Tuyển sinh & Đề cương Ôn tập
+# Website Tổ Toán — Tuyển sinh học nghề & Ôn văn hóa
 
 Site tĩnh (HTML + Tailwind + JavaScript thuần), **1 quản trị viên đăng bài trực tiếp trên trình duyệt**.
 Dữ liệu lưu ở Cloud Firestore (chạy thật) hoặc `localStorage` (chạy thử).
+
+**Vai trò của site:** kênh thông tin giúp ứng viên hiểu ngành nghề, điều kiện, hồ sơ và phân hiệu của Trường Cao đẳng Than - Khoáng sản Việt Nam rồi liên hệ Trường; kèm khu tài liệu **ôn văn hóa**.
+Site **không nhận hồ sơ và không thu dữ liệu cá nhân** — hồ sơ và nhập học do Trường tiếp nhận tại các phân hiệu.
 
 ## 1. Chạy thử ngay (Chế độ Demo) — không cần cài gì
 
@@ -10,7 +13,7 @@ cd to-toan-portal
 node serve.js          # mở http://localhost:8080
 ```
 
-- Có sẵn 6 bài mẫu (Tuyển sinh, Đề cương vào 10, K10, K11, K12, Tin tức) và 3 file PDF mẫu.
+- Có sẵn 6 bài mẫu (Tuyển sinh học nghề, Đề cương vào 10, K10, K11, K12, Tin tức) và 3 file PDF mẫu.
 - Quản trị: bấm **"Quản trị viên đăng nhập"** ở chân trang (hoặc mở `#/admin`).
   Tài khoản demo đã điền sẵn: `admin@demo.local` / `demo123`.
 - Dữ liệu demo nằm trong trình duyệt này; **không có tính bảo mật**. Nút *Cài đặt → Khôi phục dữ liệu mẫu* đưa về ban đầu.
@@ -28,6 +31,23 @@ node serve.js          # mở http://localhost:8080
    (Hoặc dùng CLI: `firebase deploy --only firestore:rules` — đã có sẵn `firebase.json`.)
 
 Tải lại trang: banner Demo biến mất. Vào `#/admin`, đăng nhập, **Cài đặt** để nhập hotline/email/Zalo/banner. Muốn có bài mẫu: *Cài đặt → Nạp 6 bài mẫu vào Firestore*.
+
+## Mục "Tuyển sinh học nghề" (trang `#/hoc-nghe`)
+
+Toàn bộ nội dung trang này nằm trong **Quản trị → Cài đặt → Tuyển sinh học nghề** (lưu ở `settings/site.recruit`), **không phải sửa mã**:
+ngành nghề, đối tượng, quyền lợi, lộ trình, hồ sơ, phân hiệu (kèm link Google Maps), hỏi đáp, tên người tư vấn, số điện thoại của Trường.
+
+- **Mặc định** chép từ *Thông báo tuyển dụng lao động, cử đi học nghề, bố trí việc làm năm 2026* của Trường (ngày 02/01/2026) và các poster hướng dẫn hồ sơ / địa chỉ phân hiệu. Nguồn và ngày luôn hiện đầu trang.
+- **Một nguồn dữ liệu:** banner trang chủ (đối tượng, ngành, phân hiệu) và ô số liệu (số ngành, số phân hiệu) tự lấy từ mục này nếu để trống — sửa một chỗ, mọi nơi cập nhật.
+- **Khi Trường đổi thông báo:** sửa tại đây và điền ô *Đã đối chiếu với Trường ngày*. Chỉ đăng thông tin đã được Trường xác nhận.
+- **Số điện thoại:** nhập số tư vấn của Tổ Toán ở *Thông tin chung → Hotline* (và *Tên người tư vấn* — nên ghi tên thật). Trang luôn hiện kèm số của Trường để ứng viên đối chiếu.
+- Không đổi `firestore.rules`: `settings` đã cho admin ghi tự do; bài viết vẫn dùng 6 chuyên mục cũ (nhãn hiển thị đã đổi: `tuyen-sinh` = "Tuyển sinh học nghề", các `de-cuong-*` thuộc "Ôn văn hóa").
+- Xem trước khi chia sẻ link (Zalo/Facebook) lấy từ thẻ Open Graph trong `index.html` và ảnh `assets/og.png`. Địa chỉ ảnh đang là `https://to-toan-portal.onrender.com/assets/og.png` — **đổi lại khi chuyển sang tên miền riêng**. Preview chỉ có cho cả trang, không riêng từng bài (site dùng `#`).
+
+### Trước khi công bố rộng
+Các thông báo/poster của Trường còn vài chỗ ghi khác nhau; cần người phụ trách của Trường xác nhận rồi mới sửa ở Cài đặt:
+độ tuổi (18–35 hay 18–40) · lương "bình quân 20–25 triệu" tính thế nào và từ giai đoạn nào · khoản nào miễn phí (ăn, ở, xe) · công ty/mỏ/địa điểm làm việc sau đào tạo ·
+số ảnh 3x4 (05 hay 06) · giấy khai sinh là bản sao hay photo công chứng · nơi nộp hồ sơ (địa phương hay phân hiệu) · cách Trường ghi nhận người giới thiệu.
 
 ## 3. Đưa lên mạng
 
@@ -57,7 +77,8 @@ firebase.json         để deploy rules bằng CLI
 serve.js              máy chủ tĩnh cục bộ (không cần cài gói)
 js/util.js            escape an toàn, icon, kiểm tra URL, nhận diện link Drive, làm sạch dữ liệu
 js/markdown.js        Markdown + KaTeX, không chèn HTML thô
-js/data.js            chuyên mục, cài đặt mặc định, 6 bài demo
+js/data.js            chuyên mục, cài đặt mặc định (gồm mục tuyển sinh học nghề), 6 bài demo
+js/recruit.js         trang #/hoc-nghe và khối giới thiệu nhanh ở trang chủ
 js/store.js           lớp dữ liệu: Demo (localStorage) / Firebase (Firestore + Auth)
 js/views.js           giao diện công khai
 js/admin.js           trang quản trị
