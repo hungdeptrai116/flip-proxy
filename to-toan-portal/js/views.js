@@ -205,10 +205,12 @@
     return html`<div data-browser-root="${key}">${browserInner(key)}</div>`;
   }
 
-  function rerenderBrowser(key, focusSelector) {
+  // keep: số thẻ ĐẦU TIÊN đã hiển thị từ trước (bấm "Xem thêm") → không cho mờ đi rồi hiện lại, chỉ thẻ mới mới có hiệu ứng
+  function rerenderBrowser(key, focusSelector, keep) {
     const el = document.querySelector('[data-browser-root="' + key + '"]');
     if (!el) return;
     el.innerHTML = browserInner(key).s;
+    if (keep) Array.prototype.slice.call(el.querySelectorAll('article[data-reveal]'), 0, keep).forEach((a) => a.removeAttribute('data-reveal'));
     if (TT.motion) TT.motion.afterRender(el, false);
     if (focusSelector) {
       const f = el.querySelector(focusSelector);
@@ -225,8 +227,9 @@
   TT.actions.more = (el) => {
     const key = el.dataset.browser;
     if (!browserState[key]) return;
+    const before = browserState[key].shown;
     browserState[key].shown += PAGE_SIZE;
-    rerenderBrowser(key);
+    rerenderBrowser(key, null, before);
   };
   TT.actions['view-mode'] = (el) => {
     viewMode = el.dataset.mode === 'list' ? 'list' : 'grid';

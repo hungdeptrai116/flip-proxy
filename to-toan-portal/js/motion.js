@@ -19,8 +19,12 @@
   const mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
   const hasIO = 'IntersectionObserver' in window;
 
+  // Lựa chọn của người dùng giữ cả trong biến (phiên hiện tại) lẫn localStorage:
+  // nếu trình duyệt chặn localStorage thì nút "Hiệu ứng" vẫn tắt/bật được trong phiên đó.
+  let pref = TT.lsGet(KEY, 'on') === 'off' ? 'off' : 'on';
+
   const osReduced = () => !!(mq && mq.matches);
-  const userOff = () => TT.lsGet(KEY, 'on') === 'off';
+  const userOff = () => pref === 'off';
   const enabled = () => hasIO && !osReduced() && !userOff();
   const active = () => root.classList.contains('motion-ok');
 
@@ -43,7 +47,8 @@
 
   TT.actions = TT.actions || {};
   TT.actions['toggle-motion'] = () => {
-    TT.lsSet(KEY, active() ? 'off' : 'on');
+    pref = active() ? 'off' : 'on';
+    TT.lsSet(KEY, pref);
     apply();
   };
 
@@ -61,7 +66,9 @@
         e.target.classList.add('is-in');
         revealIO.unobserve(e.target);
       });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    // threshold 0: chỉ cần lọt vào khung nhìn 1 điểm ảnh. Ngưỡng theo tỉ lệ diện tích (vd. 0.08) sẽ KHÔNG BAO GIỜ
+    // đạt với khối cao hơn ~12 lần màn hình (bài viết rất dài) → khối đó ẩn vĩnh viễn.
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0 });
 
     countIO = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
@@ -180,8 +187,15 @@
     el.innerHTML = TT.icon(paused ? 'play' : 'pause', 'h-4 w-4').s;
   };
 
+  // Lỗi trong lúc dựng hiệu ứng → gỡ class để mọi khối đang chờ hiện (opacity 0) lập tức hiện đầy đủ, tĩnh
+  function disable() {
+    root.classList.remove('motion-ok');
+    syncToggle();
+  }
+
   TT.motion = {
     isOn: active,
+    disable: disable,
     isOsReduced: osReduced,
     afterRender: afterRender,
     routeStart: routeStart,

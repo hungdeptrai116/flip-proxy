@@ -116,7 +116,11 @@
       main.classList.toggle('no-anim', !animate);
       document.title = v.title || 'Tổ Toán';
       if (v.mount) v.mount(main);
-      if (animate && TT.motion) TT.motion.afterRender(main, true);
+      // Hiệu ứng hỏng thì chỉ tắt hiệu ứng — KHÔNG được làm mất nội dung trang
+      if (animate && TT.motion) {
+        try { TT.motion.afterRender(main, true); }
+        catch (me) { console.error(me); TT.motion.disable(); }
+      }
     } catch (e) {
       console.error(e);
       main.innerHTML = '<div class="container-x py-16 text-center"><p class="text-lg font-bold text-red-700">Đã xảy ra lỗi khi hiển thị trang.</p>' +

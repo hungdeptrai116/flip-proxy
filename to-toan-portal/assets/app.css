@@ -92,7 +92,8 @@
   box-shadow: 0 6px 18px rgba(15, 23, 42, .35); transition: transform .15s;
 }
 .float-btn:hover { transform: scale(1.06); }
-.float-ring { position: absolute; inset: 0; border-radius: 9999px; opacity: .5; animation: pulse-ring 2s ease-out 4; }
+.float-ring { display: none; position: absolute; inset: 0; border-radius: 9999px; opacity: .5; }
+html.motion-ok .float-ring { display: block; animation: pulse-ring 2s ease-out 4; }
 .float-tip {
   position: absolute; right: calc(100% + .6rem); white-space: nowrap;
   background: #0f172a; color: #fff; font-size: .75rem; font-weight: 600; padding: .3rem .6rem; border-radius: .4rem;
@@ -270,3 +271,9 @@ html.motion-ok .skel { animation: shimmer 1.4s ease infinite; }
 
 /* Làm mới dữ liệu (không phải chuyển trang): không phát lại hiệu ứng vào banner */
 html.motion-ok #view.no-anim .hero-in { animation: none; }
+
+/* In ra giấy / lưu PDF: không có cuộn nên không có gì kích hoạt "hiện dần" → phải hiện hết */
+@media print {
+  .reveal, .reveal:not(.is-in), .hero-in { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .ticker, .route-bar, .read-bar, .to-top, #floating { display: none !important; }
+}
