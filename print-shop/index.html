@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="claude:viewport-fit-sides" content="cover">
-<title>Print2Door Print Shop</title>
+<title>PrintGo</title>
 <meta name="description" content="Print documents online and get them delivered to your door. A demo storefront for a course project.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -697,11 +697,11 @@ textarea.in{min-height:84px;resize:vertical}
 
   /* ===== 1. CÀI ĐẶT: sửa tên thương hiệu, liên hệ và bảng giá ở đây =====
      Giá tính bằng VND. Mọi bảng giá, báo giá và giỏ hàng trên trang đều đọc từ khối này.
-     Nếu đổi tên thương hiệu, sửa thêm thẻ <title> và <meta name="description"> ở đầu file. */
+     Nếu đổi tên thương hiệu, sửa thêm thẻ <title> ở đầu file. */
   const SHOP = {
-    brand: 'Print2Door',
+    brand: 'PrintGo',
     phone: '1900 xxxx',
-    email: 'hello@print2door.example',
+    email: 'hello@printgo.example',
     hours: '07:00 - 21:00',
     prices: {
       page: { a4: { bw: 400, color: 2500 }, a3: { bw: 1500, color: 6000 } },   // mỗi trang in
@@ -716,7 +716,7 @@ textarea.in{min-height:84px;resize:vertical}
 
   /* ===== 2. NỘI DUNG: mỗi dòng là [English, Tiếng Việt] ===== */
   const S = {
-    'meta.title': ['{brand} Print Shop', '{brand} In ấn giao tận nơi'],
+    'meta.title': ['{brand}', '{brand}'],
     'skip': ['Skip to content', 'Bỏ qua, đến nội dung'],
     'demo.bar': ['Course project. Fictional business. Nothing on this site is real.', 'Bài tập môn học. Doanh nghiệp giả định. Mọi nội dung trên trang đều là mô phỏng.'],
     'nav.main': ['Main', 'Chính'],
@@ -1309,12 +1309,12 @@ textarea.in{min-height:84px;resize:vertical}
 
   // Giá trị lưu trữ cục bộ chỉ là tiện ích: bọc try/catch vì có thể bị chặn.
   function loadLang() {
-    try { const v = localStorage.getItem('p2d-lang'); if (v === 'vi' || v === 'en') return v; } catch (e) { /* bỏ qua */ }
+    try { const v = localStorage.getItem('printgo-lang'); if (v === 'vi' || v === 'en') return v; } catch (e) { /* bỏ qua */ }
     return 'en';
   }
   function setLang(l) {
     lang = l;
-    try { localStorage.setItem('p2d-lang', l); } catch (e) { /* bỏ qua */ }
+    try { localStorage.setItem('printgo-lang', l); } catch (e) { /* bỏ qua */ }
     renderAll();
   }
 
