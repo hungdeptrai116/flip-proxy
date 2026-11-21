@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>BrewGo</title>
-<meta name="description" content="Small-batch cold brew, steeped 18 hours and delivered cold. A demo storefront for a course project.">
+<meta name="description" content="Small-batch cold brew in a can, steeped 18 hours and delivered cold. A demo storefront for a course project.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap">
@@ -16,7 +16,7 @@
   --bg:#EAF1F5; --paper:#FFFFFF; --ink:#1D130F; --muted:#4F5C67; --line:#D0DCE3;
   --brand:#0B6E99; --brand-ink:#FFFFFF; --brand-soft:#DDEFF7;
   --caramel:#C9782B; --disc:#D3E7F1;
-  --tint-original:#DCEBF3; --tint-sweet:#F1E3D3; --tint-oat:#E2EBDA; --tint-coconut:#D6EEEC;
+  --tint-original:#DCEBF3; --tint-citrus:#FBE6CC; --tint-apple:#E1F0D9; --tile-disc:rgb(255 255 255 / .55);
   --ice-fill:#FFFFFF; --ice-stroke:#FFFFFF; --ice-o:.5;
   --ok:#0B7A55; --bad:#BE2338;
   --lift:0 1px 0 rgb(29 19 15 / .05),0 18px 40px -18px rgb(29 19 15 / .35);
@@ -29,7 +29,7 @@
     --bg:#0B1216; --paper:#121B21; --ink:#EDF3F6; --muted:#9DAEB8; --line:#24353F;
     --brand:#6CC3EC; --brand-ink:#04222F; --brand-soft:#11303D;
     --caramel:#E79A48; --disc:#15303C;
-    --tint-original:#14303C; --tint-sweet:#2E2318; --tint-oat:#1F2B1C; --tint-coconut:#102E2C;
+    --tint-original:#14303C; --tint-citrus:#33230F; --tint-apple:#16291A; --tile-disc:rgb(255 255 255 / .06);
     --ice-fill:#BFE4F5; --ice-stroke:#BFE4F5; --ice-o:.22;
     --ok:#4BD6A0; --bad:#FF8190;
     --lift:0 1px 0 rgb(0 0 0 / .4),0 18px 40px -18px rgb(0 0 0 / .8);
@@ -40,7 +40,7 @@
   --bg:#0B1216; --paper:#121B21; --ink:#EDF3F6; --muted:#9DAEB8; --line:#24353F;
   --brand:#6CC3EC; --brand-ink:#04222F; --brand-soft:#11303D;
   --caramel:#E79A48; --disc:#15303C;
-  --tint-original:#14303C; --tint-sweet:#2E2318; --tint-oat:#1F2B1C; --tint-coconut:#102E2C;
+  --tint-original:#14303C; --tint-citrus:#33230F; --tint-apple:#16291A; --tile-disc:rgb(255 255 255 / .06);
   --ice-fill:#BFE4F5; --ice-stroke:#BFE4F5; --ice-o:.22;
   --ok:#4BD6A0; --bad:#FF8190;
   --lift:0 1px 0 rgb(0 0 0 / .4),0 18px 40px -18px rgb(0 0 0 / .8);
@@ -138,7 +138,22 @@ button:disabled{cursor:not-allowed}
 .bt{display:block;overflow:visible}
 .bt-b{font:500 7px var(--f-mono);letter-spacing:.18em;fill:#1D130F}
 .bt-n{font-family:var(--f-display);font-weight:800;fill:#1D130F}
-.bt-s{font:500 5.2px var(--f-mono);letter-spacing:.1em;fill:#4F5C67}
+.bt-s{font:500 5.2px var(--f-mono);letter-spacing:.1em;fill:#1D130F;fill-opacity:.78}
+.bt-b.l,.bt-n.l{fill:#fff}
+.bt-s.l{fill:#fff;fill-opacity:.8}
+
+.campaign{overflow:hidden;background:linear-gradient(100deg,#08121A 0%,#0F2D3C 56%,#9A5A1E 126%);color:#fff}
+.campaign .eyebrow{color:#9FD8F2}
+.camp-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:24px;padding-block:clamp(36px,5vw,60px)}
+.campaign h2{margin-top:10px;font-size:clamp(2.4rem,6vw,4.6rem);font-weight:800;line-height:1}
+.campaign h2 em{font-style:normal}
+.campaign h2 .nt{color:#8FD3F4}
+.campaign h2 .dy{color:#FFB347}
+.camp-sub{max-width:30em;margin-top:14px;color:#D5E4EC;font-size:1.0625rem}
+.camp-btn{margin-top:22px;border-color:#fff;background:#fff;color:#1D130F}
+.camp-btn:hover:not(:disabled){border-color:#FFB347;background:#FFB347;color:#1D130F}
+.camp-art{display:block;width:100%;max-width:440px;height:auto;justify-self:end}
+@media (max-width:900px){.camp-grid{grid-template-columns:minmax(0,1fr)}.camp-art{justify-self:start;max-width:300px}}
 
 .usp{border-block:1px solid var(--line)}
 .usp ul{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -157,30 +172,25 @@ section[id]{scroll-margin-top:80px}
 /* chip và pill */
 .chips{display:flex;flex-wrap:wrap;gap:10px}
 .chip{position:relative;flex:1 1 150px;min-width:0}
-.chip input,.pill input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.chip input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
 .chip .box{display:flex;flex-direction:column;gap:2px;height:100%;padding:12px 16px;border:1.5px solid var(--line);border-radius:16px;background:var(--paper);transition:border-color .15s,background-color .15s}
 .chip .box b{font-weight:600;line-height:1.35}
 .chip .box small{font:400 .75rem/1.4 var(--f-mono);color:var(--muted)}
 .chip:hover .box{border-color:var(--muted)}
 .chip input:checked+.box{border-color:var(--brand);background:var(--brand-soft);box-shadow:inset 0 0 0 1px var(--brand)}
-.chip input:focus-visible+.box,.pill input:focus-visible+span{outline:3px solid var(--brand);outline-offset:2px}
-.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
-.pill{position:relative}
-.pill span{display:inline-flex;align-items:center;min-height:42px;padding:0 18px;border:1.5px solid var(--line);border-radius:999px;background:var(--paper);font-weight:500;transition:background-color .15s,color .15s,border-color .15s}
-.pill:hover span{border-color:var(--ink)}
-.pill input:checked+span{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chip input:focus-visible+.box{outline:3px solid var(--brand);outline-offset:2px}
 
 /* sản phẩm */
-.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .pcard{display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:var(--paper)}
-.pmedia{position:relative;display:flex;align-items:flex-end;justify-content:center;height:300px;padding:52px 0 12px;background:var(--tint-original)}
-.pcard[data-sku="sweet"] .pmedia,.t-sweet{background:var(--tint-sweet)}
-.pcard[data-sku="oat"] .pmedia,.t-oat{background:var(--tint-oat)}
-.pcard[data-sku="coconut"] .pmedia,.t-coconut{background:var(--tint-coconut)}
+.pmedia{position:relative;display:flex;align-items:flex-end;justify-content:center;height:320px;padding:46px 0 10px;overflow:hidden;background:var(--tint-original)}
+.pmedia::before{content:"";position:absolute;left:50%;bottom:-14%;width:78%;aspect-ratio:1;border-radius:50%;background:var(--tile-disc);transform:translateX(-50%)}
+.pcard[data-sku="citrus"] .pmedia,.t-citrus{background:var(--tint-citrus)}
+.pcard[data-sku="apple"] .pmedia,.t-apple{background:var(--tint-apple)}
 .t-original{background:var(--tint-original)}
-.pmedia .bt{height:100%;width:auto;transition:transform .3s ease}
+.pmedia .bt{position:relative;z-index:1;height:100%;width:auto;transition:transform .3s ease}
 .pcard:hover .pmedia .bt{transform:translateY(-6px)}
-.ptag{position:absolute;top:14px;left:14px;padding:4px 10px;border-radius:999px;background:var(--paper);font:500 .68rem/1.4 var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.ptag{position:absolute;z-index:2;top:14px;left:14px;padding:4px 10px;border-radius:999px;background:var(--paper);font:500 .68rem/1.4 var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
 .pbody{display:flex;flex:1;flex-direction:column;gap:10px;padding:18px}
 .prow{display:flex;flex-direction:column;gap:2px}
 .prow h3{font-size:1.65rem;font-weight:800}
@@ -328,7 +338,6 @@ textarea.in{min-height:84px;resize:vertical}
 .toast button{padding:4px;border:0;background:none;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 
 @media (max-width:1100px){
-  .pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
   .steps::before{display:none}
 }
@@ -349,6 +358,15 @@ textarea.in{min-height:84px;resize:vertical}
   .nav a{padding:14px 0;border-bottom:1px solid var(--line)}
   .who-grid,.foot-grid{grid-template-columns:minmax(0,1fr)}
 }
+@media (max-width:760px){
+  .pgrid{grid-template-columns:minmax(0,1fr)}
+  .pcard{display:grid;grid-template-columns:136px minmax(0,1fr)}
+  .pmedia{height:auto;min-height:240px;align-items:center;padding:44px 0 14px}
+  .pmedia::before{top:50%;bottom:auto;transform:translate(-50%,-50%)}
+  .pmedia .bt{height:200px;width:auto}
+  .notes{display:none}
+  .pnudge{padding:14px 16px}
+}
 @media (max-width:720px){
   .usp ul{grid-template-columns:repeat(2,minmax(0,1fr))}
   .usp li:nth-child(odd){padding-left:0;border-left:0}
@@ -357,12 +375,6 @@ textarea.in{min-height:84px;resize:vertical}
 @media (max-width:640px){
   dialog.drawer{width:100%;height:auto;max-height:92vh;max-height:92dvh;margin:auto 0 0;border:0;border-radius:24px 24px 0 0}
   dialog.drawer[open]{animation-name:slide-up}
-  .pgrid{gap:12px}
-  .pmedia{height:210px;padding-top:44px}
-  .pbody{padding:14px}
-  .prow h3{font-size:1.45rem}
-  .pdesc,.notes{display:none}
-  .pact .btn{padding-inline:.5rem;white-space:nowrap;font-size:.95rem}
   .steps{grid-template-columns:minmax(0,1fr)}
   .cart-btn .lbl{display:none}
 }
@@ -395,7 +407,7 @@ textarea.in{min-height:84px;resize:vertical}
     <symbol id="i-box" viewBox="0 0 24 24"><path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
-    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-laptop" viewBox="0 0 24 24"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></symbol>
   </defs>
 </svg>
 
@@ -410,7 +422,7 @@ textarea.in{min-height:84px;resize:vertical}
     </a>
     <nav class="nav" id="nav" data-i18n-attr="aria-label:nav.main">
       <a href="#shop" data-i18n="nav.shop"></a>
-      <a href="#box" data-i18n="nav.box"></a>
+      <a href="#combo" data-i18n="nav.combo"></a>
       <a href="#how" data-i18n="nav.how"></a>
       <a href="#faq" data-i18n="nav.faq"></a>
       <div class="lang" role="group" data-i18n-attr="aria-label:lang.label">
@@ -445,15 +457,45 @@ textarea.in{min-height:84px;resize:vertical}
       <p class="sub" data-i18n="hero.sub"></p>
       <div class="cta">
         <a class="btn" href="#shop" data-i18n="hero.cta1"></a>
-        <a class="btn ghost" href="#box" data-i18n="hero.cta2"></a>
+        <a class="btn ghost" href="#combo" data-i18n="hero.cta2"></a>
       </div>
       <ul class="facts">
         <li><b>18 h</b><span data-i18n="fact.1"></span></li>
         <li><b>4 °C</b><span data-i18n="fact.2"></span></li>
-        <li><b>250 ml</b><span data-i18n="fact.3"></span></li>
+        <li><b id="fact-ml"></b><span data-i18n="fact.3"></span></li>
       </ul>
     </div>
     <figure class="hero-art" id="hero-art" aria-hidden="true"></figure>
+  </div>
+</section>
+
+<section class="campaign" aria-labelledby="camp-title">
+  <div class="wrap camp-grid">
+    <div>
+      <p class="eyebrow" data-i18n="camp.label"></p>
+      <h2 id="camp-title">Fuel Your <em class="nt">Night</em>, Own Your <em class="dy">Day</em></h2>
+      <p class="camp-sub" data-i18n="camp.sub"></p>
+      <a class="btn camp-btn" href="#shop" data-i18n="hero.cta1"></a>
+    </div>
+    <svg class="camp-art" viewBox="0 0 420 220" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="cg-sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC15E"/><stop offset="1" stop-color="#E8731A"/></linearGradient>
+        <mask id="cg-moon"><rect width="420" height="220" fill="#fff"/><circle cx="124" cy="62" r="36" fill="#000"/></mask>
+      </defs>
+      <g fill="#fff">
+        <circle cx="36" cy="38" r="1.8"/><circle cx="168" cy="22" r="1.4"/><circle cx="214" cy="64" r="1.8"/><circle cx="62" cy="116" r="1.4"/><circle cx="190" cy="120" r="1.6"/><circle cx="20" cy="152" r="1.4"/>
+        <path d="M150 52l1.8 5.2 5.2 1.8-5.2 1.8-1.8 5.2-1.8-5.2-5.2-1.8 5.2-1.8z"/>
+        <path d="M52 78l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4z"/>
+      </g>
+      <circle cx="96" cy="78" r="40" fill="#EAF4FA" mask="url(#cg-moon)"/>
+      <line x1="0" y1="176" x2="420" y2="176" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+      <g stroke="#FFC15E" stroke-width="3" stroke-linecap="round">
+        <line x1="219.4" y1="160" x2="201.7" y2="156.9"/><line x1="230.3" y1="130" x2="214.7" y2="121"/><line x1="250.9" y1="105.5" x2="239.3" y2="91.7"/>
+        <line x1="278.5" y1="89.5" x2="272.4" y2="72.6"/><line x1="310" y1="84" x2="310" y2="66"/><line x1="341.5" y1="89.5" x2="347.6" y2="72.6"/>
+        <line x1="369.1" y1="105.5" x2="380.7" y2="91.7"/><line x1="389.7" y1="130" x2="405.3" y2="121"/><line x1="400.6" y1="160" x2="418.3" y2="156.9"/>
+      </g>
+      <path d="M230 176A80 80 0 0 1 390 176Z" fill="url(#cg-sun)"/>
+    </svg>
   </div>
 </section>
 
@@ -473,15 +515,14 @@ textarea.in{min-height:84px;resize:vertical}
     <header class="sec-head">
       <p class="eyebrow" data-i18n="shop.eyebrow"></p>
       <h2 data-i18n="shop.title"></h2>
-      <p class="lead" data-i18n="shop.lead"></p>
+      <p class="lead" id="shop-lead"></p>
     </header>
-    <div class="pills" id="filter" role="radiogroup" data-i18n-attr="aria-label:filter.label"></div>
     <div class="pgrid" id="products"></div>
-    <div class="pnudge"><span id="pnudge-t"></span><a class="link" href="#box" data-i18n="p.boxlink"></a></div>
+    <div class="pnudge"><span id="pnudge-t"></span><a class="link" href="#combo" data-i18n="p.combolink"></a></div>
   </div>
 </section>
 
-<section class="sec alt" id="box">
+<section class="sec alt" id="combo">
   <div class="wrap">
     <header class="sec-head">
       <p class="eyebrow" data-i18n="bx.eyebrow"></p>
@@ -490,9 +531,9 @@ textarea.in{min-height:84px;resize:vertical}
     </header>
     <div class="bx-grid">
       <div class="bx-main">
-        <div class="bx-step" role="radiogroup" aria-labelledby="lg-bsize">
-          <p class="lg" id="lg-bsize"><span class="n" aria-hidden="true">1</span><span data-i18n="bx.step1"></span></p>
-          <div class="chips" id="bx-size"></div>
+        <div class="bx-step" role="radiogroup" aria-labelledby="lg-bpack">
+          <p class="lg" id="lg-bpack"><span class="n" aria-hidden="true">1</span><span data-i18n="bx.step1"></span></p>
+          <div class="chips" id="bx-pack"></div>
         </div>
         <div class="bx-step">
           <div class="bx-head">
@@ -506,16 +547,12 @@ textarea.in{min-height:84px;resize:vertical}
           <div class="prog"><i id="bx-prog"></i></div>
           <ul class="bx-rows" id="bx-rows" aria-labelledby="lg-brows"></ul>
         </div>
-        <div class="bx-step">
+        <div class="bx-step" id="bx-step3" hidden>
           <div role="radiogroup" aria-labelledby="lg-bmode">
             <p class="lg" id="lg-bmode"><span class="n" aria-hidden="true">3</span><span data-i18n="bx.step3"></span></p>
             <div class="chips" id="bx-mode"></div>
           </div>
-          <div id="bx-freq-wrap" hidden>
-            <p class="lg" id="lg-bfreq" data-i18n="bx.freq"></p>
-            <div class="chips" id="bx-freq" role="radiogroup" aria-labelledby="lg-bfreq"></div>
-            <p class="hint bx-sub-note" data-i18n="bx.subnote"></p>
-          </div>
+          <p class="hint bx-sub-note" id="bx-sub-note" hidden></p>
         </div>
         <div class="bx-bar">
           <div><p class="js-bx-count"></p><output class="js-bx-total"></output></div>
@@ -558,7 +595,7 @@ textarea.in{min-height:84px;resize:vertical}
     <div class="who-grid">
       <article class="who"><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><h3 data-i18n="who.1.t"></h3><p data-i18n="who.1.d"></p></article>
       <article class="who"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg><h3 data-i18n="who.2.t"></h3><p data-i18n="who.2.d"></p></article>
-      <article class="who"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><h3 data-i18n="who.3.t"></h3><p data-i18n="who.3.d"></p></article>
+      <article class="who"><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg><h3 data-i18n="who.3.t"></h3><p data-i18n="who.3.d"></p></article>
     </div>
   </div>
 </section>
@@ -588,7 +625,7 @@ textarea.in{min-height:84px;resize:vertical}
       <h2 data-i18n="cta.title"></h2>
       <p id="cta-sub"></p>
     </div>
-    <a class="btn invert" href="#box" data-i18n="hero.cta2"></a>
+    <a class="btn invert" href="#combo" data-i18n="hero.cta2"></a>
   </div>
 </section>
 
@@ -657,6 +694,7 @@ textarea.in{min-height:84px;resize:vertical}
         <div class="chips" id="co-payment"></div>
         <p class="hint" data-i18n="co.pay.demo"></p>
       </div>
+      <div class="field" id="f-ref"><label for="c-ref" data-i18n="co.ref"></label><input class="in" id="c-ref" name="ref" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" aria-describedby="h-ref e-ref"><p class="hint" id="h-ref" data-i18n="co.ref.hint"></p><p class="err" id="e-ref" hidden></p></div>
       <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true"></button>
     </form>
     <div class="done" id="v-done" hidden></div>
@@ -676,28 +714,36 @@ textarea.in{min-height:84px;resize:vertical}
   'use strict';
 
   /* ===== 1. CÀI ĐẶT: sửa tên thương hiệu, liên hệ, sản phẩm và giá ở đây =====
-     Giá tính bằng VND. Mọi bảng giá, hộp, giỏ hàng trên trang đều đọc từ khối này.
-     Nếu đổi tên thương hiệu, sửa thêm thẻ <title> ở đầu file. */
+     Giá tính bằng VND. Mọi bảng giá, combo, giỏ hàng trên trang đều đọc từ khối này.
+     Nếu đổi tên thương hiệu, sửa thêm thẻ <title> ở đầu file.
+     Lấy từ survey của nhóm: giá lon và giá hai combo.
+     Số tự đặt, cần đối chiếu: dung tích lon, phí giao, ngưỡng miễn phí giao. */
   const SHOP = {
     brand: 'BrewGo',
     phone: '1900 xxxx',
     email: 'hello@brewgo.example',
     hours: '07:00 - 21:00',
-    boxes: [{ size: 6, off: 0.10 }, { size: 12, off: 0.15 }, { size: 24, off: 0.20 }], // cỡ hộp và mức giảm
-    subscription: { off: 0.10, freqs: ['1w', '2w', '4w'] },                            // giảm thêm khi đăng ký định kỳ
-    delivery: { pickup: 0, standard: 25000, express: 45000 },
-    freeDeliveryFrom: 300000,                                                          // miễn phí giao tiêu chuẩn từ mức này
-    maxPerLine: 24                                                                     // tối đa mỗi vị khi mua lẻ
+    canMl: 250,                                                    // dung tích mỗi lon (tự đặt)
+    canPrice: 28000,                                               // giá mỗi lon, mọi vị cùng giá (survey)
+    combos: [
+      { id: 'duo', cans: 2, price: 49000 },                        // combo 2 lon (survey)
+      { id: 'week', cans: 5, price: 110000, subscribable: true }   // combo tuần 5 lon (survey), chỉ combo này được đăng ký
+    ],
+    delivery: { pickup: 0, standard: 25000, express: 45000 },      // phí giao (tự đặt)
+    freeDeliveryFrom: 150000,                                      // miễn phí giao tiêu chuẩn từ mức này (tự đặt)
+    maxPerLine: 24                                                 // tối đa mỗi vị khi mua lẻ
   };
   // Tên sản phẩm giữ nguyên tiếng Anh ở cả hai ngôn ngữ. Mô tả, nốt hương, thành phần nằm trong khối S bên dưới.
   const PRODUCTS = [
-    { sku: 'original', name: ['Original', 'Black'], price: 45000, tags: ['black', 'dairyfree'], label: 'dairyfree', liquid: ['#2A1812', '#150B07'], accent: '#0B6E99', foam: null },
-    { sku: 'sweet', name: ['Sweet', 'Milk'], price: 49000, tags: ['creamy'], label: 'milk', liquid: ['#9A6440', '#6B3F26'], accent: '#C9782B', foam: null },
-    { sku: 'oat', name: ['Oat', 'Latte'], price: 55000, tags: ['creamy', 'dairyfree'], label: 'dairyfree', liquid: ['#C79A70', '#9C6B45'], accent: '#5F8A4E', foam: null },
-    { sku: 'coconut', name: ['Coconut', 'Cloud'], price: 55000, tags: ['creamy', 'dairyfree'], label: 'dairyfree', liquid: ['#6A4533', '#3F2619'], accent: '#14908A', foam: '#F4F1E8' }
+    { sku: 'original', name: ['Original'], tag: 'black', can: { body: '#1D130F', band: '#0B6E99', light: true, icon: 'bean' } },
+    { sku: 'citrus', name: ['Citrus'], tag: 'fruity', can: { body: '#F28A1B', band: '#FFD84A', light: false, icon: 'slice' } },
+    { sku: 'apple', name: ['Apple', 'Sparkle'], tag: 'fruity', can: { body: '#7CC36B', band: '#EAF7CB', light: false, icon: 'apple' } }
   ];
-  const BYSKU = {};
+  PRODUCTS.forEach(p => { p.price = SHOP.canPrice; });
+  const BYSKU = {}, COMBO = {};
   PRODUCTS.forEach(p => { BYSKU[p.sku] = p; });
+  SHOP.combos.forEach(c => { COMBO[c.id] = c; });
+  const WEEK = SHOP.combos.find(c => c.subscribable);
 
   /* ===== 2. NỘI DUNG: mỗi dòng là [English, Tiếng Việt] ===== */
   const S = {
@@ -706,51 +752,49 @@ textarea.in{min-height:84px;resize:vertical}
     'demo.bar': ['Course project. Fictional business. Nothing on this site is real.', 'Bài tập môn học. Doanh nghiệp giả định. Mọi nội dung trên trang đều là mô phỏng.'],
     'nav.main': ['Main', 'Chính'],
     'nav.shop': ['Shop', 'Cửa hàng'],
-    'nav.box': ['Build a box', 'Tự tạo hộp'],
+    'nav.combo': ['Build a combo', 'Tự tạo combo'],
     'nav.how': ['How it is made', 'Cách làm'],
     'nav.faq': ['FAQ', 'Hỏi đáp'],
     'nav.menu': ['Menu', 'Menu'],
     'nav.cart': ['Cart', 'Giỏ hàng'],
     'lang.label': ['Language', 'Ngôn ngữ'],
 
-    'hero.eyebrow': ['Small-batch cold brew, delivered cold', 'Cold brew ủ theo mẻ nhỏ, giao lạnh tận nơi'],
+    'hero.eyebrow': ['Small-batch cold brew in a can, delivered cold', 'Cold brew đóng lon ủ theo mẻ nhỏ, giao lạnh tận nơi'],
     'hero.h1a': ['Steeped 18 hours.', 'Ủ lạnh 18 giờ.'],
-    'hero.h1b': ['Poured in seconds.', 'Rót ra là uống.'],
-    'hero.sub': ['Smooth cold brew, bottled the day you order and delivered chilled. Pick a bottle, build a box, or subscribe and save.', 'Cold brew êm dịu, đóng chai ngay trong ngày bạn đặt và giao lạnh tận nơi. Chọn từng chai, tự tạo hộp hoặc đăng ký định kỳ để tiết kiệm hơn.'],
+    'hero.h1b': ['Ready in seconds.', 'Bật nắp là uống.'],
+    'hero.sub': ['Smooth cold brew, canned the day you order and delivered chilled. Pick a can, build a combo, or subscribe to the weekly combo.', 'Cold brew êm dịu, đóng lon ngay trong ngày bạn đặt và giao lạnh tận nơi. Chọn từng lon, tự tạo combo hoặc đăng ký combo tuần.'],
     'hero.cta1': ['Shop cold brew', 'Mua cold brew'],
-    'hero.cta2': ['Build a box', 'Tự tạo hộp'],
+    'hero.cta2': ['Build a combo', 'Tự tạo combo'],
     'fact.1': ['Cold steep', 'Ủ lạnh'],
     'fact.2': ['Served at', 'Nhiệt độ uống'],
-    'fact.3': ['Per bottle', 'Mỗi chai'],
+    'fact.3': ['Per can', 'Mỗi lon'],
 
-    'usp.1.k': ['Bottled', 'Đóng chai'],
+    'camp.label': ['The campaign', 'Chiến dịch'],
+    'camp.sub': ['Cold brew in a can, steeped for 18 hours. Ready when your night starts.', 'Cold brew đóng lon, ủ 18 giờ. Sẵn sàng khi đêm của bạn bắt đầu.'],
+
+    'usp.1.k': ['Canned', 'Đóng lon'],
     'usp.1.v': ['The day you order', 'Ngay trong ngày đặt'],
     'usp.2.k': ['Delivery', 'Giao hàng'],
     'usp.2.v': ['Chilled, same day', 'Lạnh, trong ngày'],
     'usp.3.k': ['Free delivery', 'Miễn phí giao'],
     'usp.3.v': ['Over {amount}', 'Từ {amount}'],
-    'usp.4.k': ['Subscribe', 'Đăng ký'],
-    'usp.4.v': ['Save {pct}%, skip anytime', 'Giảm {pct}%, bỏ qua bất cứ lúc nào'],
+    'usp.4.k': ['Weekly combo', 'Combo tuần'],
+    'usp.4.v': ['{n} cans, cancel anytime', '{n} lon, huỷ bất cứ lúc nào'],
 
     'shop.eyebrow': ['The lineup', 'Dòng sản phẩm'],
-    'shop.title': ['Pick your bottle', 'Chọn chai của bạn'],
-    'shop.lead': ['Every bottle is 250 ml, steeped for 18 hours and kept at 4 °C until it reaches you.', 'Mỗi chai 250 ml, ủ 18 giờ và giữ ở 4 °C cho đến khi đến tay bạn.'],
-    'filter.label': ['Filter flavors', 'Lọc theo vị'],
-    'filter.all': ['All', 'Tất cả'],
-    'filter.black': ['Black', 'Cà phê đen'],
-    'filter.creamy': ['Creamy', 'Béo ngậy'],
-    'filter.dairyfree': ['Dairy-free', 'Không sữa bò'],
-    'tag.dairyfree': ['Dairy-free', 'Không sữa bò'],
-    'tag.milk': ['Contains milk', 'Có chứa sữa'],
+    'shop.title': ['Pick your can', 'Chọn lon của bạn'],
+    'shop.lead': ['Every can is {ml} ml, steeped for 18 hours and kept at 4 °C until it reaches you.', 'Mỗi lon {ml} ml, ủ 18 giờ và giữ ở 4 °C cho đến khi đến tay bạn.'],
+    'tag.black': ['Black', 'Cà phê đen'],
+    'tag.fruity': ['Fruity', 'Trái cây'],
     'p.add': ['Add to cart', 'Thêm vào giỏ'],
-    'p.dec': ['Remove one {name}', 'Bớt một chai {name}'],
-    'p.inc': ['Add one {name}', 'Thêm một chai {name}'],
+    'p.dec': ['Remove one {name}', 'Bớt một lon {name}'],
+    'p.inc': ['Add one {name}', 'Thêm một lon {name}'],
     'p.qty.label': ['{name} in cart', '{name} trong giỏ'],
     'p.more': ['Ingredients and allergens', 'Thành phần và chất gây dị ứng'],
     'p.ing': ['Ingredients', 'Thành phần'],
     'p.all': ['Allergens', 'Dị ứng'],
-    'p.boxnudge': ['Save up to {pct}% when you buy a box.', 'Tiết kiệm đến {pct}% khi mua theo hộp.'],
-    'p.boxlink': ['Build a box', 'Tự tạo hộp'],
+    'p.combonudge': ['Combos cost less per can: {duoN} cans for {duo}, {weekN} cans for {week}.', 'Combo rẻ hơn mỗi lon: {duoN} lon giá {duo}, {weekN} lon giá {week}.'],
+    'p.combolink': ['Build a combo', 'Tự tạo combo'],
     'p.original.type': ['Black, no sugar', 'Đen, không đường'],
     'p.original.desc': ['Clean, smooth and chocolatey. Nothing added.', 'Êm dịu, hậu vị chocolate. Không thêm gì khác.'],
     'p.original.n1': ['Dark chocolate', 'Chocolate đen'],
@@ -758,60 +802,52 @@ textarea.in{min-height:84px;resize:vertical}
     'p.original.n3': ['Clean finish', 'Hậu vị sạch'],
     'p.original.ing': ['Cold brewed coffee (water, arabica coffee).', 'Cà phê ủ lạnh (nước, cà phê arabica).'],
     'p.original.all': ['None.', 'Không có.'],
-    'p.sweet.type': ['Creamy, lightly sweet', 'Béo nhẹ, ngọt dịu'],
-    'p.sweet.desc': ['Cold brew with sweetened condensed milk, inspired by Vietnamese cà phê sữa.', 'Cold brew với sữa đặc, lấy cảm hứng từ cà phê sữa Việt Nam.'],
-    'p.sweet.n1': ['Caramel', 'Caramel'],
-    'p.sweet.n2': ['Creamy', 'Béo mịn'],
-    'p.sweet.n3': ['Smooth', 'Êm dịu'],
-    'p.sweet.ing': ['Cold brewed coffee (water, arabica coffee), sweetened condensed milk (milk, sugar).', 'Cà phê ủ lạnh (nước, cà phê arabica), sữa đặc có đường (sữa, đường).'],
-    'p.sweet.all': ['Contains milk.', 'Có chứa sữa.'],
-    'p.oat.type': ['Creamy, dairy-free', 'Béo mịn, không sữa bò'],
-    'p.oat.desc': ['Cold brew with oat milk and a hint of vanilla.', 'Cold brew với sữa yến mạch và một chút vanilla.'],
-    'p.oat.n1': ['Toasted oat', 'Yến mạch rang'],
-    'p.oat.n2': ['Vanilla', 'Vanilla'],
-    'p.oat.n3': ['Mellow', 'Dịu nhẹ'],
-    'p.oat.ing': ['Cold brewed coffee (water, arabica coffee), oat drink (water, oats), vanilla flavor.', 'Cà phê ủ lạnh (nước, cà phê arabica), sữa yến mạch (nước, yến mạch), hương vanilla.'],
-    'p.oat.all': ['Contains oats.', 'Có chứa yến mạch.'],
-    'p.coconut.type': ['Creamy, dairy-free', 'Béo mịn, không sữa bò'],
-    'p.coconut.desc': ['Cold brew topped with light coconut cream, inspired by Vietnamese cà phê cốt dừa.', 'Cold brew phủ lớp kem dừa nhẹ, lấy cảm hứng từ cà phê cốt dừa Việt Nam.'],
-    'p.coconut.n1': ['Coconut', 'Dừa'],
-    'p.coconut.n2': ['Cocoa', 'Cacao'],
-    'p.coconut.n3': ['Silky', 'Mượt mà'],
-    'p.coconut.ing': ['Cold brewed coffee (water, arabica coffee), coconut cream (coconut, water).', 'Cà phê ủ lạnh (nước, cà phê arabica), kem dừa (dừa, nước).'],
-    'p.coconut.all': ['Contains coconut.', 'Có chứa dừa.'],
+    'p.citrus.type': ['Fruity, refreshing', 'Trái cây, sảng khoái'],
+    'p.citrus.desc': ['Cold brew with a bright citrus twist. Light, zesty and made for hot days.', 'Cold brew thêm chút cam chanh tươi sáng. Nhẹ, thơm và hợp những ngày nóng.'],
+    'p.citrus.n1': ['Citrus zest', 'Vỏ cam chanh'],
+    'p.citrus.n2': ['Bright', 'Tươi sáng'],
+    'p.citrus.n3': ['Refreshing', 'Sảng khoái'],
+    'p.citrus.ing': ['Cold brewed coffee (water, arabica coffee), citrus juice, natural citrus flavor.', 'Cà phê ủ lạnh (nước, cà phê arabica), nước ép cam chanh, hương cam chanh tự nhiên.'],
+    'p.citrus.all': ['None.', 'Không có.'],
+    'p.apple.type': ['Fruity, crisp', 'Trái cây, giòn mát'],
+    'p.apple.desc': ['Cold brew with crisp green apple. Lively, fresh and easy to drink.', 'Cold brew với táo xanh giòn mát. Tươi vui, sảng khoái và dễ uống.'],
+    'p.apple.n1': ['Green apple', 'Táo xanh'],
+    'p.apple.n2': ['Crisp', 'Giòn mát'],
+    'p.apple.n3': ['Lively', 'Tươi vui'],
+    'p.apple.ing': ['Cold brewed coffee (water, arabica coffee), apple juice, natural apple flavor.', 'Cà phê ủ lạnh (nước, cà phê arabica), nước ép táo, hương táo tự nhiên.'],
+    'p.apple.all': ['None.', 'Không có.'],
 
-    'bx.eyebrow': ['Build a box', 'Tự tạo hộp'],
-    'bx.title': ['Mix your own box. The bigger it is, the more you save.', 'Tự chọn vị cho hộp của bạn. Hộp càng lớn, càng tiết kiệm.'],
-    'bx.lead': ['Choose a size, pick your flavors and watch the savings update.', 'Chọn cỡ hộp, chọn vị và xem số tiền tiết kiệm cập nhật ngay.'],
-    'bx.step1': ['Box size', 'Cỡ hộp'],
+    'bx.eyebrow': ['Build a combo', 'Tự tạo combo'],
+    'bx.title': ['Pick a combo, then pick your flavors.', 'Chọn combo, rồi chọn vị.'],
+    'bx.lead': ['Combos cost less than buying cans one by one. You choose every flavor.', 'Combo rẻ hơn mua lẻ từng lon. Vị nào cũng do bạn chọn.'],
+    'bx.step1': ['Choose your combo', 'Chọn combo'],
     'bx.step2': ['Pick your flavors', 'Chọn vị'],
     'bx.step3': ['How do you want it?', 'Bạn muốn mua thế nào?'],
-    'bx.size': ['{n} bottles', '{n} chai'],
-    'bx.size.s': ['Save {pct}%', 'Giảm {pct}%'],
+    'combo.duo.name': ['{n}-can combo', 'Combo {n} lon'],
+    'combo.week.name': ['Weekly combo, {n} cans', 'Combo tuần, {n} lon'],
+    'bx.pack.s': ['{price}. Save {amount}.', '{price}. Tiết kiệm {amount}.'],
     'bx.fill': ['Fill the rest for me', 'Chọn giúp phần còn lại'],
     'bx.clear': ['Clear', 'Xoá hết'],
     'bx.count': ['{n} of {max} chosen', 'Đã chọn {n}/{max}'],
-    'bx.dec': ['Remove one {name}', 'Bớt một chai {name}'],
-    'bx.inc': ['Add one {name}', 'Thêm một chai {name}'],
-    'bx.once': ['One-time box', 'Mua một lần'],
-    'bx.once.s': ['No commitment', 'Không ràng buộc'],
-    'bx.sub': ['Subscribe and save', 'Đăng ký và tiết kiệm'],
-    'bx.sub.s': ['Extra {pct}% off', 'Giảm thêm {pct}%'],
-    'bx.freq': ['Delivery rhythm', 'Chu kỳ giao hàng'],
-    'bx.f.1w': ['Every week', 'Mỗi tuần'],
-    'bx.f.2w': ['Every 2 weeks', 'Mỗi 2 tuần'],
-    'bx.f.4w': ['Every 4 weeks', 'Mỗi 4 tuần'],
-    'bx.subnote': ['Free delivery on every subscription box. Skip or cancel anytime.', 'Miễn phí giao cho mọi hộp đăng ký. Bỏ qua hoặc huỷ bất cứ lúc nào.'],
-    'bx.sum.title': ['Your box', 'Hộp của bạn'],
-    'bx.empty': ['Pick at least one bottle.', 'Hãy chọn ít nhất một chai.'],
-    'bx.sum.box': ['Box discount ({pct}%)', 'Giảm theo hộp ({pct}%)'],
-    'bx.sum.sub': ['Subscription discount ({pct}%)', 'Giảm đăng ký ({pct}%)'],
+    'bx.dec': ['Remove one {name}', 'Bớt một lon {name}'],
+    'bx.inc': ['Add one {name}', 'Thêm một lon {name}'],
+    'bx.once': ['One-time combo', 'Mua một lần'],
+    'bx.once.s': ['Pay once, no commitment', 'Trả một lần, không ràng buộc'],
+    'bx.sub': ['Weekly subscription', 'Đăng ký hằng tuần'],
+    'bx.sub.s': ['{n} cans every week, cancel anytime', '{n} lon mỗi tuần, huỷ bất cứ lúc nào'],
+    'bx.subnote': ['We deliver your {n} cans every week with free delivery. Cancel anytime.', 'Mỗi tuần chúng tôi giao {n} lon của bạn, miễn phí giao hàng. Huỷ bất cứ lúc nào.'],
+    'bx.sum.title': ['Your combo', 'Combo của bạn'],
+    'bx.empty': ['Pick your cans to complete the combo.', 'Hãy chọn lon để hoàn thành combo.'],
+    'bx.sum.list': ['List price, {n} × {price}', 'Giá lẻ, {n} × {price}'],
+    'bx.sum.saveline': ['Combo saving', 'Tiết kiệm nhờ combo'],
+    'bx.sum.subline': ['Weekly subscription. Cancel anytime.', 'Đăng ký hằng tuần. Huỷ bất cứ lúc nào.'],
     'bx.sum.total': ['Total', 'Tổng cộng'],
     'bx.sum.save': ['You save {amount}', 'Bạn tiết kiệm {amount}'],
-    'bx.add': ['Add box to cart', 'Thêm hộp vào giỏ'],
+    'bx.add': ['Add combo to cart', 'Thêm combo vào giỏ'],
+    'bx.add.sub': ['Add subscription to cart', 'Thêm gói đăng ký vào giỏ'],
     'bx.add.need': ['Choose {n} more {unit}', 'Chọn thêm {n} {unit}'],
-    'bx.note': ['Boxes ship chilled in an insulated bag.', 'Hộp được giao lạnh trong túi giữ nhiệt.'],
-    'u.bottle.1': ['bottle', 'chai'], 'u.bottle.n': ['bottles', 'chai'],
+    'bx.note': ['Cans ship chilled in an insulated bag.', 'Lon được giao lạnh trong túi giữ nhiệt.'],
+    'u.can.1': ['can', 'lon'], 'u.can.n': ['cans', 'lon'],
 
     'how.eyebrow': ['How it is made', 'Cách chúng tôi làm'],
     'how.title': ['Slow on purpose', 'Chậm có chủ đích'],
@@ -825,36 +861,36 @@ textarea.in{min-height:84px;resize:vertical}
     'how.3.t': ['Filter twice', 'Lọc hai lần'],
     'how.3.d': ['We filter the brew two times for a clean pour without sediment.', 'Chúng tôi lọc hai lần để cà phê trong, không cặn.'],
     'how.4.time': ['4 °C', '4 °C'],
-    'how.4.t': ['Bottle and chill', 'Đóng chai và làm lạnh'],
-    'how.4.d': ['Bottled the day you order, chilled to 4 °C and delivered cold.', 'Đóng chai trong ngày bạn đặt, làm lạnh 4 °C và giao lạnh tận nơi.'],
+    'how.4.t': ['Can and chill', 'Đóng lon và làm lạnh'],
+    'how.4.d': ['Canned the day you order, chilled to 4 °C and delivered cold.', 'Đóng lon trong ngày bạn đặt, làm lạnh 4 °C và giao lạnh tận nơi.'],
 
     'who.eyebrow': ['Made for', 'Dành cho'],
     'who.title': ['Every kind of long day', 'Mọi kiểu ngày dài'],
     'who.1.t': ['Early starts', 'Buổi sáng bận rộn'],
-    'who.1.d': ['Grab a bottle from the fridge. No kettle, no queue.', 'Lấy chai từ tủ lạnh. Không cần đun nước, không phải xếp hàng.'],
+    'who.1.d': ['Grab a can from the fridge. No kettle, no queue.', 'Lấy lon từ tủ lạnh. Không cần đun nước, không phải xếp hàng.'],
     'who.2.t': ['Study nights', 'Đêm ôn bài'],
-    'who.2.d': ['Keep a box in the fridge for deadline week.', 'Để sẵn một hộp trong tủ lạnh cho tuần deadline.'],
-    'who.3.t': ['Office fridges', 'Tủ lạnh văn phòng'],
-    'who.3.d': ['A large box keeps the whole team going and costs less per bottle.', 'Hộp lớn giúp cả nhóm tỉnh táo với giá mỗi chai thấp hơn.'],
+    'who.2.d': ['Keep a combo in the fridge for deadline week.', 'Để sẵn một combo trong tủ lạnh cho tuần deadline.'],
+    'who.3.t': ['Co-working desks', 'Bàn co-working'],
+    'who.3.d': ['Freelancers on shared desks: a cold can between client calls and deadlines.', 'Freelancer ngồi bàn làm việc chung: một lon lạnh giữa các cuộc gọi khách hàng và deadline.'],
 
     'faq.eyebrow': ['Questions', 'Hỏi đáp'],
     'faq.title': ['Frequently asked questions', 'Câu hỏi thường gặp'],
     'faq.1.q': ['How long does it stay fresh?', 'Cold brew giữ được bao lâu?'],
-    'faq.1.a': ['Keep it refrigerated and drink it within 14 days of delivery. Shake gently before opening.', 'Bảo quản lạnh và uống trong vòng 14 ngày kể từ khi nhận. Lắc nhẹ trước khi mở.'],
+    'faq.1.a': ['Keep the cans refrigerated and drink them within 14 days of delivery.', 'Bảo quản lon trong tủ lạnh và uống trong vòng 14 ngày kể từ khi nhận.'],
     'faq.2.q': ['Does it contain caffeine?', 'Có chứa caffeine không?'],
     'faq.2.a': ['Yes. Enjoy it in moderation. If you are pregnant, sensitive to caffeine or have a medical condition, ask your doctor first.', 'Có. Hãy uống điều độ. Nếu bạn đang mang thai, nhạy cảm với caffeine hoặc có bệnh lý, hãy hỏi bác sĩ trước.'],
     'faq.3.q': ['How does delivery work?', 'Giao hàng hoạt động thế nào?'],
     'faq.3.a': ['We deliver chilled in an insulated bag. Standard delivery arrives the same day if you order before 3 PM. Express delivery takes about 60 minutes.', 'Chúng tôi giao lạnh trong túi giữ nhiệt. Giao tiêu chuẩn trong ngày nếu bạn đặt trước 15:00. Giao nhanh mất khoảng 60 phút.'],
-    'faq.4.q': ['Can I skip or cancel a subscription?', 'Tôi có thể bỏ qua hoặc huỷ đăng ký không?'],
-    'faq.4.a': ['Yes. Skip a delivery or cancel anytime. There are no fees.', 'Được. Bạn có thể bỏ qua một lần giao hoặc huỷ bất cứ lúc nào, không mất phí.'],
-    'faq.5.q': ['Which drinks are dairy-free?', 'Vị nào không có sữa bò?'],
-    'faq.5.a': ['Original Black, Oat Latte and Coconut Cloud contain no dairy. Sweet Milk contains milk.', 'Original Black, Oat Latte và Coconut Cloud không có sữa bò. Sweet Milk có chứa sữa.'],
+    'faq.4.q': ['How does the weekly subscription work?', 'Đăng ký hằng tuần hoạt động thế nào?'],
+    'faq.4.a': ['Pick your flavors once. We deliver your weekly combo every week, and you can cancel anytime.', 'Bạn chọn vị một lần. Mỗi tuần chúng tôi giao combo tuần của bạn, và bạn có thể huỷ bất cứ lúc nào.'],
+    'faq.5.q': ['Which flavors can I choose?', 'Tôi có thể chọn những vị nào?'],
+    'faq.5.a': ['Original, Citrus and Apple Sparkle. Mix them any way you like in a combo.', 'Original, Citrus và Apple Sparkle. Bạn có thể trộn tuỳ ý trong combo.'],
     'faq.6.q': ['What if my order arrives warm or damaged?', 'Nếu đơn đến khi không còn lạnh hoặc bị hỏng thì sao?'],
     'faq.6.a': ['Tell us within 24 hours and we will replace it for free.', 'Hãy báo cho chúng tôi trong 24 giờ, chúng tôi sẽ đổi miễn phí.'],
 
     'cta.title': ['Stock the fridge. Skip the queue.', 'Trữ đầy tủ lạnh. Khỏi xếp hàng.'],
-    'cta.sub': ['Save up to {pct}% when you build a box.', 'Tiết kiệm đến {pct}% khi tự tạo hộp.'],
-    'foot.blurb': ['Small-batch cold brew, delivered cold.', 'Cold brew ủ theo mẻ nhỏ, giao lạnh tận nơi.'],
+    'cta.sub': ['Save {amount} on every weekly combo.', 'Tiết kiệm {amount} mỗi combo tuần.'],
+    'foot.blurb': ['Small-batch cold brew in a can, delivered cold.', 'Cold brew đóng lon ủ theo mẻ nhỏ, giao lạnh tận nơi.'],
     'foot.contact': ['Contact', 'Liên hệ'],
     'foot.hotline': ['Hotline', 'Hotline'],
     'foot.email': ['Email', 'Email'],
@@ -873,11 +909,10 @@ textarea.in{min-height:84px;resize:vertical}
     'st.details': ['Details', 'Thông tin'],
     'st.done': ['Done', 'Hoàn tất'],
     'cart.empty': ['Your cart is empty.', 'Giỏ hàng đang trống.'],
-    'cart.empty.d': ['Add a bottle or build a box to get started.', 'Thêm một chai hoặc tự tạo hộp để bắt đầu.'],
+    'cart.empty.d': ['Add a can or build a combo to get started.', 'Thêm một lon hoặc tự tạo combo để bắt đầu.'],
     'cart.empty.btn': ['Shop cold brew', 'Mua cold brew'],
-    'cart.box': ['Box of {n}', 'Hộp {n} chai'],
-    'cart.once': ['One-time box', 'Mua một lần'],
-    'cart.subf': ['Subscription, {freq}', 'Đăng ký, {freq}'],
+    'cart.once': ['One-time combo', 'Mua một lần'],
+    'cart.sub': ['Weekly subscription: {n} cans every week', 'Đăng ký hằng tuần: {n} lon mỗi tuần'],
     'cart.remove': ['Remove', 'Xoá'],
     'cart.remove.l': ['Remove {name} from cart', 'Xoá {name} khỏi giỏ hàng'],
     'cart.qty.dec': ['Decrease quantity of {name}', 'Giảm số lượng {name}'],
@@ -885,7 +920,7 @@ textarea.in{min-height:84px;resize:vertical}
     'meter.label': ['Progress to free delivery', 'Tiến độ miễn phí giao hàng'],
     'meter.away': ['{amount} away from free delivery', 'Còn {amount} để được miễn phí giao hàng'],
     'meter.free': ['You get free delivery', 'Bạn được miễn phí giao hàng'],
-    'meter.sub': ['Free delivery with your subscription', 'Miễn phí giao hàng với hộp đăng ký'],
+    'meter.sub': ['Free delivery with your subscription', 'Miễn phí giao hàng với gói đăng ký'],
     'tot.sub': ['Subtotal', 'Tạm tính'],
     'tot.ship': ['Delivery', 'Phí giao hàng'],
     'tot.total': ['Total', 'Tổng cộng'],
@@ -897,7 +932,7 @@ textarea.in{min-height:84px;resize:vertical}
     'co.d.pickup': ['Pickup at our kitchen', 'Tự đến lấy tại bếp'],
     'co.d.pickup.s': ['Free. Ready in about 30 minutes.', 'Miễn phí. Sẵn sàng sau khoảng 30 phút.'],
     'co.d.standard': ['Standard delivery', 'Giao tiêu chuẩn'],
-    'co.d.standard.s': ['{price}. Free over {free} or with a subscription. Same day before 3 PM.', '{price}. Miễn phí từ {free} hoặc khi có hộp đăng ký. Trong ngày nếu đặt trước 15:00.'],
+    'co.d.standard.s': ['{price}. Free over {free} or with a subscription. Same day before 3 PM.', '{price}. Miễn phí từ {free} hoặc khi có gói đăng ký. Trong ngày nếu đặt trước 15:00.'],
     'co.d.express': ['Express delivery', 'Giao nhanh'],
     'co.d.express.s': ['{price}. About 60 minutes.', '{price}. Khoảng 60 phút.'],
     'co.details': ['Your details', 'Thông tin của bạn'],
@@ -910,24 +945,28 @@ textarea.in{min-height:84px;resize:vertical}
     'co.p.bank': ['Bank transfer', 'Chuyển khoản'],
     'co.p.wallet': ['E-wallet', 'Ví điện tử'],
     'co.pay.demo': ['Demo only. No payment is taken and nothing is sent.', 'Chỉ là demo. Không thu tiền và không gửi dữ liệu đi đâu.'],
+    'co.ref': ['Referral code (optional)', 'Mã giới thiệu (không bắt buộc)'],
+    'co.ref.hint': ['Got a code from a friend? Enter it here.', 'Bạn có mã từ bạn bè? Nhập vào đây.'],
     'co.free.hint': ['Add {amount} more for free standard delivery.', 'Thêm {amount} để được miễn phí giao tiêu chuẩn.'],
     'co.submit': ['Place demo order', 'Đặt đơn demo'],
     'err.name': ['Enter your full name.', 'Nhập họ và tên.'],
     'err.phone': ['Enter a phone number with 9 to 12 digits.', 'Nhập số điện thoại gồm 9 đến 12 chữ số.'],
     'err.address': ['Enter the delivery address.', 'Nhập địa chỉ giao hàng.'],
+    'err.ref': ['Use 3 to 20 letters, numbers or dashes.', 'Dùng 3 đến 20 chữ cái, chữ số hoặc dấu gạch ngang.'],
 
     'ok.title': ['Demo order placed', 'Đã tạo đơn demo'],
     'ok.thanks': ['Thank you, {name}.', 'Cảm ơn {name}.'],
     'ok.code': ['Order code', 'Mã đơn'],
     'ok.total': ['Total', 'Tổng cộng'],
+    'ok.ref': ['Referral code', 'Mã giới thiệu'],
     'ok.eta': ['Estimated time', 'Thời gian dự kiến'],
     'ok.eta.pickup': ['Ready for pickup in about 30 minutes.', 'Sẵn sàng để lấy sau khoảng 30 phút.'],
     'ok.eta.standard': ['Delivered chilled today if you order before 3 PM.', 'Giao lạnh trong ngày nếu bạn đặt trước 15:00.'],
     'ok.eta.express': ['Delivered chilled in about 60 minutes.', 'Giao lạnh trong khoảng 60 phút.'],
-    'ok.sub': ['Subscription: {freq}. You can skip or cancel anytime.', 'Đăng ký: {freq}. Bạn có thể bỏ qua hoặc huỷ bất cứ lúc nào.'],
+    'ok.sub': ['Subscription: {n} cans every week. You can cancel anytime.', 'Đăng ký: {n} lon mỗi tuần. Bạn có thể huỷ bất cứ lúc nào.'],
     'ok.note': ['This is a classroom demo. Nothing was sent, and nothing will be brewed or delivered.', 'Đây chỉ là bản demo cho lớp học. Không có dữ liệu nào được gửi đi, và sẽ không có gì được pha hay giao.'],
     'ok.done': ['Done', 'Xong'],
-    'toast.box': ['Box added to your cart.', 'Đã thêm hộp vào giỏ hàng.'],
+    'toast.combo': ['Combo added to your cart.', 'Đã thêm combo vào giỏ hàng.'],
     'toast.view': ['View cart', 'Xem giỏ hàng'],
     'sr.added': ['{name} added. {n} in your cart.', 'Đã thêm {name}. Giỏ hàng có {n}.'],
     'sr.removed': ['{name} removed. {n} in your cart.', 'Đã bớt {name}. Giỏ hàng có {n}.']
@@ -946,7 +985,6 @@ textarea.in{min-height:84px;resize:vertical}
   }
   const fmtNum = n => new Intl.NumberFormat(lang === 'vi' ? 'vi-VN' : 'en-US').format(n);
   const money = n => (n < 0 ? '−' : '') + fmtNum(Math.abs(n)) + '₫';
-  const pct = r => Math.round(r * 100);
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -987,9 +1025,6 @@ textarea.in{min-height:84px;resize:vertical}
       h('input', { type: 'radio', name, value, id, checked }),
       h('span', { class: 'box' }, h('b', null, title), sub ? h('small', null, sub) : null));
   }
-  function pill(name, value, text, checked, id) {
-    return h('label', { class: 'pill' }, h('input', { type: 'radio', name, value, id, checked }), h('span', null, text));
-  }
   function row(label, amount, cls) {
     return h('li', { class: 'row' + (cls ? ' ' + cls : '') },
       h('span', { class: 'lbl' }, label), h('span', { class: 'dots', 'aria-hidden': 'true' }), h('span', { class: 'amt' }, amount));
@@ -1001,55 +1036,60 @@ textarea.in{min-height:84px;resize:vertical}
   }
 
   /* ===== 4. Hình minh hoạ (SVG vẽ bằng mã) ===== */
-  const BOTTLE_PATH = 'M46 22V70C46 96 16 98 16 128V268Q16 284 32 284H88Q104 284 104 268V128C104 98 74 96 74 70V22Z';
+  const CAN_PATH = 'M33 22C32 34 22 38 22 54V256C22 266 26 270 33 272H87C94 270 98 266 98 256V54C98 38 88 34 87 22Z';
   let artSeq = 0;
-  function bottleInner(p) {
-    const id = 'bt' + (++artSeq);
-    const nm = p.name.map(s => esc(s.toUpperCase()));
-    const foam = p.foam
-      ? '<rect y="54" width="120" height="15" fill="' + p.foam + '"/><rect y="69" width="120" height="6" fill="' + p.foam + '" fill-opacity=".45"/>'
-      : '';
+  function canIcon(kind, band) {
+    if (kind === 'bean') {
+      return '<g transform="translate(60 124) rotate(-28)"><ellipse rx="14" ry="9" fill="#fff"/><path d="M-12 0Q0-6 12 1" fill="none" stroke="' + band + '" stroke-width="2.2" stroke-linecap="round"/></g>';
+    }
+    if (kind === 'slice') {
+      return '<g transform="translate(60 124)"><circle r="14" fill="#FFF3D6"/><circle r="11.5" fill="#FFB52E"/><path d="M0-11.5V11.5M-10-5.7 10 5.7M-10 5.7 10-5.7" stroke="#FFF3D6" stroke-width="1.6"/></g>';
+    }
+    return '<g transform="translate(60 128)"><circle cx="-5" cy="1" r="9.5" fill="#fff"/><circle cx="5" cy="1" r="9.5" fill="#fff"/>' +
+      '<path d="M0-7Q1-13 5-15" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<ellipse cx="8" cy="-12" rx="5" ry="2.6" transform="rotate(-28 8 -12)" fill="#fff"/>' +
+      '<path d="M17-23 18.8-18.8 23-17 18.8-15.2 17-11 15.2-15.2 11-17 15.2-18.8Z" fill="#fff"/></g>';
+  }
+  function canInner(p) {
+    const id = 'cn' + (++artSeq), c = p.can, L = c.light ? ' l' : '';
+    const names = p.name.map(s => esc(s.toUpperCase())), y0 = names.length === 1 ? 168 : 158;
+    const lines = names.map((n, i) => '<text class="bt-n' + L + '" data-fit="58" font-size="22" x="60" y="' + (y0 + i * 22) + '" text-anchor="middle">' + n + '</text>').join('');
     return '<defs>' +
-      '<clipPath id="' + id + 'c"><path d="' + BOTTLE_PATH + '"/></clipPath>' +
-      '<linearGradient id="' + id + 'l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + p.liquid[0] + '"/><stop offset="1" stop-color="' + p.liquid[1] + '"/></linearGradient>' +
-      '<linearGradient id="' + id + 's" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".30"/><stop offset=".24" stop-color="#000" stop-opacity="0"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></linearGradient>' +
+      '<clipPath id="' + id + 'c"><path d="' + CAN_PATH + '"/></clipPath>' +
+      '<linearGradient id="' + id + 'm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7F9FA"/><stop offset=".55" stop-color="#C7CED3"/><stop offset="1" stop-color="#9AA3A9"/></linearGradient>' +
+      '<linearGradient id="' + id + 's" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".34"/><stop offset=".22" stop-color="#000" stop-opacity="0"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></linearGradient>' +
       '</defs>' +
-      '<ellipse cx="60" cy="292" rx="46" ry="5.5" fill="#000" fill-opacity=".2"/>' +
+      '<ellipse cx="60" cy="278" rx="40" ry="5" fill="#000" fill-opacity=".2"/>' +
       '<g clip-path="url(#' + id + 'c)">' +
-      '<rect width="120" height="300" fill="#fff" fill-opacity=".14"/>' +
-      '<rect y="54" width="120" height="246" fill="url(#' + id + 'l)"/>' + foam +
+      '<rect width="120" height="300" fill="url(#' + id + 'm)"/>' +
+      '<rect y="60" width="120" height="198" fill="' + c.body + '"/>' +
+      '<rect y="58" width="120" height="3" fill="#000" fill-opacity=".28"/><rect y="257" width="120" height="3" fill="#000" fill-opacity=".28"/>' +
+      '<rect y="68" width="120" height="9" fill="' + c.band + '"/><rect y="241" width="120" height="9" fill="' + c.band + '"/>' +
+      '<text class="bt-b' + L + '" x="60" y="98" text-anchor="middle">' + esc(SHOP.brand.toUpperCase()) + '</text>' +
+      canIcon(c.icon, c.band) + lines +
+      '<text class="bt-s' + L + '" x="60" y="212" text-anchor="middle">COLD BREW</text>' +
+      '<text class="bt-s' + L + '" x="60" y="223" text-anchor="middle">' + SHOP.canMl + ' ML</text>' +
       '<rect width="120" height="300" fill="url(#' + id + 's)"/>' +
+      '<rect x="30" y="62" width="7" height="190" rx="3.5" fill="#fff" fill-opacity=".3"/><rect x="40" y="66" width="2.6" height="170" rx="1.3" fill="#fff" fill-opacity=".15"/>' +
       '</g>' +
-      '<path d="' + BOTTLE_PATH + '" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>' +
-      '<path d="M42 24V15Q42 8 49 8H71Q78 8 78 15V24Z" fill="#1D130F"/>' +
-      '<rect x="40" y="22" width="40" height="5" rx="2.5" fill="#0D0806"/>' +
-      '<path d="M50 11V21M56 10V21M62 10V21M68 10V21M74 11V21" stroke="#fff" stroke-opacity=".22"/>' +
-      '<rect x="16" y="150" width="88" height="90" fill="#F7F9FA"/>' +
-      '<rect x="16" y="150" width="88" height="8" fill="' + p.accent + '"/>' +
-      '<rect x="16" y="232" width="88" height="8" fill="' + p.accent + '"/>' +
-      '<rect x="16" y="150" width="88" height="90" fill="url(#' + id + 's)"/>' +
-      '<text class="bt-b" x="60" y="173" text-anchor="middle">' + esc(SHOP.brand.toUpperCase()) + '</text>' +
-      '<text class="bt-n" data-fit="72" font-size="20" x="60" y="197" text-anchor="middle">' + nm[0] + '</text>' +
-      '<text class="bt-n" data-fit="72" font-size="20" x="60" y="217" text-anchor="middle">' + nm[1] + '</text>' +
-      '<text class="bt-s" x="60" y="227" text-anchor="middle">COLD BREW · 250 ML</text>' +
-      '<rect x="22" y="132" width="6" height="128" rx="3" fill="#fff" fill-opacity=".3"/>' +
-      '<rect x="31" y="136" width="2.5" height="96" rx="1.25" fill="#fff" fill-opacity=".16"/>' +
-      '<path d="M50 30V62" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>' +
-      '<path d="M24 118C26 108 34 102 42 100" stroke="#fff" stroke-opacity=".4" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '<g fill="#fff" fill-opacity=".45" stroke="#fff" stroke-opacity=".7" stroke-width=".6">' +
-      '<ellipse cx="29" cy="256" rx="2.2" ry="3"/><ellipse cx="92" cy="250" rx="1.8" ry="2.6"/><ellipse cx="38" cy="120" rx="1.6" ry="2.2"/><ellipse cx="86" cy="110" rx="1.4" ry="2"/><ellipse cx="97" cy="270" rx="1.5" ry="2.1"/>' +
-      '</g>';
+      '<ellipse cx="60" cy="272" rx="27" ry="4.4" fill="#7F888E"/>' +
+      '<path d="' + CAN_PATH + '" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>' +
+      '<ellipse cx="60" cy="21" rx="27" ry="5.6" fill="#E8ECEE" stroke="#8E979D" stroke-width=".9"/>' +
+      '<ellipse cx="60" cy="21" rx="21" ry="3.9" fill="none" stroke="#000" stroke-opacity=".2"/>' +
+      '<path d="M51 20h15a3.2 3.2 0 0 1 0 4.4H53a3.2 3.2 0 0 1-2-4.4Z" fill="#CBD1D5" stroke="#000" stroke-opacity=".3" stroke-width=".6"/>' +
+      '<ellipse cx="70" cy="21.5" rx="2.4" ry="1.3" fill="#000" fill-opacity=".3"/>' +
+      '<g fill="#fff" fill-opacity=".5" stroke="#fff" stroke-opacity=".75" stroke-width=".6"><ellipse cx="32" cy="232" rx="2.2" ry="3"/><ellipse cx="88" cy="196" rx="1.8" ry="2.6"/><ellipse cx="36" cy="182" rx="1.5" ry="2.1"/><ellipse cx="90" cy="250" rx="1.6" ry="2.3"/><ellipse cx="34" cy="100" rx="1.4" ry="2"/></g>';
   }
-  function bottleSVG(p) {
-    return svgFrom('<svg class="bt" viewBox="0 0 120 300" aria-hidden="true" focusable="false">' + bottleInner(p) + '</svg>');
+  function canSVG(p) {
+    return svgFrom('<svg class="bt" viewBox="0 0 120 300" aria-hidden="true" focusable="false">' + canInner(p) + '</svg>');
   }
-  // Co chữ trên nhãn chai cho vừa khung nhãn, dù font nào đang dùng.
+  // Co chữ trên lon cho vừa khung, dù đang dùng font nào.
   function fitLabels() {
     $$('.bt-n[data-fit]').forEach(el => {
-      el.setAttribute('font-size', '20');
+      el.setAttribute('font-size', '22');
       const len = el.getComputedTextLength();
       if (!len) return;
-      el.setAttribute('font-size', clamp(20 * Number(el.dataset.fit) / len, 9, 24).toFixed(2));
+      el.setAttribute('font-size', clamp(22 * Number(el.dataset.fit) / len, 9, 26).toFixed(2));
     });
   }
 
@@ -1067,7 +1107,7 @@ textarea.in{min-height:84px;resize:vertical}
       '<circle cx="16" cy="16" r="3.2" fill="var(--caramel)"/>';
   }
 
-  // Mặt đồng hồ 24 giờ, cung sáng là 18 giờ ủ lạnh, ba chai đứng trước.
+  // Mặt đồng hồ 24 giờ, cung sáng là 18 giờ ủ lạnh, ba lon đứng trước.
   function heroMarkup() {
     const R = 236, C = 2 * Math.PI * R;
     let ticks = '', labels = '';
@@ -1081,7 +1121,7 @@ textarea.in{min-height:84px;resize:vertical}
     }
     const ice = (x, y, s, r) => '<g transform="translate(' + x + ' ' + y + ') rotate(' + r + ')"><rect class="ice" x="' + (-s / 2) + '" y="' + (-s / 2) + '" width="' + s + '" height="' + s + '" rx="' + (s * 0.22) + '"/><rect class="ice-hi" x="' + (-s / 2 + s * 0.14) + '" y="' + (-s / 2 + s * 0.14) + '" width="' + (s * 0.42) + '" height="' + (s * 0.16) + '" rx="' + (s * 0.07) + '"/></g>';
     const bean = (x, y, r) => '<g transform="translate(' + x + ' ' + y + ') rotate(' + r + ')"><ellipse class="bean" rx="12" ry="8"/><path class="bean-l" d="M-10 0Q0 -5 10 1"/></g>';
-    const bottle = (p, x, y, rot, sc) => '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ') scale(' + sc + ') translate(-60 -300)">' + bottleInner(p) + '</g>';
+    const can = (p, x, y, rot, sc) => '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ') scale(' + sc + ') translate(-60 -277)">' + canInner(p) + '</g>';
     return '<svg viewBox="0 0 640 600" focusable="false" aria-hidden="true">' +
       '<g transform="translate(320 300)">' +
       '<circle class="disc" r="' + (R - 18) + '"/><circle class="ring" r="' + R + '"/>' +
@@ -1090,37 +1130,33 @@ textarea.in{min-height:84px;resize:vertical}
       '<circle class="dot" cx="' + (-R) + '" cy="0" r="8"/>' +
       '</g>' +
       '<ellipse cx="320" cy="514" rx="215" ry="13" fill="#000" fill-opacity=".14"/>' +
-      bottle(BYSKU.oat, 196, 506, -8, 1.12) +
-      bottle(BYSKU.coconut, 444, 506, 8, 1.12) +
-      bottle(BYSKU.original, 320, 514, 0, 1.4) +
-      ice(150, 494, 40, -14) + ice(236, 520, 34, 12) + ice(405, 524, 38, -8) + ice(492, 498, 42, 16) + ice(300, 536, 28, 24) +
-      bean(110, 528, 20) + bean(520, 534, -24) + bean(360, 546, 70) +
+      can(BYSKU.citrus, 188, 510, -9, 1.2) +
+      can(BYSKU.apple, 452, 510, 9, 1.2) +
+      can(BYSKU.original, 320, 516, 0, 1.5) +
+      ice(150, 496, 40, -14) + ice(236, 522, 34, 12) + ice(405, 526, 38, -8) + ice(492, 500, 42, 16) + ice(300, 538, 28, 24) +
+      bean(110, 530, 20) + bean(520, 536, -24) + bean(360, 548, 70) +
       '</svg>';
   }
 
   /* ===== 5. Dữ liệu, tính giá ===== */
   const state = {
-    cart: [], seq: 0, filter: 'all',
-    box: { size: 12, picks: { original: 4, sweet: 3, oat: 3, coconut: 2 }, sub: false, freq: '2w' },
+    cart: [], seq: 0,
+    combo: { pack: 'week', picks: { original: 2, citrus: 2, apple: 1 }, sub: false },
     view: 'cart', delivery: 'standard', payment: 'cod', placed: null, errs: {}
   };
   const DELIVERY = ['pickup', 'standard', 'express'];
   const PAYMENT = ['cod', 'bank', 'wallet'];
 
-  const boxRate = size => { const b = SHOP.boxes.find(x => x.size === size); return b ? b.off : 0; };
   const pickCount = picks => PRODUCTS.reduce((s, p) => s + (picks[p.sku] || 0), 0);
-  function boxQuote(box) {
-    const n = pickCount(box.picks);
-    const base = PRODUCTS.reduce((s, p) => s + (box.picks[p.sku] || 0) * p.price, 0);
-    const bRate = boxRate(box.size), boxOff = Math.round(base * bRate);
-    const sRate = box.sub ? SHOP.subscription.off : 0, subOff = Math.round((base - boxOff) * sRate);
-    const total = base - boxOff - subOff;
-    return { n, base, bRate, boxOff, sRate, subOff, total, save: base - total };
+  // Combo có giá cố định theo survey. Đăng ký hằng tuần không đổi giá.
+  function comboQuote(c) {
+    const def = COMBO[c.pack], list = def.cans * SHOP.canPrice;
+    return { n: pickCount(c.picks), cans: def.cans, list, total: def.price, save: list - def.price };
   }
-  const lineTotal = it => (it.type === 'bottle' ? it.qty * BYSKU[it.sku].price : boxQuote(it).total);
+  const lineTotal = it => (it.type === 'can' ? it.qty * BYSKU[it.sku].price : comboQuote(it).total);
   const cartSubtotal = () => state.cart.reduce((s, it) => s + lineTotal(it), 0);
-  const hasSub = () => state.cart.some(it => it.type === 'box' && it.sub);
-  const cartCount = () => state.cart.reduce((s, it) => s + (it.type === 'bottle' ? it.qty : 1), 0);
+  const hasSub = () => state.cart.some(it => it.type === 'combo' && it.sub);
+  const cartCount = () => state.cart.reduce((s, it) => s + (it.type === 'can' ? it.qty : 1), 0);
   function deliveryFee(method, subtotal) {
     if (method === 'standard' && (subtotal >= SHOP.freeDeliveryFrom || hasSub())) return 0;
     return SHOP.delivery[method] || 0;
@@ -1129,8 +1165,7 @@ textarea.in{min-height:84px;resize:vertical}
     const subtotal = cartSubtotal(), fee = deliveryFee(state.delivery, subtotal);
     return { subtotal, fee, total: subtotal + fee };
   }
-  const looseQty = sku => { const it = state.cart.find(i => i.type === 'bottle' && i.sku === sku); return it ? it.qty : 0; };
-  const maxOff = () => Math.max.apply(null, SHOP.boxes.map(b => b.off));
+  const looseQty = sku => { const it = state.cart.find(i => i.type === 'can' && i.sku === sku); return it ? it.qty : 0; };
 
   /* ===== 6. Hiển thị ===== */
   function applyStatic() {
@@ -1147,24 +1182,21 @@ textarea.in{min-height:84px;resize:vertical}
     $('#f-phone').textContent = SHOP.phone;
     $('#f-email').textContent = SHOP.email;
     $('#f-hours').textContent = SHOP.hours;
+    $('#fact-ml').textContent = SHOP.canMl + ' ml';
+    $('#shop-lead').textContent = t('shop.lead', { ml: SHOP.canMl });
     $('#usp-free').textContent = t('usp.3.v', { amount: money(SHOP.freeDeliveryFrom) });
-    $('#usp-sub').textContent = t('usp.4.v', { pct: pct(SHOP.subscription.off) });
-    $('#cta-sub').textContent = t('cta.sub', { pct: pct(maxOff()) });
-    $('#pnudge-t').textContent = t('p.boxnudge', { pct: pct(maxOff()) });
+    $('#usp-sub').textContent = t('usp.4.v', { n: WEEK.cans });
+    $('#cta-sub').textContent = t('cta.sub', { amount: money(WEEK.cans * SHOP.canPrice - WEEK.price) });
+    const duo = SHOP.combos[0];
+    $('#pnudge-t').textContent = t('p.combonudge', { duoN: duo.cans, duo: money(duo.price), weekN: WEEK.cans, week: money(WEEK.price) });
     $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
   }
 
   /* -- cửa hàng -- */
-  function renderFilter() {
-    const counts = { all: PRODUCTS.length, black: 0, creamy: 0, dairyfree: 0 };
-    PRODUCTS.forEach(p => p.tags.forEach(g => { counts[g]++; }));
-    $('#filter').replaceChildren(...['all', 'black', 'creamy', 'dairyfree'].map(k =>
-      pill('filter', k, t('filter.' + k) + ' (' + counts[k] + ')', state.filter === k, 'filter-' + k)));
-  }
   function card(p) {
     const name = p.name.join(' '), k = f => t('p.' + p.sku + '.' + f);
     return h('article', { class: 'pcard', 'data-sku': p.sku },
-      h('div', { class: 'pmedia' }, h('span', { class: 'ptag' }, t('tag.' + p.label)), bottleSVG(p)),
+      h('div', { class: 'pmedia' }, h('span', { class: 'ptag' }, t('tag.' + p.tag)), canSVG(p)),
       h('div', { class: 'pbody' },
         h('div', { class: 'prow' }, h('h3', null, name), h('p', { class: 'pprice' }, money(p.price))),
         h('p', { class: 'ptype' }, k('type')),
@@ -1183,15 +1215,7 @@ textarea.in{min-height:84px;resize:vertical}
   }
   function renderShop() {
     $('#products').replaceChildren(...PRODUCTS.map(card));
-    applyFilter();
     updateShop();
-  }
-  function applyFilter() {
-    $$('.pcard').forEach(c => {
-      const p = BYSKU[c.dataset.sku];
-      c.hidden = !(state.filter === 'all' || p.tags.includes(state.filter));
-    });
-    fitLabels();
   }
   function updateShop() {
     PRODUCTS.forEach(p => {
@@ -1207,9 +1231,9 @@ textarea.in{min-height:84px;resize:vertical}
   function setLoose(sku, qty, focusSel) {
     const before = cartCount();
     qty = clamp(qty, 0, SHOP.maxPerLine);
-    const i = state.cart.findIndex(it => it.type === 'bottle' && it.sku === sku);
+    const i = state.cart.findIndex(it => it.type === 'can' && it.sku === sku);
     if (i >= 0) { if (qty === 0) state.cart.splice(i, 1); else state.cart[i].qty = qty; }
-    else if (qty > 0) state.cart.push({ id: ++state.seq, type: 'bottle', sku, qty });
+    else if (qty > 0) state.cart.push({ id: ++state.seq, type: 'can', sku, qty });
     cartChanged(cartCount() > before, focusSel);
     const name = BYSKU[sku].name.join(' ');
     announce(t(cartCount() >= before ? 'sr.added' : 'sr.removed', { name, n: cartCount() }));
@@ -1228,15 +1252,16 @@ textarea.in{min-height:84px;resize:vertical}
     if (bump && n) { b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
   }
 
-  /* -- tự tạo hộp -- */
+  /* -- tự tạo combo -- */
   function renderBuilder() {
-    const b = state.box, sub = SHOP.subscription;
-    $('#bx-size').replaceChildren(...SHOP.boxes.map(x =>
-      chip('bsize', String(x.size), t('bx.size', { n: x.size }), t('bx.size.s', { pct: pct(x.off) }), b.size === x.size, 'bsize-' + x.size)));
+    const c = state.combo;
+    $('#bx-pack').replaceChildren(...SHOP.combos.map(d =>
+      chip('bpack', d.id, t('combo.' + d.id + '.name', { n: d.cans }),
+        t('bx.pack.s', { price: money(d.price), amount: money(d.cans * SHOP.canPrice - d.price) }), c.pack === d.id, 'bpack-' + d.id)));
     $('#bx-rows').replaceChildren(...PRODUCTS.map(p => {
       const name = p.name.join(' ');
       return h('li', { class: 'bx-row', 'data-sku': p.sku },
-        h('span', { class: 'thumb t-' + p.sku }, bottleSVG(p)),
+        h('span', { class: 'thumb t-' + p.sku }, canSVG(p)),
         h('span', { class: 'meta' }, h('b', null, name), h('span', null, money(p.price))),
         h('div', { class: 'stepper sm' },
           h('button', { type: 'button', class: 'st-btn', id: 'bdec-' + p.sku, 'data-bact': 'dec', 'data-sku': p.sku, 'aria-label': t('bx.dec', { name }) }, icon('minus')),
@@ -1244,72 +1269,77 @@ textarea.in{min-height:84px;resize:vertical}
           h('button', { type: 'button', class: 'st-btn', id: 'binc-' + p.sku, 'data-bact': 'inc', 'data-sku': p.sku, 'aria-label': t('bx.inc', { name }) }, icon('plus'))));
     }));
     $('#bx-mode').replaceChildren(
-      chip('bmode', 'once', t('bx.once'), t('bx.once.s'), !b.sub, 'bmode-once'),
-      chip('bmode', 'sub', t('bx.sub'), t('bx.sub.s', { pct: pct(sub.off) }), b.sub, 'bmode-sub'));
-    $('#bx-freq').replaceChildren(...sub.freqs.map(f => chip('bfreq', f, t('bx.f.' + f), '', b.freq === f, 'bfreq-' + f)));
+      chip('bmode', 'once', t('bx.once'), t('bx.once.s'), !c.sub, 'bmode-once'),
+      chip('bmode', 'sub', t('bx.sub'), t('bx.sub.s', { n: WEEK.cans }), c.sub, 'bmode-sub'));
     updateBuilder();
   }
   function updateBuilder() {
-    const b = state.box, q = boxQuote(b), full = q.n === b.size, left = b.size - q.n;
+    const c = state.combo, def = COMBO[c.pack], q = comboQuote(c), full = q.n === def.cans, left = def.cans - q.n;
+    $('#bpack-' + c.pack).checked = true;
+    $('#bmode-once').checked = !c.sub;
+    $('#bmode-sub').checked = c.sub;
     PRODUCTS.forEach(p => {
-      const n = b.picks[p.sku] || 0;
+      const n = c.picks[p.sku] || 0;
       $('[data-bn="' + p.sku + '"]').textContent = n;
       $('#bdec-' + p.sku).disabled = n === 0;
       $('#binc-' + p.sku).disabled = full;
     });
-    const countText = t('bx.count', { n: q.n, max: b.size });
+    const countText = t('bx.count', { n: q.n, max: def.cans });
     $('#bx-count').textContent = countText;
     $$('.js-bx-count').forEach(el => { el.textContent = countText; });
-    $('#bx-prog').style.width = (q.n / b.size * 100) + '%';
+    $('#bx-prog').style.width = (q.n / def.cans * 100) + '%';
     $('#bx-fill').disabled = full;
     $('#bx-clear').disabled = q.n === 0;
-    $('#bx-freq-wrap').hidden = !b.sub;
-    const lines = PRODUCTS.filter(p => (b.picks[p.sku] || 0) > 0).map(p => row((b.picks[p.sku]) + ' × ' + p.name.join(' '), money(b.picks[p.sku] * p.price)));
+    $('#bx-step3').hidden = !def.subscribable;
+    $('#bx-sub-note').hidden = !(def.subscribable && c.sub);
+    $('#bx-sub-note').textContent = t('bx.subnote', { n: def.cans });
+    const lines = PRODUCTS.filter(p => (c.picks[p.sku] || 0) > 0).map(p => h('li', { class: 'row' }, h('span', { class: 'lbl' }, c.picks[p.sku] + ' × ' + p.name.join(' '))));
     if (!lines.length) lines.push(h('li', { class: 'row mute' }, t('bx.empty')));
-    if (q.boxOff) lines.push(row(t('bx.sum.box', { pct: pct(q.bRate) }), money(-q.boxOff), 'neg'));
-    if (q.subOff) lines.push(row(t('bx.sum.sub', { pct: pct(q.sRate) }), money(-q.subOff), 'neg'));
+    lines.push(row(t('bx.sum.list', { n: def.cans, price: money(SHOP.canPrice) }), money(q.list)));
+    lines.push(row(t('bx.sum.saveline'), money(-q.save), 'neg'));
+    if (def.subscribable && c.sub) lines.push(h('li', { class: 'row mute' }, t('bx.sum.subline')));
     $('#bx-lines').replaceChildren(...lines);
-    $('#bx-save').textContent = q.save > 0 ? t('bx.sum.save', { amount: money(q.save) }) : '';
+    $('#bx-save').textContent = t('bx.sum.save', { amount: money(q.save) });
     $$('.js-bx-total').forEach(el => { el.textContent = money(q.total); });
     $$('.js-bx-add').forEach(btn => {
       btn.disabled = !full;
-      btn.textContent = full ? t('bx.add') : t('bx.add.need', { n: fmtNum(left), unit: t('u.bottle.' + (left === 1 ? '1' : 'n')) });
+      btn.textContent = full ? t(def.subscribable && c.sub ? 'bx.add.sub' : 'bx.add') : t('bx.add.need', { n: fmtNum(left), unit: t('u.can.' + (left === 1 ? '1' : 'n')) });
     });
   }
-  function trimPicks(b) {
-    let over = pickCount(b.picks) - b.size;
+  function trimPicks(c) {
+    let over = pickCount(c.picks) - COMBO[c.pack].cans;
     for (let i = PRODUCTS.length - 1; i >= 0 && over > 0; i--) {
-      const sku = PRODUCTS[i].sku, take = Math.min(b.picks[sku] || 0, over);
-      b.picks[sku] = (b.picks[sku] || 0) - take;
+      const sku = PRODUCTS[i].sku, take = Math.min(c.picks[sku] || 0, over);
+      c.picks[sku] = (c.picks[sku] || 0) - take;
       over -= take;
     }
   }
-  function fillRest(b) {
-    let left = b.size - pickCount(b.picks);
+  function fillRest(c) {
+    let left = COMBO[c.pack].cans - pickCount(c.picks);
     while (left-- > 0) {
       let best = PRODUCTS[0].sku;
-      PRODUCTS.forEach(p => { if ((b.picks[p.sku] || 0) < (b.picks[best] || 0)) best = p.sku; });
-      b.picks[best] = (b.picks[best] || 0) + 1;
+      PRODUCTS.forEach(p => { if ((c.picks[p.sku] || 0) < (c.picks[best] || 0)) best = p.sku; });
+      c.picks[best] = (c.picks[best] || 0) + 1;
     }
   }
-  function addBox() {
-    const b = state.box;
-    if (pickCount(b.picks) !== b.size) return;
-    state.cart.push({ id: ++state.seq, type: 'box', size: b.size, picks: Object.assign({}, b.picks), sub: b.sub, freq: b.freq });
-    PRODUCTS.forEach(p => { b.picks[p.sku] = 0; });
+  function addCombo() {
+    const c = state.combo, def = COMBO[c.pack];
+    if (pickCount(c.picks) !== def.cans) return;
+    state.cart.push({ id: ++state.seq, type: 'combo', pack: c.pack, picks: Object.assign({}, c.picks), sub: !!(def.subscribable && c.sub) });
+    PRODUCTS.forEach(p => { c.picks[p.sku] = 0; });
     updateBuilder();
     cartChanged(true);
-    showToast(t('toast.box'), t('toast.view'), () => openCart('cart'));
+    showToast(t('toast.combo'), t('toast.view'), () => openCart('cart'));
   }
 
   /* -- ngăn kéo giỏ hàng -- */
   const dlg = $('#cart');
   function jobLine(it) {
-    if (it.type === 'bottle') {
+    if (it.type === 'can') {
       const p = BYSKU[it.sku], name = p.name.join(' ');
       return h('li', { class: 'cline' },
-        h('span', { class: 'thumb t-' + p.sku }, bottleSVG(p)),
-        h('div', { class: 'cmain' }, h('b', null, name), h('span', { class: 'csub' }, money(p.price) + ' · 250 ml')),
+        h('span', { class: 'thumb t-' + p.sku }, canSVG(p)),
+        h('div', { class: 'cmain' }, h('b', null, name), h('span', { class: 'csub' }, money(p.price) + ' · ' + SHOP.canMl + ' ml')),
         h('p', { class: 'cprice' }, money(lineTotal(it))),
         h('div', { class: 'cctrl' },
           h('div', { class: 'stepper sm' },
@@ -1318,13 +1348,13 @@ textarea.in{min-height:84px;resize:vertical}
             h('button', { type: 'button', class: 'st-btn', 'data-cact': 'inc', 'data-id': it.id, 'aria-label': t('cart.qty.inc', { name }), disabled: it.qty >= SHOP.maxPerLine }, icon('plus'))),
           h('button', { type: 'button', class: 'link sm', 'data-cact': 'rm', 'data-id': it.id, 'aria-label': t('cart.remove.l', { name }) }, t('cart.remove'))));
     }
-    const q = boxQuote(it), name = t('cart.box', { n: it.size });
+    const def = COMBO[it.pack], q = comboQuote(it), name = t('combo.' + it.pack + '.name', { n: def.cans });
     const picks = PRODUCTS.filter(p => it.picks[p.sku]).map(p => it.picks[p.sku] + ' × ' + p.name.join(' ')).join(', ');
     return h('li', { class: 'cline' },
       h('span', { class: 'thumb t-box' }, icon('box')),
       h('div', { class: 'cmain' },
         h('b', null, name),
-        h('span', { class: 'csub' }, it.sub ? t('cart.subf', { freq: t('bx.f.' + it.freq).toLowerCase() }) : t('cart.once')),
+        h('span', { class: 'csub' }, it.sub ? t('cart.sub', { n: def.cans }) : t('cart.once')),
         h('span', { class: 'csub' }, picks),
         q.save > 0 ? h('span', { class: 'csave' }, t('bx.sum.save', { amount: money(q.save) })) : null),
       h('p', { class: 'cprice' }, money(q.total)),
@@ -1380,7 +1410,7 @@ textarea.in{min-height:84px;resize:vertical}
     $('#dr-sum').replaceChildren(...rows);
   }
   function renderErrors() {
-    ['name', 'phone', 'address'].forEach(k => {
+    ['name', 'phone', 'address', 'ref'].forEach(k => {
       const msg = $('#e-' + k), input = $('#c-' + k), key = state.errs[k];
       msg.hidden = !key;
       msg.textContent = key ? t(key) : '';
@@ -1396,8 +1426,9 @@ textarea.in{min-height:84px;resize:vertical}
       h('dl', { class: 'facts2' },
         h('div', null, h('dt', null, t('ok.code')), h('dd', null, p.code)),
         h('div', null, h('dt', null, t('ok.total')), h('dd', null, money(p.total))),
-        h('div', null, h('dt', null, t('ok.eta')), h('dd', null, t('ok.eta.' + p.delivery)))),
-      ...p.subs.map(f => h('p', null, t('ok.sub', { freq: t('bx.f.' + f).toLowerCase() }))),
+        h('div', null, h('dt', null, t('ok.eta')), h('dd', null, t('ok.eta.' + p.delivery))),
+        p.ref ? h('div', null, h('dt', null, t('ok.ref')), h('dd', null, p.ref)) : null),
+      ...p.subs.map(n => h('p', null, t('ok.sub', { n }))),
       h('p', { class: 'note' }, t('ok.note')),
       h('button', { type: 'button', class: 'btn', id: 'done-btn' }, t('ok.done')));
   }
@@ -1444,10 +1475,11 @@ textarea.in{min-height:84px;resize:vertical}
     $('#dr-body').scrollTop = 0;
   }
   function validate() {
-    const errs = {};
+    const errs = {}, ref = $('#c-ref').value.trim();
     if ($('#c-name').value.trim().length < 2) errs.name = 'err.name';
     if (!/^\+?\d{9,12}$/.test($('#c-phone').value.replace(/[\s.\-()]/g, ''))) errs.phone = 'err.phone';
     if (state.delivery !== 'pickup' && $('#c-address').value.trim().length < 6) errs.address = 'err.address';
+    if (ref && !/^[A-Za-z0-9-]{3,20}$/.test(ref)) errs.ref = 'err.ref';
     state.errs = errs;
     renderErrors();
     const first = Object.keys(errs)[0];
@@ -1459,9 +1491,10 @@ textarea.in{min-height:84px;resize:vertical}
     state.placed = {
       code: '#' + (1000 + Math.floor(Math.random() * 9000)),
       name: $('#c-name').value.trim(),
+      ref: $('#c-ref').value.trim().toUpperCase(),
       delivery: state.delivery,
       total: totals().total,
-      subs: state.cart.filter(it => it.type === 'box' && it.sub).map(it => it.freq)
+      subs: state.cart.filter(it => it.type === 'combo' && it.sub).map(it => COMBO[it.pack].cans)
     };
     renderDrawer();
     $('#dr-title').focus();
@@ -1498,7 +1531,6 @@ textarea.in{min-height:84px;resize:vertical}
   }
   function renderAll() {
     applyStatic();
-    renderFilter();
     renderShop();
     renderBuilder();
     renderBadge();
@@ -1524,7 +1556,6 @@ textarea.in{min-height:84px;resize:vertical}
     });
 
     // cửa hàng
-    $('#filter').addEventListener('change', e => { state.filter = e.target.value; applyFilter(); });
     $('#products').addEventListener('click', e => {
       const add = e.target.closest('.add'), st = e.target.closest('[data-act]');
       if (add) setLoose(add.dataset.sku, looseQty(add.dataset.sku) + 1, '#inc-' + add.dataset.sku);
@@ -1534,25 +1565,28 @@ textarea.in{min-height:84px;resize:vertical}
       }
     });
 
-    // tự tạo hộp
-    $('#box').addEventListener('change', e => {
-      const el = e.target, b = state.box;
-      if (el.name === 'bsize') { b.size = Number(el.value); trimPicks(b); updateBuilder(); }
-      else if (el.name === 'bmode') { b.sub = el.value === 'sub'; updateBuilder(); }
-      else if (el.name === 'bfreq') { b.freq = el.value; updateBuilder(); }
+    // tự tạo combo
+    $('#combo').addEventListener('change', e => {
+      const el = e.target, c = state.combo;
+      if (el.name === 'bpack') {
+        c.pack = el.value;
+        if (!COMBO[c.pack].subscribable) c.sub = false;
+        trimPicks(c);
+        updateBuilder();
+      } else if (el.name === 'bmode') { c.sub = el.value === 'sub'; updateBuilder(); }
     });
-    $('#box').addEventListener('click', e => {
-      const b = state.box, st = e.target.closest('[data-bact]');
+    $('#combo').addEventListener('click', e => {
+      const c = state.combo, st = e.target.closest('[data-bact]');
       if (st) {
-        const sku = st.dataset.sku, cur = b.picks[sku] || 0;
-        if (st.dataset.bact === 'inc' && pickCount(b.picks) < b.size) b.picks[sku] = cur + 1;
-        if (st.dataset.bact === 'dec' && cur > 0) b.picks[sku] = cur - 1;
+        const sku = st.dataset.sku, cur = c.picks[sku] || 0;
+        if (st.dataset.bact === 'inc' && pickCount(c.picks) < COMBO[c.pack].cans) c.picks[sku] = cur + 1;
+        if (st.dataset.bact === 'dec' && cur > 0) c.picks[sku] = cur - 1;
         updateBuilder();
         const again = $('#b' + st.dataset.bact + '-' + sku);
         if (again && again.disabled) { const other = $('#b' + (st.dataset.bact === 'inc' ? 'dec' : 'inc') + '-' + sku); if (other && !other.disabled) other.focus(); }
-      } else if (e.target.closest('#bx-fill')) { fillRest(b); updateBuilder(); }
-      else if (e.target.closest('#bx-clear')) { PRODUCTS.forEach(p => { b.picks[p.sku] = 0; }); updateBuilder(); }
-      else if (e.target.closest('.js-bx-add')) addBox();
+      } else if (e.target.closest('#bx-fill')) { fillRest(c); updateBuilder(); }
+      else if (e.target.closest('#bx-clear')) { PRODUCTS.forEach(p => { c.picks[p.sku] = 0; }); updateBuilder(); }
+      else if (e.target.closest('.js-bx-add')) addCombo();
     });
 
     // giỏ hàng
@@ -1601,7 +1635,7 @@ textarea.in{min-height:84px;resize:vertical}
   }
 
   // Cho kiểm thử trên trình duyệt.
-  window.__shop = { SHOP, PRODUCTS, S, state, boxQuote, deliveryFee, totals, setLang, fitLabels };
+  window.__shop = { SHOP, PRODUCTS, COMBO, S, state, comboQuote, deliveryFee, totals, setLang, fitLabels };
 })();
 </script>
 </body>
